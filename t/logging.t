@@ -11,16 +11,16 @@ use Log::Any qw($log);
 use_ok('WWW::Hetzner::Cloud');
 
 subtest 'uses Log::Any' => sub {
-    # Verify the module imports Log::Any
-    my $cloud_log = Log::Any->get_logger(category => 'WWW::Hetzner::Cloud');
-    ok($cloud_log, 'WWW::Hetzner::Cloud has a Log::Any logger');
+    # Verify the Role imports Log::Any
+    my $http_log = Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP');
+    ok($http_log, 'WWW::Hetzner::Role::HTTP has a Log::Any logger');
 };
 
 subtest 'logging with mocked UA' => sub {
     my $cloud = WWW::Hetzner::Cloud->new(token => 'test-token');
 
     # Clear any previous log messages
-    Log::Any->get_logger(category => 'WWW::Hetzner::Cloud')->clear;
+    Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP')->clear;
 
     # Mock the UA to return a valid response
     no warnings 'redefine';
@@ -35,7 +35,7 @@ subtest 'logging with mocked UA' => sub {
     eval { $cloud->servers->list };
 
     # Check logs
-    my $msgs = Log::Any->get_logger(category => 'WWW::Hetzner::Cloud')->msgs;
+    my $msgs = Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP')->msgs;
 
     my @debug = grep { $_->{level} eq 'debug' } @$msgs;
     ok(@debug >= 1, 'has debug messages');
@@ -49,7 +49,7 @@ subtest 'logging with mocked UA' => sub {
 subtest 'debug logs request body for POST' => sub {
     my $cloud = WWW::Hetzner::Cloud->new(token => 'test-token');
 
-    Log::Any->get_logger(category => 'WWW::Hetzner::Cloud')->clear;
+    Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP')->clear;
 
     no warnings 'redefine';
     local *LWP::UserAgent::request = sub {
@@ -67,7 +67,7 @@ subtest 'debug logs request body for POST' => sub {
         );
     };
 
-    my $msgs = Log::Any->get_logger(category => 'WWW::Hetzner::Cloud')->msgs;
+    my $msgs = Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP')->msgs;
     my @debug = grep { $_->{level} eq 'debug' } @$msgs;
 
     ok(@debug >= 2, 'has multiple debug messages');
@@ -80,7 +80,7 @@ subtest 'debug logs request body for POST' => sub {
 subtest 'error logging on API error' => sub {
     my $cloud = WWW::Hetzner::Cloud->new(token => 'test-token');
 
-    Log::Any->get_logger(category => 'WWW::Hetzner::Cloud')->clear;
+    Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP')->clear;
 
     no warnings 'redefine';
     local *LWP::UserAgent::request = sub {
@@ -92,7 +92,7 @@ subtest 'error logging on API error' => sub {
 
     eval { $cloud->servers->list };
 
-    my $msgs = Log::Any->get_logger(category => 'WWW::Hetzner::Cloud')->msgs;
+    my $msgs = Log::Any->get_logger(category => 'WWW::Hetzner::Role::HTTP')->msgs;
     my @errors = grep { $_->{level} eq 'error' } @$msgs;
 
     ok(@errors >= 1, 'has error messages');

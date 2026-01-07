@@ -76,6 +76,8 @@ DNS is now part of the Cloud API.
 
 =item * L<WWW::Hetzner::Cloud> - Main client class
 
+=item * L<WWW::Hetzner::Role::HTTP> - HTTP client role (shared by all API clients)
+
 =back
 
 =head2 API Classes (Controllers)

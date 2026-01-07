@@ -3,11 +3,6 @@ package WWW::Hetzner::Cloud;
 # ABSTRACT: Perl client for Hetzner Cloud API
 
 use Moo;
-use LWP::UserAgent;
-use JSON::MaybeXS qw(decode_json encode_json);
-use Carp qw(croak);
-use Log::Any qw($log);
-
 use WWW::Hetzner::Cloud::API::Servers;
 use WWW::Hetzner::Cloud::API::ServerTypes;
 use WWW::Hetzner::Cloud::API::Images;
@@ -15,7 +10,6 @@ use WWW::Hetzner::Cloud::API::SSHKeys;
 use WWW::Hetzner::Cloud::API::Locations;
 use WWW::Hetzner::Cloud::API::Datacenters;
 use WWW::Hetzner::Cloud::API::Zones;
-
 use namespace::clean;
 
 our $VERSION = '0.001';
@@ -30,16 +24,7 @@ has base_url => (
     default => 'https://api.hetzner.cloud/v1',
 );
 
-has ua => (
-    is      => 'lazy',
-    builder => sub {
-        my $self = shift;
-        LWP::UserAgent->new(
-            agent   => 'WWW-Hetzner/' . $VERSION,
-            timeout => 30,
-        );
-    },
-);
+with 'WWW::Hetzner::Role::HTTP';
 
 # Resource accessors
 has servers => (
@@ -76,77 +61,6 @@ has zones => (
     is      => 'lazy',
     builder => sub { WWW::Hetzner::Cloud::API::Zones->new(client => shift) },
 );
-
-# HTTP methods
-
-sub get {
-    my ($self, $path, %params) = @_;
-    return $self->_request('GET', $path, %params);
-}
-
-sub post {
-    my ($self, $path, $data) = @_;
-    return $self->_request('POST', $path, body => $data);
-}
-
-sub put {
-    my ($self, $path, $data) = @_;
-    return $self->_request('PUT', $path, body => $data);
-}
-
-sub delete {
-    my ($self, $path) = @_;
-    return $self->_request('DELETE', $path);
-}
-
-sub _request {
-    my ($self, $method, $path, %opts) = @_;
-
-    croak "No API token configured" unless $self->token;
-
-    my $url = $self->base_url . $path;
-
-    # Add query params for GET
-    if ($method eq 'GET' && $opts{params}) {
-        my @pairs;
-        for my $k (keys %{$opts{params}}) {
-            my $v = $opts{params}{$k};
-            next unless defined $v;
-            push @pairs, "$k=$v";
-        }
-        $url .= '?' . join('&', @pairs) if @pairs;
-    }
-
-    $log->debug("$method $url");
-
-    my $request = HTTP::Request->new($method => $url);
-    $request->header('Authorization' => 'Bearer ' . $self->token);
-    $request->header('Content-Type' => 'application/json');
-
-    if ($opts{body}) {
-        my $json = encode_json($opts{body});
-        $request->content($json);
-        $log->debugf("Body: %s", $json);
-    }
-
-    my $response = $self->ua->request($request);
-
-    $log->debugf("Response: %s", $response->status_line);
-
-    my $data;
-    if ($response->content && $response->content =~ /^\s*[\{\[]/) {
-        $data = decode_json($response->content);
-    }
-
-    unless ($response->is_success) {
-        my $error = $data->{error}{message} // $response->status_line;
-        $log->errorf("API error: %s", $error);
-        croak "Hetzner API error: $error";
-    }
-
-    $log->infof("%s %s -> %s", $method, $path, $response->status_line);
-    return $data;
-}
 
 1;
 
@@ -215,8 +129,8 @@ WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
 
 =head1 LOGGING
 
-WWW::Hetzner::Cloud uses L<Log::Any> for logging. This allows you to
-integrate with any logging framework of your choice.
+WWW::Hetzner::Cloud uses L<Log::Any> for logging via L<WWW::Hetzner::Role::HTTP>.
+This allows you to integrate with any logging framework of your choice.
 
 =head2 Log Levels Used
 
@@ -254,5 +168,9 @@ By default, logs are discarded. To see them, configure a Log::Any adapter:
     use Log::Any::Adapter ('Dispatch', dispatcher => $dispatcher);
 
 See L<Log::Any::Adapter> for all available adapters.
+
+=head1 SEE ALSO
+
+L<WWW::Hetzner>, L<WWW::Hetzner::Role::HTTP>
 
 =cut
