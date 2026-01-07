@@ -1,0 +1,14 @@
+Revision history for WWW-Hetzner
+
+{{$NEXT}}
+    - Initial release
+    - WWW::Hetzner::Cloud API client:
+      - Servers (list, get, create, delete, power_on, shutdown, reboot, rebuild)
+      - SSH Keys (list, get, create, update, delete)
+      - Server Types, Images, Locations, Datacenters (read-only)
+      - DNS Zones (list, get, create, update, delete, export)
+      - DNS RRSets with convenience methods (add_a, add_aaaa, add_cname, add_mx, add_txt)
+    - Entity classes with real attributes and methods (update, delete, etc.)
+    - Log::Any integration for flexible logging
+    - CLI tool: bin/hcloud.pl
+    - Note: Uses Cloud API for DNS (old dns.hetzner.com API no longer exists)
