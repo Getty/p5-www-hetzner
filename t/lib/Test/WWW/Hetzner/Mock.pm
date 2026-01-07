@@ -6,6 +6,7 @@ use Test::More;
 use JSON::MaybeXS qw(decode_json);
 use Path::Tiny qw(path);
 use HTTP::Response;
+use WWW::Hetzner::Cloud;
 
 my $FIXTURES_DIR;
 
@@ -31,8 +32,6 @@ sub load_fixture {
 
 sub mock_cloud {
     my (%routes) = @_;
-
-    require WWW::Hetzner::Cloud;
 
     my $cloud = WWW::Hetzner::Cloud->new(token => 'test-token');
 

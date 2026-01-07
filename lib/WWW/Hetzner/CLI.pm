@@ -5,6 +5,7 @@ package WWW::Hetzner::CLI;
 use Moo;
 use MooX::Cmd;
 use MooX::Options;
+use WWW::Hetzner::Cloud;
 
 our $VERSION = '0.001';
 
@@ -28,7 +29,6 @@ has cloud => (
     is      => 'lazy',
     builder => sub {
         my ($self) = @_;
-        require WWW::Hetzner::Cloud;
         WWW::Hetzner::Cloud->new(token => $self->token);
     },
 );
@@ -66,7 +66,9 @@ WWW::Hetzner::CLI - Command-line interface for Hetzner Cloud
 Main CLI class for the Hetzner Cloud API client. Uses L<MooX::Cmd>
 for subcommand handling.
 
-This is a Perl implementation of the official hcloud CLI tool.
+This CLI is designed to be a B<1:1 replica> of the official C<hcloud> CLI
+from Hetzner (L<https://github.com/hetznercloud/cli>). Command structure,
+options, and output should match the original tool as closely as possible.
 
 =head1 ATTRIBUTES
 
