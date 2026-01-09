@@ -44,6 +44,11 @@ sub delete {
     return $self->_request('DELETE', $path);
 }
 
+sub _set_auth {
+    my ($self, $request) = @_;
+    $request->header('Authorization' => 'Bearer ' . $self->token);
+}
+
 sub _request {
     my ($self, $method, $path, %opts) = @_;
 
@@ -65,7 +70,7 @@ sub _request {
     $log->debug("$method $url");
 
     my $request = HTTP::Request->new($method => $url);
-    $request->header('Authorization' => 'Bearer ' . $self->token);
+    $self->_set_auth($request);
     $request->header('Content-Type' => 'application/json');
 
     if ($opts{body}) {
@@ -129,6 +134,24 @@ Classes consuming this role must provide:
 =item * C<base_url> - Base URL for the API
 
 =back
+
+=head1 CUSTOMIZATION
+
+=head2 _set_auth
+
+Override this method to change authentication. Default is Bearer token:
+
+    sub _set_auth {
+        my ($self, $request) = @_;
+        $request->header('Authorization' => 'Bearer ' . $self->token);
+    }
+
+For Basic Auth (e.g. Robot API):
+
+    sub _set_auth {
+        my ($self, $request) = @_;
+        $request->authorization_basic($self->user, $self->password);
+    }
 
 =head1 PROVIDED METHODS
 
