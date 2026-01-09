@@ -37,8 +37,11 @@ sub execute {
     my ($self, $args, $chain) = @_;
 
     # No subcommand given, show help
-    print "Usage: hcloud <command> [options]\n\n";
-    print "Commands:\n";
+    print "Usage: hcloud.pl [options] <command> [command-options]\n\n";
+    print "Global options (must come BEFORE the command):\n";
+    print "  -t, --token    API token\n";
+    print "  -o, --output   Output format: table, json\n";
+    print "\nCommands:\n";
     print "  server      Manage servers\n";
     print "  sshkey      Manage SSH keys\n";
     print "  zone        Manage DNS zones\n";
@@ -47,7 +50,13 @@ sub execute {
     print "  servertype  List server types\n";
     print "  location    List locations\n";
     print "  datacenter  List datacenters\n";
-    print "\nRun 'hcloud <command> --help' for more information.\n";
+    print "\nExamples:\n";
+    print "  hcloud.pl server list\n";
+    print "  hcloud.pl -t mytoken server list\n";
+    print "  hcloud.pl --output json server describe 12345\n";
+    print "\nEnvironment variables:\n";
+    print "  HETZNER_API_TOKEN  Default for --token\n";
+    print "\nRun 'hcloud.pl <command> --help' for command-specific options.\n";
 }
 
 1;

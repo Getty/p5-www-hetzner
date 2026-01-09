@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Zone::Cmd::Create;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl zone create --name <domain> [--ttl <seconds>]';
 use JSON::MaybeXS qw(encode_json);
 
 option name => (

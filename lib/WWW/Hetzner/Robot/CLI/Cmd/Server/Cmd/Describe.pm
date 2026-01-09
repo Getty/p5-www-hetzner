@@ -4,13 +4,32 @@ package WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::Describe;
 
 use Moo;
 use MooX::Cmd;
+use MooX::Options protect_argv => 0, usage_string => 'USAGE: hrobot.pl server describe <server-number> [options]';
+
+=head1 NAME
+
+hrobot.pl server describe - Show details of a dedicated server
+
+=head1 SYNOPSIS
+
+    hrobot.pl server describe <server-number>
+    hrobot.pl server describe 123456
+    hrobot.pl server describe 123456 -o json
+
+=head1 DESCRIPTION
+
+Shows detailed information about a dedicated server including:
+server number, name, IP, product, datacenter, status, traffic,
+cancellation status, and paid-until date.
+
+=cut
 
 sub execute {
     my ($self, $args, $chain) = @_;
     my $root = $chain->[0];
     my $robot = $root->robot;
 
-    my $server_number = $args->[0] or die "Usage: hrobot server describe <server-number>\n";
+    my $server_number = $args->[0] or die "Usage: hrobot.pl server describe <server-number>\n";
 
     my $s = $robot->servers->get($server_number);
 

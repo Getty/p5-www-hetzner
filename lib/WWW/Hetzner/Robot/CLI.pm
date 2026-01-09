@@ -47,13 +47,25 @@ has robot => (
 sub execute {
     my ($self, $args, $chain) = @_;
 
-    print "Usage: hrobot <command> [options]\n\n";
-    print "Commands:\n";
+    print "Usage: hrobot.pl [options] <command> [command-options]\n\n";
+    print "Global options (must come BEFORE the command):\n";
+    print "  -u, --user       Robot webservice user\n";
+    print "  -p, --password   Robot webservice password\n";
+    print "  -o, --output     Output format: table, json\n";
+    print "\nCommands:\n";
     print "  server    Manage dedicated servers\n";
     print "  key       Manage SSH keys\n";
     print "  reset     Reset a server\n";
     print "  wol       Wake-on-LAN\n";
-    print "\nRun 'hrobot <command> --help' for more information.\n";
+    print "  traffic   Query traffic statistics\n";
+    print "\nExamples:\n";
+    print "  hrobot.pl server list\n";
+    print "  hrobot.pl -u user -p pass server list\n";
+    print "  hrobot.pl --output json server describe 123456\n";
+    print "\nEnvironment variables:\n";
+    print "  HETZNER_ROBOT_USER      Default for --user\n";
+    print "  HETZNER_ROBOT_PASSWORD  Default for --password\n";
+    print "\nRun 'hrobot.pl <command> --help' for command-specific options.\n";
 }
 
 1;

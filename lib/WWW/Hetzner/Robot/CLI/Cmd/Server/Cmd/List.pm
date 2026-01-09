@@ -4,6 +4,23 @@ package WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::List;
 
 use Moo;
 use MooX::Cmd;
+use MooX::Options usage_string => 'USAGE: hrobot.pl server list [options]';
+
+=head1 NAME
+
+hrobot.pl server list - List all dedicated servers
+
+=head1 SYNOPSIS
+
+    hrobot.pl server list
+    hrobot.pl server list -o json
+
+=head1 DESCRIPTION
+
+Lists all dedicated servers in your Hetzner Robot account.
+Shows server number, name, IP, product, and datacenter for each server.
+
+=cut
 
 sub execute {
     my ($self, $args, $chain) = @_;

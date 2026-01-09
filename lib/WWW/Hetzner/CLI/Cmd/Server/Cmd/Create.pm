@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Server::Cmd::Create;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl server create --name <name> --type <type> --image <image> [options]';
 use JSON::MaybeXS qw(encode_json);
 use Path::Tiny qw(path);
 

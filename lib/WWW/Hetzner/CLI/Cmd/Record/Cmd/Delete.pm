@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Record::Cmd::Delete;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl record delete --zone <zone-id> --name <name> --type <type>';
 
 option zone => (
     is       => 'ro',

@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Server::Cmd::List;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl server list [options]';
 use JSON::MaybeXS qw(encode_json);
 
 option selector => (

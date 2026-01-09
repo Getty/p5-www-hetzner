@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Location;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl location [options]';
 use JSON::MaybeXS qw(encode_json);
 
 sub execute {

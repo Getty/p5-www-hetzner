@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Zone::Cmd::List;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl zone list [options]';
 use JSON::MaybeXS qw(encode_json);
 
 option selector => (

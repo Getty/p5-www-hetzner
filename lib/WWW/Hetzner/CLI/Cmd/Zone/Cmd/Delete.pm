@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Zone::Cmd::Delete;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl zone delete <zone-id>';
 
 sub execute {
     my ($self, $args, $chain) = @_;

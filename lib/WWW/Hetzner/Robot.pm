@@ -7,6 +7,7 @@ use WWW::Hetzner::Robot::API::Servers;
 use WWW::Hetzner::Robot::API::Keys;
 use WWW::Hetzner::Robot::API::IPs;
 use WWW::Hetzner::Robot::API::Reset;
+use WWW::Hetzner::Robot::API::Traffic;
 use namespace::clean;
 
 our $VERSION = '0.001';
@@ -78,6 +79,11 @@ has reset => (
     builder => sub { WWW::Hetzner::Robot::API::Reset->new(client => shift) },
 );
 
+has traffic => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Traffic->new(client => shift) },
+);
+
 1;
 
 __END__
@@ -132,6 +138,8 @@ Uses HTTP Basic Auth (user/password) instead of Bearer tokens.
 =item * ips - IP address management
 
 =item * reset - Server reset (software/hardware)
+
+=item * traffic - Traffic statistics
 
 =back
 

@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Image;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl image [--type system|snapshot|backup] [options]';
 use JSON::MaybeXS qw(encode_json);
 
 option type => (

@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Record::Cmd::Describe;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options usage_string => 'USAGE: hcloud.pl record describe --zone <zone-id> --name <name> --type <type>';
 use JSON::MaybeXS qw(encode_json);
 
 option zone => (

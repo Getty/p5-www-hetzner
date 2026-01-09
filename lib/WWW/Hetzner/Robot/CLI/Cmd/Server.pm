@@ -4,6 +4,38 @@ package WWW::Hetzner::Robot::CLI::Cmd::Server;
 
 use Moo;
 use MooX::Cmd;
+use MooX::Options usage_string => 'USAGE: hrobot.pl server [list|describe] [options]';
+
+=head1 NAME
+
+hrobot.pl server - Manage dedicated servers
+
+=head1 SYNOPSIS
+
+    hrobot.pl server                    # List all servers (default)
+    hrobot.pl server list               # List all servers
+    hrobot.pl server describe <number>  # Show server details
+
+=head1 DESCRIPTION
+
+Commands for managing Hetzner dedicated servers.
+Without a subcommand, lists all servers.
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item B<list>
+
+List all dedicated servers.
+
+=item B<describe> <server-number>
+
+Show detailed information about a specific server.
+
+=back
+
+=cut
 
 sub execute {
     my ($self, $args, $chain) = @_;

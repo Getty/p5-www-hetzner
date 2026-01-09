@@ -37,6 +37,7 @@ use_ok('WWW::Hetzner::Robot::API::Servers');
 use_ok('WWW::Hetzner::Robot::API::Keys');
 use_ok('WWW::Hetzner::Robot::API::IPs');
 use_ok('WWW::Hetzner::Robot::API::Reset');
+use_ok('WWW::Hetzner::Robot::API::Traffic');
 
 # Robot entities
 use_ok('WWW::Hetzner::Robot::Server');

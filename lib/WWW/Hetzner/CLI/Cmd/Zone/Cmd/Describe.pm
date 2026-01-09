@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Zone::Cmd::Describe;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options;
+use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl zone describe <zone-id> [options]';
 use JSON::MaybeXS qw(encode_json);
 
 sub execute {
