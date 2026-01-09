@@ -41,7 +41,9 @@ sub execute {
     print "Commands:\n";
     print "  server      Manage servers\n";
     print "  sshkey      Manage SSH keys\n";
-    print "  image       Manage images\n";
+    print "  zone        Manage DNS zones\n";
+    print "  record      Manage DNS records\n";
+    print "  image       List images\n";
     print "  servertype  List server types\n";
     print "  location    List locations\n";
     print "  datacenter  List datacenters\n";
@@ -92,6 +94,10 @@ L<WWW::Hetzner::Cloud> instance.
 =item * server - Manage servers (list, create, delete, describe)
 
 =item * sshkey - Manage SSH keys
+
+=item * zone - Manage DNS zones (list, create, delete, describe)
+
+=item * record - Manage DNS records (list, create, delete, describe)
 
 =item * image - List images
 

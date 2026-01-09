@@ -4,6 +4,7 @@ package WWW::Hetzner;
 
 use Moo;
 use WWW::Hetzner::Cloud;
+use WWW::Hetzner::Robot;
 use namespace::clean;
 
 our $VERSION = '0.001';
@@ -13,15 +14,15 @@ has cloud => (
     builder => sub { WWW::Hetzner::Cloud->new },
 );
 
-# TODO: Storage and Robot APIs not yet implemented
+has robot => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot->new },
+);
+
+# TODO: Storage API not yet implemented
 # has storage => (
 #     is      => 'lazy',
 #     builder => sub { WWW::Hetzner::Storage->new },
-# );
-#
-# has robot => (
-#     is      => 'lazy',
-#     builder => sub { WWW::Hetzner::Robot->new },
 # );
 
 1;
@@ -34,13 +35,13 @@ WWW::Hetzner - Perl client for Hetzner APIs (Cloud, Storage, Robot)
 
 =head1 SYNOPSIS
 
+    # Cloud API (Cloud Servers, DNS)
     use WWW::Hetzner::Cloud;
 
     my $cloud = WWW::Hetzner::Cloud->new(
         token => $ENV{HETZNER_API_TOKEN},
     );
 
-    # Servers
     my $servers = $cloud->servers->list;
     my $server = $cloud->servers->create(
         name        => 'my-server',
@@ -48,10 +49,20 @@ WWW::Hetzner - Perl client for Hetzner APIs (Cloud, Storage, Robot)
         image       => 'debian-12',
     );
 
-    # DNS
     my $zones = $cloud->zones->list;
     my $zone = $cloud->zones->create(name => 'example.com');
     $zone->rrsets->add_a('www', '1.2.3.4');
+
+    # Robot API (Dedicated Servers)
+    use WWW::Hetzner::Robot;
+
+    my $robot = WWW::Hetzner::Robot->new(
+        user     => $ENV{HETZNER_ROBOT_USER},
+        password => $ENV{HETZNER_ROBOT_PASSWORD},
+    );
+
+    my $dedicated = $robot->servers->list;
+    $robot->reset->software(123456);  # Reset server
 
 =head1 HETZNER APIs
 
@@ -59,9 +70,9 @@ WWW::Hetzner - Perl client for Hetzner APIs (Cloud, Storage, Robot)
 
 =item * B<Cloud API> (L<WWW::Hetzner::Cloud>) - api.hetzner.cloud
 
-=item * B<Hetzner API> - api.hetzner.com (Storage Boxes, not yet implemented)
+=item * B<Robot API> (L<WWW::Hetzner::Robot>) - robot-ws.your-server.de (Dedicated servers)
 
-=item * B<Robot API> - robot-ws.your-server.de (Dedicated servers, not yet implemented)
+=item * B<Hetzner API> - api.hetzner.com (Storage Boxes, not yet implemented)
 
 =back
 
@@ -149,12 +160,15 @@ Server objects:
     $server->ipv6
     $server->server_type
     $server->datacenter
+    $server->location
     $server->image
     $server->labels
     $server->is_running
+    $server->is_off
     $server->update
     $server->delete
     $server->power_on
+    $server->power_off
     $server->shutdown
     $server->reboot
     $server->rebuild($image)
@@ -164,9 +178,11 @@ Server objects:
 
     $cloud->ssh_keys->list
     $cloud->ssh_keys->get($id)
+    $cloud->ssh_keys->get_by_name($name)
     $cloud->ssh_keys->create(%params)
     $cloud->ssh_keys->update($id, %params)
     $cloud->ssh_keys->delete($id)
+    $cloud->ssh_keys->ensure($name, $public_key)
 
 SSH key objects:
 
@@ -241,6 +257,96 @@ RRSet objects:
     $cloud->datacenters->list
     $cloud->datacenters->get($id)
 
+=head1 ROBOT API (Dedicated Servers)
+
+    use WWW::Hetzner::Robot;
+
+    my $robot = WWW::Hetzner::Robot->new(
+        user     => $ENV{HETZNER_ROBOT_USER},
+        password => $ENV{HETZNER_ROBOT_PASSWORD},
+    );
+
+=head2 Robot API Classes
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot> - Main client class
+
+=item * L<WWW::Hetzner::Robot::API::Servers> - Server management
+
+=item * L<WWW::Hetzner::Robot::API::Keys> - SSH key management
+
+=item * L<WWW::Hetzner::Robot::API::IPs> - IP address management
+
+=item * L<WWW::Hetzner::Robot::API::Reset> - Server reset and WOL
+
+=back
+
+=head2 Robot Entity Classes
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot::Server> - Server object
+
+=item * L<WWW::Hetzner::Robot::Key> - SSH key object
+
+=item * L<WWW::Hetzner::Robot::IP> - IP address object
+
+=back
+
+=head2 Robot Servers
+
+    $robot->servers->list
+    $robot->servers->get($server_number)
+    $robot->servers->update($server_number, %params)
+
+Server objects:
+
+    $server->server_number
+    $server->server_name
+    $server->server_ip
+    $server->product
+    $server->dc
+    $server->status
+    $server->reset($type)
+    $server->update
+    $server->refresh
+
+=head2 Robot SSH Keys
+
+    $robot->keys->list
+    $robot->keys->get($fingerprint)
+    $robot->keys->create(name => 'key', data => 'ssh-ed25519 ...')
+    $robot->keys->delete($fingerprint)
+
+=head2 Robot IPs
+
+    $robot->ips->list
+    $robot->ips->get($ip_address)
+
+IP objects:
+
+    $ip->ip
+    $ip->server_number
+    $ip->server_ip
+    $ip->locked
+    $ip->separate_mac
+    $ip->traffic_warnings
+    $ip->traffic_hourly
+    $ip->traffic_daily
+    $ip->traffic_monthly
+    $ip->update
+
+=head2 Robot Reset and WOL
+
+    $robot->reset->get($server_number)
+    $robot->reset->execute($server_number, 'sw')  # software reset
+    $robot->reset->execute($server_number, 'hw')  # hardware reset
+    $robot->reset->execute($server_number, 'man') # manual reset
+    $robot->reset->software($server_number)
+    $robot->reset->hardware($server_number)
+    $robot->reset->wol($server_number)            # wake-on-lan
+
 =head1 LOGGING
 
 Uses L<Log::Any> for flexible logging. See L<WWW::Hetzner::Cloud/LOGGING>.
@@ -249,14 +355,28 @@ Uses L<Log::Any> for flexible logging. See L<WWW::Hetzner::Cloud/LOGGING>.
 
 =head1 CLI
 
+=head2 hcloud.pl - Cloud CLI
+
 1:1 replica of the official C<hcloud> CLI from Hetzner:
 
-    hcloud.pl servers list
-    hcloud.pl servers create --name test --type cx22 --image debian-12
-    hcloud.pl zones list
-    hcloud.pl ssh-keys list
+    hcloud.pl server list
+    hcloud.pl server create --name test --type cx22 --image debian-12
+    hcloud.pl zone list
+    hcloud.pl ssh-key list
 
 See L<WWW::Hetzner::CLI>.
+
+=head2 hrobot.pl - Robot CLI
+
+CLI for dedicated server management:
+
+    hrobot.pl server list
+    hrobot.pl server describe 123456
+    hrobot.pl key list
+    hrobot.pl reset 123456 --type sw
+    hrobot.pl wol 123456
+
+See L<WWW::Hetzner::Robot::CLI>.
 
 =head1 SEE ALSO
 

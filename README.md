@@ -44,15 +44,55 @@ my $key = $cloud->ssh_keys->create(
 );
 ```
 
+## Robot API (Dedicated Servers)
+
+```perl
+use WWW::Hetzner::Robot;
+
+my $robot = WWW::Hetzner::Robot->new(
+    user     => $ENV{HETZNER_ROBOT_USER},
+    password => $ENV{HETZNER_ROBOT_PASSWORD},
+);
+
+# Dedicated servers
+my $servers = $robot->servers->list;
+my $server = $robot->servers->get(123456);
+print $server->server_name, " - ", $server->product, "\n";
+
+# SSH Keys
+my $keys = $robot->keys->list;
+$robot->keys->create(name => 'my-key', data => 'ssh-ed25519 AAAA...');
+
+# Server reset
+$robot->reset->software(123456);  # CTRL+ALT+DEL
+$robot->reset->hardware(123456);  # Power cycle
+$robot->reset->wol(123456);       # Wake-on-LAN
+```
+
 ## CLI
+
+### hcloud.pl (Cloud)
 
 ```bash
 export HETZNER_API_TOKEN=your-token
 
-hcloud.pl servers list
-hcloud.pl servers create --name test --type cx22 --image debian-12
-hcloud.pl zones list
-hcloud.pl ssh-keys list
+hcloud.pl server list
+hcloud.pl server create --name test --type cx22 --image debian-12
+hcloud.pl zone list
+hcloud.pl ssh-key list
+```
+
+### hrobot.pl (Robot)
+
+```bash
+export HETZNER_ROBOT_USER=your-user
+export HETZNER_ROBOT_PASSWORD=your-password
+
+hrobot.pl server list
+hrobot.pl server describe 123456
+hrobot.pl key list
+hrobot.pl reset 123456 --type sw
+hrobot.pl wol 123456
 ```
 
 ## Logging

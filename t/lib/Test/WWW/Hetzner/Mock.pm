@@ -7,6 +7,7 @@ use JSON::MaybeXS qw(decode_json);
 use Path::Tiny qw(path);
 use HTTP::Response;
 use WWW::Hetzner::Cloud;
+use WWW::Hetzner::Robot;
 
 my $FIXTURES_DIR;
 
@@ -21,6 +22,7 @@ sub import {
 
     no strict 'refs';
     *{"${caller}::mock_cloud"} = \&mock_cloud;
+    *{"${caller}::mock_robot"} = \&mock_robot;
     *{"${caller}::load_fixture"} = \&load_fixture;
 }
 
@@ -68,6 +70,48 @@ sub mock_cloud {
     };
 
     return $cloud;
+}
+
+sub mock_robot {
+    my (%routes) = @_;
+
+    my $robot = WWW::Hetzner::Robot->new(
+        user     => 'test-user',
+        password => 'test-password',
+    );
+
+    # Override the _request method
+    no warnings 'redefine';
+
+    *WWW::Hetzner::Robot::_request = sub {
+        my ($self, $method, $path, %opts) = @_;
+
+        my $key = "$method $path";
+
+        # Check for exact match first
+        if (exists $routes{$key}) {
+            my $handler = $routes{$key};
+            if (ref $handler eq 'CODE') {
+                return $handler->($method, $path, %opts);
+            }
+            return $handler;
+        }
+
+        # Check for pattern matches
+        for my $pattern (keys %routes) {
+            if ($path =~ /$pattern/) {
+                my $handler = $routes{$pattern};
+                if (ref $handler eq 'CODE') {
+                    return $handler->($method, $path, %opts);
+                }
+                return $handler;
+            }
+        }
+
+        die "No mock route for: $key";
+    };
+
+    return $robot;
 }
 
 1;

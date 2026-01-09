@@ -19,12 +19,29 @@ has token => (
     default => sub { $ENV{HETZNER_API_TOKEN} },
 );
 
+sub _check_auth {
+    my ($self) = @_;
+    unless ($self->token) {
+        die "No Cloud API token configured.\n\n" .
+            "Set token via:\n" .
+            "  Environment: HETZNER_API_TOKEN\n" .
+            "  Option:      --token\n\n" .
+            "Get token at: https://console.hetzner.cloud/ -> Select project -> Security -> API tokens\n";
+    }
+}
+
 has base_url => (
     is      => 'ro',
     default => 'https://api.hetzner.cloud/v1',
 );
 
 with 'WWW::Hetzner::Role::HTTP';
+
+around _request => sub {
+    my ($orig, $self, @args) = @_;
+    $self->_check_auth;
+    return $self->$orig(@args);
+};
 
 # Resource accessors
 has servers => (

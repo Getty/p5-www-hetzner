@@ -8,7 +8,13 @@ Revision history for WWW-Hetzner
       - Server Types, Images, Locations, Datacenters (read-only)
       - DNS Zones (list, get, create, update, delete, export)
       - DNS RRSets with convenience methods (add_a, add_aaaa, add_cname, add_mx, add_txt)
+    - WWW::Hetzner::Robot API client:
+      - Servers (list, get, update)
+      - SSH Keys (list, get, create, delete)
+      - Reset (software, hardware, manual)
+      - Wake-on-LAN
+    - WWW::Hetzner::Role::HTTP for shared HTTP client logic
     - Entity classes with real attributes and methods (update, delete, etc.)
     - Log::Any integration for flexible logging
-    - CLI tool: bin/hcloud.pl
+    - CLI tools: bin/hcloud.pl (Cloud), bin/hrobot.pl (Robot)
     - Note: Uses Cloud API for DNS (old dns.hetzner.com API no longer exists)
