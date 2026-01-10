@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Servertype;
-
+our $VERSION = '0.002';
 # ABSTRACT: Server type commands
 
 use Moo;

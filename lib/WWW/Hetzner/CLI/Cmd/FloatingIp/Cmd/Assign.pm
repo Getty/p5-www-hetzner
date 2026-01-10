@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Assign;
-
+our $VERSION = '0.002';
 # ABSTRACT: Assign a floating IP to a server
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Record;
-
+our $VERSION = '0.002';
 # ABSTRACT: DNS Record commands
 
 use Moo;

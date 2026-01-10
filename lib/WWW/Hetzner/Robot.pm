@@ -10,7 +10,7 @@ use WWW::Hetzner::Robot::API::Reset;
 use WWW::Hetzner::Robot::API::Traffic;
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has user => (
     is      => 'ro',

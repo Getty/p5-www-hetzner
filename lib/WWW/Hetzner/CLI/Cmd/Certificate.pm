@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Certificate;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Certificate commands
 
 use Moo;

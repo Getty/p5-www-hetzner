@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Volume::Cmd::Create;
-
+our $VERSION = '0.002';
 # ABSTRACT: Create a volume
 
 use Moo;

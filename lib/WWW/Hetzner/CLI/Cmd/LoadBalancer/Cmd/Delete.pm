@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::Delete;
-
+our $VERSION = '0.002';
 # ABSTRACT: Delete a load balancer
 
 use Moo;

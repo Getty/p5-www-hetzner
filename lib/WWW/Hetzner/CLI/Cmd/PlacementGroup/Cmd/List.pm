@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::PlacementGroup::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List placement groups
 
 use Moo;

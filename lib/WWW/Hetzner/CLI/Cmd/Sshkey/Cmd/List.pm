@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List SSH keys
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Location;
-
+our $VERSION = '0.002';
 # ABSTRACT: Location commands
 
 use Moo;

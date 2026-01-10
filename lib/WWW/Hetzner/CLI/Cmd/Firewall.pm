@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Firewall;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Firewall commands
 
 use Moo;

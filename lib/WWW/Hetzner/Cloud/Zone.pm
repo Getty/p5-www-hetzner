@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::Zone;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud DNS Zone object
 
 use Moo;

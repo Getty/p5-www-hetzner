@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::Delete;
-
+our $VERSION = '0.002';
 # ABSTRACT: Delete a network
 
 use Moo;

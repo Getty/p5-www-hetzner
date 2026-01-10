@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Describe;
-
+our $VERSION = '0.002';
 # ABSTRACT: Show server details
 
 use Moo;

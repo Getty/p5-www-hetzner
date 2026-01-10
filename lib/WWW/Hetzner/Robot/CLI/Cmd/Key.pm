@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Key;
-
+our $VERSION = '0.002';
 # ABSTRACT: Robot SSH key commands
 
 use Moo;

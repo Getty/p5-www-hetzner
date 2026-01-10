@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::Create;
-
+our $VERSION = '0.002';
 # ABSTRACT: Create an SSH key
 
 use Moo;

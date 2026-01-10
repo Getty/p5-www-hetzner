@@ -20,7 +20,7 @@ use WWW::Hetzner::Cloud::API::Certificates;
 use WWW::Hetzner::Cloud::API::PlacementGroups;
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has token => (
     is      => 'ro',

@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List servers
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::Firewall;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Firewall object
 
 use Moo;

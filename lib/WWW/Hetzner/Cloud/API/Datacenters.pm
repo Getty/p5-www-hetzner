@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::Datacenters;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Datacenters API
 
 use Moo;

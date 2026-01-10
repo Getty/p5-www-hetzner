@@ -8,7 +8,7 @@ use JSON::MaybeXS qw(decode_json encode_json);
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 requires 'token';
 requires 'base_url';

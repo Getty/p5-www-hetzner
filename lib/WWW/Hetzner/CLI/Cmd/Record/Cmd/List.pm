@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Record::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List DNS records
 
 use Moo;

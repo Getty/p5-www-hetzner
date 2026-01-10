@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::Location;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Location object
 
 use Moo;

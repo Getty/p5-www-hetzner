@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::API::Keys;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot SSH Keys API
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Volume::Cmd::Describe;
-
+our $VERSION = '0.002';
 # ABSTRACT: Describe a volume
 
 use Moo;

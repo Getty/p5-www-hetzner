@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Certificate::Cmd::Describe;
-
+our $VERSION = '0.002';
 # ABSTRACT: Describe a certificate
 
 use Moo;

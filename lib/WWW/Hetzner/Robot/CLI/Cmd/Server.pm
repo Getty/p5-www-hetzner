@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Server;
-
+our $VERSION = '0.002';
 # ABSTRACT: Robot server commands
 
 use Moo;

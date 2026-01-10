@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::Certificate;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Certificate object
 
 use Moo;

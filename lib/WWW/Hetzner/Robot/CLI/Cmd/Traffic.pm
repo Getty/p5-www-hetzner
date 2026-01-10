@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Traffic;
-
+our $VERSION = '0.002';
 # ABSTRACT: Query traffic statistics
 
 use Moo;

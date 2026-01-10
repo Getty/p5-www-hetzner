@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::Volumes;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Volumes API
 
 use Moo;

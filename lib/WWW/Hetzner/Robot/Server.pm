@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::Server;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot Server entity
 
 use Moo;

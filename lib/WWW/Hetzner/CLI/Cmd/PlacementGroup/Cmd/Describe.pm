@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::PlacementGroup::Cmd::Describe;
-
+our $VERSION = '0.002';
 # ABSTRACT: Describe a placement group
 
 use Moo;

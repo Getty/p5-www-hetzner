@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Reset;
-
+our $VERSION = '0.002';
 # ABSTRACT: Reset a server (hard)
 
 use Moo;

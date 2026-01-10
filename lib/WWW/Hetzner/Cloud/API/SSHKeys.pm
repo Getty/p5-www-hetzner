@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::SSHKeys;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud SSH Keys API
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::RRSet;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud DNS RRSet object
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::Locations;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Locations API
 
 use Moo;

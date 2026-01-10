@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::Create;
-
+our $VERSION = '0.002';
 # ABSTRACT: Create a load balancer
 
 use Moo;

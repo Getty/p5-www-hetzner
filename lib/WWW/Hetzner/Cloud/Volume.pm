@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::Volume;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Volume object
 
 use Moo;

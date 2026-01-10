@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Certificate::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List certificates
 
 use Moo;

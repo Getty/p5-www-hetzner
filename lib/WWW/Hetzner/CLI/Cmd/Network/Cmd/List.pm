@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List networks
 
 use Moo;

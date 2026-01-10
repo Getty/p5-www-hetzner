@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List firewalls
 
 use Moo;

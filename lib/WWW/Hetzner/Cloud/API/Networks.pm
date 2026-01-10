@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::Networks;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Networks API
 
 use Moo;

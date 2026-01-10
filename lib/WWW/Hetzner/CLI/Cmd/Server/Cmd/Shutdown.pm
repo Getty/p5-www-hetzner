@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Shutdown;
-
+our $VERSION = '0.002';
 # ABSTRACT: Shutdown a server (graceful)
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Zone;
-
+our $VERSION = '0.002';
 # ABSTRACT: DNS Zone commands
 
 use Moo;

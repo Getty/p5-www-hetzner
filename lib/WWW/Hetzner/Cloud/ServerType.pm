@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::ServerType;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud ServerType object
 
 use Moo;

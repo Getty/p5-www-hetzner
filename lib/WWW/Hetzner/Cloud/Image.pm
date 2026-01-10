@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::Image;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Image object
 
 use Moo;

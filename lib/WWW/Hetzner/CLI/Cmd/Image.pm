@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Image;
-
+our $VERSION = '0.002';
 # ABSTRACT: Image commands
 
 use Moo;

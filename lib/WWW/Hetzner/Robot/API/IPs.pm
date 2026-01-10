@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::API::IPs;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot IPs API
 
 use Moo;

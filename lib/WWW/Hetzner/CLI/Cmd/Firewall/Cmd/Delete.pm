@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::Delete;
-
+our $VERSION = '0.002';
 # ABSTRACT: Delete a firewall
 
 use Moo;

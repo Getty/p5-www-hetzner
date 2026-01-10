@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::Firewalls;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Firewalls API
 
 use Moo;

@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List dedicated servers
 
 use Moo;

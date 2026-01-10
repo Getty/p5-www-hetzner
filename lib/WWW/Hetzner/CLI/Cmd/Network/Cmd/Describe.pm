@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::Describe;
-
+our $VERSION = '0.002';
 # ABSTRACT: Describe a network
 
 use Moo;

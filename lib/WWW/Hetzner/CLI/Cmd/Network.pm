@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Network;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Network commands
 
 use Moo;

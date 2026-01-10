@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::List;
-
+our $VERSION = '0.002';
 # ABSTRACT: List primary IPs
 
 use Moo;

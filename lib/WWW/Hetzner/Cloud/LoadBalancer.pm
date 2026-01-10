@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::LoadBalancer;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Load Balancer object
 
 use Moo;

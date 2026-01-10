@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Certificate::Cmd::Create;
-
+our $VERSION = '0.002';
 # ABSTRACT: Create a managed certificate
 
 use Moo;

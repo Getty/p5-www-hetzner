@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::Images;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Images API
 
 use Moo;

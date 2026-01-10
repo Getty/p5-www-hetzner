@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::RemoveFrom;
-
+our $VERSION = '0.002';
 # ABSTRACT: Remove a firewall from a server
 
 use Moo;

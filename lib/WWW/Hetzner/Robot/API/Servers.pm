@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::API::Servers;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot Servers API
 
 use Moo;

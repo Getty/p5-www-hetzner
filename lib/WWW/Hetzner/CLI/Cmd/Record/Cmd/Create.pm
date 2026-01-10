@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Record::Cmd::Create;
-
+our $VERSION = '0.002';
 # ABSTRACT: Create a DNS record
 
 use Moo;

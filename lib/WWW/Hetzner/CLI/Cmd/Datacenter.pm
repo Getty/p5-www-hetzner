@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Datacenter;
-
+our $VERSION = '0.002';
 # ABSTRACT: Datacenter commands
 
 use Moo;

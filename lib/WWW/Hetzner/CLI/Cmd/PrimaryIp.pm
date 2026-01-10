@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Primary IP commands
 
 use Moo;

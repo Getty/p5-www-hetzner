@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Volume;
-
+our $VERSION = '0.002';
 # ABSTRACT: Volume commands
 
 use Moo;

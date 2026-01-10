@@ -7,7 +7,7 @@ use MooX::Cmd;
 use MooX::Options;
 use WWW::Hetzner::Robot;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 option user => (
     is     => 'ro',

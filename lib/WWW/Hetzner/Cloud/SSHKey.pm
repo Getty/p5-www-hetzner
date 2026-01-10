@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::SSHKey;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud SSHKey object
 
 use Moo;

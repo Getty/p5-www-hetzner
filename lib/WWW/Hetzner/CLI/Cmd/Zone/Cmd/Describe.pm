@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Zone::Cmd::Describe;
-
+our $VERSION = '0.002';
 # ABSTRACT: Describe a DNS zone
 
 use Moo;

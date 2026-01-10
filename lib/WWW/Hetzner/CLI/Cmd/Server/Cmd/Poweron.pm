@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Poweron;
-
+our $VERSION = '0.002';
 # ABSTRACT: Power on a server
 
 use Moo;

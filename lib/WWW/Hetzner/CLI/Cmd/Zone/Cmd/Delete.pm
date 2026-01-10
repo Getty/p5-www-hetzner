@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Zone::Cmd::Delete;
-
+our $VERSION = '0.002';
 # ABSTRACT: Delete a DNS zone
 
 use Moo;

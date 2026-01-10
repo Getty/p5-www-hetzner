@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::PlacementGroup;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Placement Group object
 
 use Moo;

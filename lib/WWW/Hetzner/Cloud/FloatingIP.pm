@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::FloatingIP;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Floating IP object
 
 use Moo;

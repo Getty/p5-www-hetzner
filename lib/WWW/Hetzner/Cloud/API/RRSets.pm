@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::RRSets;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud DNS RRSets (Records) API
 
 use Moo;

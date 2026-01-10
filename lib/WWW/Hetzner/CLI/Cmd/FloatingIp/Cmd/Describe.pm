@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Describe;
-
+our $VERSION = '0.002';
 # ABSTRACT: Describe a floating IP
 
 use Moo;

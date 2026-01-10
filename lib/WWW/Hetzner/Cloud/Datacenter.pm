@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::Datacenter;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Datacenter object
 
 use Moo;

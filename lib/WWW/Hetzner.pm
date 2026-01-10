@@ -7,7 +7,7 @@ use WWW::Hetzner::Cloud;
 use WWW::Hetzner::Robot;
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has cloud => (
     is      => 'lazy',

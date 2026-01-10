@@ -1,5 +1,5 @@
 package WWW::Hetzner::Robot::IP;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot IP entity
 
 use Moo;

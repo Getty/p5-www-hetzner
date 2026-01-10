@@ -7,7 +7,7 @@ use MooX::Cmd;
 use MooX::Options;
 use WWW::Hetzner::Cloud;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 option token => (
     is     => 'ro',

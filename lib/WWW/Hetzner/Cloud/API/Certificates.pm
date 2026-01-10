@@ -1,5 +1,5 @@
 package WWW::Hetzner::Cloud::API::Certificates;
-
+our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Certificates API
 
 use Moo;

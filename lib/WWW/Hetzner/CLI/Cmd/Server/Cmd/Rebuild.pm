@@ -1,5 +1,5 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Rebuild;
-
+our $VERSION = '0.002';
 # ABSTRACT: Rebuild a server with a new image
 
 use Moo;
