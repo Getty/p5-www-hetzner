@@ -1,6 +1,6 @@
 Revision history for WWW-Hetzner
 
-{{$NEXT}}
+0.001     2026-01-10 01:50:52Z
     - Initial release
     - WWW::Hetzner::Cloud API client:
       - Servers (list, get, create, delete, power_on, power_off, shutdown,
