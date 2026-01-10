@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Server;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options usage_string => 'USAGE: hcloud.pl server [list|describe|create|delete] [options]';
+use MooX::Options usage_string => 'USAGE: hcloud.pl server <command> [options]';
 use JSON::MaybeXS qw(encode_json);
 
 sub execute {

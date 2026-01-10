@@ -161,6 +161,73 @@ sub change_type {
     });
 }
 
+sub reset {
+    my ($self, $id) = @_;
+    croak "Server ID required" unless $id;
+
+    return $self->client->post("/servers/$id/actions/reset", {});
+}
+
+sub enable_rescue {
+    my ($self, $id, %opts) = @_;
+    croak "Server ID required" unless $id;
+
+    my $body = { type => $opts{type} // 'linux64' };
+    $body->{ssh_keys} = $opts{ssh_keys} if $opts{ssh_keys};
+
+    return $self->client->post("/servers/$id/actions/enable_rescue", $body);
+}
+
+sub disable_rescue {
+    my ($self, $id) = @_;
+    croak "Server ID required" unless $id;
+
+    return $self->client->post("/servers/$id/actions/disable_rescue", {});
+}
+
+sub request_console {
+    my ($self, $id) = @_;
+    croak "Server ID required" unless $id;
+
+    return $self->client->post("/servers/$id/actions/request_console", {});
+}
+
+sub reset_password {
+    my ($self, $id) = @_;
+    croak "Server ID required" unless $id;
+
+    return $self->client->post("/servers/$id/actions/reset_password", {});
+}
+
+sub attach_iso {
+    my ($self, $id, $iso) = @_;
+    croak "Server ID required" unless $id;
+    croak "ISO required" unless $iso;
+
+    return $self->client->post("/servers/$id/actions/attach_iso", { iso => $iso });
+}
+
+sub detach_iso {
+    my ($self, $id) = @_;
+    croak "Server ID required" unless $id;
+
+    return $self->client->post("/servers/$id/actions/detach_iso", {});
+}
+
+sub enable_backup {
+    my ($self, $id) = @_;
+    croak "Server ID required" unless $id;
+
+    return $self->client->post("/servers/$id/actions/enable_backup", {});
+}
+
+sub disable_backup {
+    my ($self, $id) = @_;
+    croak "Server ID required" unless $id;
+
+    return $self->client->post("/servers/$id/actions/disable_backup", {});
+}
+
 sub update {
     my ($self, $id, %params) = @_;
     croak "Server ID required" unless $id;

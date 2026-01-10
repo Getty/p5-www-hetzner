@@ -10,6 +10,14 @@ use WWW::Hetzner::Cloud::API::SSHKeys;
 use WWW::Hetzner::Cloud::API::Locations;
 use WWW::Hetzner::Cloud::API::Datacenters;
 use WWW::Hetzner::Cloud::API::Zones;
+use WWW::Hetzner::Cloud::API::Volumes;
+use WWW::Hetzner::Cloud::API::Networks;
+use WWW::Hetzner::Cloud::API::Firewalls;
+use WWW::Hetzner::Cloud::API::FloatingIPs;
+use WWW::Hetzner::Cloud::API::PrimaryIPs;
+use WWW::Hetzner::Cloud::API::LoadBalancers;
+use WWW::Hetzner::Cloud::API::Certificates;
+use WWW::Hetzner::Cloud::API::PlacementGroups;
 use namespace::clean;
 
 our $VERSION = '0.001';
@@ -79,6 +87,46 @@ has zones => (
     builder => sub { WWW::Hetzner::Cloud::API::Zones->new(client => shift) },
 );
 
+has volumes => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Volumes->new(client => shift) },
+);
+
+has networks => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Networks->new(client => shift) },
+);
+
+has firewalls => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Firewalls->new(client => shift) },
+);
+
+has floating_ips => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::FloatingIPs->new(client => shift) },
+);
+
+has primary_ips => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::PrimaryIPs->new(client => shift) },
+);
+
+has load_balancers => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::LoadBalancers->new(client => shift) },
+);
+
+has certificates => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Certificates->new(client => shift) },
+);
+
+has placement_groups => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::PlacementGroups->new(client => shift) },
+);
+
 1;
 
 __END__
@@ -112,9 +160,11 @@ WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
 
 =head1 RESOURCES
 
+=head2 Compute
+
 =over 4
 
-=item * servers - Cloud servers
+=item * servers - Cloud servers (create, delete, power on/off, reboot, rebuild, rescue)
 
 =item * server_types - Available server types
 
@@ -122,11 +172,57 @@ WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
 
 =item * ssh_keys - SSH keys
 
-=item * locations - Locations (fsn1, nbg1, hel1, ash, hil)
+=item * placement_groups - Placement groups for server distribution
 
-=item * datacenters - Datacenters
+=back
+
+=head2 Networking
+
+=over 4
+
+=item * networks - Private networks with subnets and routes
+
+=item * firewalls - Firewall rules and application
+
+=item * floating_ips - Reassignable public IPs
+
+=item * primary_ips - Primary IPs for servers
+
+=item * load_balancers - Load balancers with targets and services
+
+=back
+
+=head2 Storage
+
+=over 4
+
+=item * volumes - Block storage volumes
+
+=back
+
+=head2 DNS
+
+=over 4
 
 =item * zones - DNS zones and records
+
+=back
+
+=head2 Security
+
+=over 4
+
+=item * certificates - TLS certificates (managed or uploaded)
+
+=back
+
+=head2 Info
+
+=over 4
+
+=item * locations - Locations (fsn1, nbg1, hel1, ash, hil, sin)
+
+=item * datacenters - Datacenters
 
 =back
 
