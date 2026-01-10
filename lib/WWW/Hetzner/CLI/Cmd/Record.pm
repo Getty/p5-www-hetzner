@@ -7,6 +7,16 @@ use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl record [list|describe|create|delete] --zone <zone-id> [options]';
 use JSON::MaybeXS qw(encode_json);
 
+=head1 SYNOPSIS
+
+    hcloud.pl record --zone <zone-id>                    # List all records
+    hcloud.pl record list --zone <zone-id>               # List all records
+    hcloud.pl record list --zone <zone-id> --type A      # List A records only
+    hcloud.pl record create --zone <zone-id> --name www --type A --value 1.2.3.4
+    hcloud.pl record delete --zone <zone-id> --name www --type A
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
@@ -67,19 +77,3 @@ sub _list {
 }
 
 1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::CLI::Cmd::Record - DNS Record commands
-
-=head1 SYNOPSIS
-
-    hcloud.pl record --zone <zone-id>                    # List all records
-    hcloud.pl record list --zone <zone-id>               # List all records
-    hcloud.pl record list --zone <zone-id> --type A      # List A records only
-    hcloud.pl record create --zone <zone-id> --name www --type A --value 1.2.3.4
-    hcloud.pl record delete --zone <zone-id> --name www --type A
-
-=cut

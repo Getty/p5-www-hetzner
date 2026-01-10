@@ -5,46 +5,6 @@ our $VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
-has _client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-    init_arg => 'client',
-);
-
-has id => ( is => 'ro' );
-has name => ( is => 'ro' );
-has description => ( is => 'ro' );
-has cores => ( is => 'ro' );
-has memory => ( is => 'ro' );
-has disk => ( is => 'ro' );
-has cpu_type => ( is => 'ro' );
-has architecture => ( is => 'ro' );
-has deprecated => ( is => 'ro' );
-
-sub data {
-    my ($self) = @_;
-    return {
-        id           => $self->id,
-        name         => $self->name,
-        description  => $self->description,
-        cores        => $self->cores,
-        memory       => $self->memory,
-        disk         => $self->disk,
-        cpu_type     => $self->cpu_type,
-        architecture => $self->architecture,
-        deprecated   => $self->deprecated,
-    };
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::ServerType - Hetzner Cloud Server Type object
-
 =head1 SYNOPSIS
 
     my $type = $cloud->server_types->get_by_name('cx22');
@@ -62,50 +22,108 @@ Objects are returned by L<WWW::Hetzner::Cloud::API::ServerTypes> methods.
 
 Server types are read-only resources.
 
-=head1 ATTRIBUTES
+=cut
 
-=head2 id
+has _client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+    init_arg => 'client',
+);
+
+has id => ( is => 'ro' );
+
+=attr id
 
 Server type ID.
 
-=head2 name
+=cut
+
+has name => ( is => 'ro' );
+
+=attr name
 
 Server type name, e.g. "cx22", "cpx31".
 
-=head2 description
+=cut
+
+has description => ( is => 'ro' );
+
+=attr description
 
 Human-readable description.
 
-=head2 cores
+=cut
+
+has cores => ( is => 'ro' );
+
+=attr cores
 
 Number of CPU cores.
 
-=head2 memory
+=cut
+
+has memory => ( is => 'ro' );
+
+=attr memory
 
 Memory in GB.
 
-=head2 disk
+=cut
+
+has disk => ( is => 'ro' );
+
+=attr disk
 
 Disk size in GB.
 
-=head2 cpu_type
+=cut
+
+has cpu_type => ( is => 'ro' );
+
+=attr cpu_type
 
 CPU type: shared or dedicated.
 
-=head2 architecture
+=cut
+
+has architecture => ( is => 'ro' );
+
+=attr architecture
 
 CPU architecture: x86 or arm.
 
-=head2 deprecated
+=cut
+
+has deprecated => ( is => 'ro' );
+
+=attr deprecated
 
 Deprecation timestamp if deprecated, undef otherwise.
 
-=head1 METHODS
+=cut
 
-=head2 data
+sub data {
+    my ($self) = @_;
+    return {
+        id           => $self->id,
+        name         => $self->name,
+        description  => $self->description,
+        cores        => $self->cores,
+        memory       => $self->memory,
+        disk         => $self->disk,
+        cpu_type     => $self->cpu_type,
+        architecture => $self->architecture,
+        deprecated   => $self->deprecated,
+    };
+}
+
+=method data
 
     my $hashref = $type->data;
 
 Returns all server type data as a hashref (for JSON serialization).
 
 =cut
+
+1;

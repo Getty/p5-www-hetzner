@@ -6,19 +6,10 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hrobot.pl wol <server-number>';
 
-=head1 NAME
-
-hrobot.pl wol - Send Wake-on-LAN to a server
-
 =head1 SYNOPSIS
 
     hrobot.pl wol <server-number>
     hrobot.pl wol 123456
-
-=head1 DESCRIPTION
-
-Sends a Wake-on-LAN magic packet to wake up a powered-off dedicated server.
-The server must support WoL and be connected to a network that supports it.
 
 =cut
 

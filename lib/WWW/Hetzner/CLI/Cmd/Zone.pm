@@ -7,6 +7,16 @@ use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl zone [list|describe|create|delete] [options]';
 use JSON::MaybeXS qw(encode_json);
 
+=head1 SYNOPSIS
+
+    hcloud.pl zone                      # List all zones
+    hcloud.pl zone list                 # List all zones
+    hcloud.pl zone describe <id>        # Show zone details
+    hcloud.pl zone create --name example.com
+    hcloud.pl zone delete <id>
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
@@ -66,19 +76,3 @@ sub _list {
 }
 
 1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::CLI::Cmd::Zone - DNS Zone commands
-
-=head1 SYNOPSIS
-
-    hcloud.pl zone                      # List all zones
-    hcloud.pl zone list                 # List all zones
-    hcloud.pl zone describe <id>        # Show zone details
-    hcloud.pl zone create --name example.com
-    hcloud.pl zone delete <id>
-
-=cut

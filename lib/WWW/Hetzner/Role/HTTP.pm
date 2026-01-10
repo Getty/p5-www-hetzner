@@ -10,6 +10,37 @@ use Log::Any qw($log);
 
 our $VERSION = '0.002';
 
+=head1 SYNOPSIS
+
+    package WWW::Hetzner::Cloud;
+    use Moo;
+
+    has token => ( is => 'ro' );
+    has base_url => ( is => 'ro', default => 'https://api.hetzner.cloud/v1' );
+
+    with 'WWW::Hetzner::Role::HTTP';
+
+=head1 DESCRIPTION
+
+This role provides HTTP methods (GET, POST, PUT, DELETE) for Hetzner API
+clients. It handles JSON encoding/decoding, authentication, and error handling.
+
+Uses L<Log::Any> for logging HTTP requests and responses.
+
+=head1 REQUIRED ATTRIBUTES
+
+Classes consuming this role must provide:
+
+=over 4
+
+=item * C<token> - API authentication token
+
+=item * C<base_url> - Base URL for the API
+
+=back
+
+=cut
+
 requires 'token';
 requires 'base_url';
 
@@ -24,30 +55,86 @@ has ua => (
     },
 );
 
+=attr ua
+
+L<LWP::UserAgent> instance for making HTTP requests.
+
+=cut
+
 sub get {
     my ($self, $path, %params) = @_;
     return $self->_request('GET', $path, %params);
 }
+
+=method get
+
+    my $data = $self->get('/path', params => { key => 'value' });
+
+Perform a GET request.
+
+=cut
 
 sub post {
     my ($self, $path, $data) = @_;
     return $self->_request('POST', $path, body => $data);
 }
 
+=method post
+
+    my $data = $self->post('/path', { key => 'value' });
+
+Perform a POST request with JSON body.
+
+=cut
+
 sub put {
     my ($self, $path, $data) = @_;
     return $self->_request('PUT', $path, body => $data);
 }
+
+=method put
+
+    my $data = $self->put('/path', { key => 'value' });
+
+Perform a PUT request with JSON body.
+
+=cut
 
 sub delete {
     my ($self, $path) = @_;
     return $self->_request('DELETE', $path);
 }
 
+=method delete
+
+    my $data = $self->delete('/path');
+
+Perform a DELETE request.
+
+=cut
+
 sub _set_auth {
     my ($self, $request) = @_;
     $request->header('Authorization' => 'Bearer ' . $self->token);
 }
+
+=method _set_auth
+
+Override this method to change authentication. Default is Bearer token:
+
+    sub _set_auth {
+        my ($self, $request) = @_;
+        $request->header('Authorization' => 'Bearer ' . $self->token);
+    }
+
+For Basic Auth (e.g. Robot API):
+
+    sub _set_auth {
+        my ($self, $request) = @_;
+        $request->authorization_basic($self->user, $self->password);
+    }
+
+=cut
 
 sub _request {
     my ($self, $method, $path, %opts) = @_;
@@ -98,81 +185,10 @@ sub _request {
     return $data;
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Role::HTTP - HTTP client role for Hetzner API clients
-
-=head1 SYNOPSIS
-
-    package WWW::Hetzner::Cloud;
-    use Moo;
-
-    has token => ( is => 'ro' );
-    has base_url => ( is => 'ro', default => 'https://api.hetzner.cloud/v1' );
-
-    with 'WWW::Hetzner::Role::HTTP';
-
-=head1 DESCRIPTION
-
-This role provides HTTP methods (GET, POST, PUT, DELETE) for Hetzner API
-clients. It handles JSON encoding/decoding, authentication, and error handling.
-
-Uses L<Log::Any> for logging HTTP requests and responses.
-
-=head1 REQUIRED ATTRIBUTES
-
-Classes consuming this role must provide:
-
-=over 4
-
-=item * C<token> - API authentication token
-
-=item * C<base_url> - Base URL for the API
-
-=back
-
-=head1 CUSTOMIZATION
-
-=head2 _set_auth
-
-Override this method to change authentication. Default is Bearer token:
-
-    sub _set_auth {
-        my ($self, $request) = @_;
-        $request->header('Authorization' => 'Bearer ' . $self->token);
-    }
-
-For Basic Auth (e.g. Robot API):
-
-    sub _set_auth {
-        my ($self, $request) = @_;
-        $request->authorization_basic($self->user, $self->password);
-    }
-
-=head1 PROVIDED METHODS
-
-=head2 get
-
-    my $data = $self->get('/path', params => { key => 'value' });
-
-=head2 post
-
-    my $data = $self->post('/path', { key => 'value' });
-
-=head2 put
-
-    my $data = $self->put('/path', { key => 'value' });
-
-=head2 delete
-
-    my $data = $self->delete('/path');
-
 =head1 SEE ALSO
 
 L<WWW::Hetzner::Cloud>, L<Log::Any>
 
 =cut
+
+1;

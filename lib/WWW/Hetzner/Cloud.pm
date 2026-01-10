@@ -22,119 +22,6 @@ use namespace::clean;
 
 our $VERSION = '0.002';
 
-has token => (
-    is      => 'ro',
-    default => sub { $ENV{HETZNER_API_TOKEN} },
-);
-
-sub _check_auth {
-    my ($self) = @_;
-    unless ($self->token) {
-        die "No Cloud API token configured.\n\n" .
-            "Set token via:\n" .
-            "  Environment: HETZNER_API_TOKEN\n" .
-            "  Option:      --token\n\n" .
-            "Get token at: https://console.hetzner.cloud/ -> Select project -> Security -> API tokens\n";
-    }
-}
-
-has base_url => (
-    is      => 'ro',
-    default => 'https://api.hetzner.cloud/v1',
-);
-
-with 'WWW::Hetzner::Role::HTTP';
-
-around _request => sub {
-    my ($orig, $self, @args) = @_;
-    $self->_check_auth;
-    return $self->$orig(@args);
-};
-
-# Resource accessors
-has servers => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Servers->new(client => shift) },
-);
-
-has server_types => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::ServerTypes->new(client => shift) },
-);
-
-has images => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Images->new(client => shift) },
-);
-
-has ssh_keys => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::SSHKeys->new(client => shift) },
-);
-
-has locations => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Locations->new(client => shift) },
-);
-
-has datacenters => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Datacenters->new(client => shift) },
-);
-
-has zones => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Zones->new(client => shift) },
-);
-
-has volumes => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Volumes->new(client => shift) },
-);
-
-has networks => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Networks->new(client => shift) },
-);
-
-has firewalls => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Firewalls->new(client => shift) },
-);
-
-has floating_ips => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::FloatingIPs->new(client => shift) },
-);
-
-has primary_ips => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::PrimaryIPs->new(client => shift) },
-);
-
-has load_balancers => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::LoadBalancers->new(client => shift) },
-);
-
-has certificates => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::Certificates->new(client => shift) },
-);
-
-has placement_groups => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud::API::PlacementGroups->new(client => shift) },
-);
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
-
 =head1 SYNOPSIS
 
     use WWW::Hetzner::Cloud;
@@ -157,6 +44,11 @@ WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
 
     # Delete server
     $cloud->servers->delete($server->{id});
+
+=head1 DESCRIPTION
+
+This module provides access to the Hetzner Cloud API for managing cloud
+servers, DNS zones, networks, volumes, and other resources.
 
 =head1 RESOURCES
 
@@ -226,6 +118,215 @@ WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
 
 =back
 
+=cut
+
+has token => (
+    is      => 'ro',
+    default => sub { $ENV{HETZNER_API_TOKEN} },
+);
+
+=attr token
+
+Hetzner Cloud API token. Defaults to C<HETZNER_API_TOKEN> environment variable.
+
+=cut
+
+sub _check_auth {
+    my ($self) = @_;
+    unless ($self->token) {
+        die "No Cloud API token configured.\n\n" .
+            "Set token via:\n" .
+            "  Environment: HETZNER_API_TOKEN\n" .
+            "  Option:      --token\n\n" .
+            "Get token at: https://console.hetzner.cloud/ -> Select project -> Security -> API tokens\n";
+    }
+}
+
+has base_url => (
+    is      => 'ro',
+    default => 'https://api.hetzner.cloud/v1',
+);
+
+=attr base_url
+
+Base URL for the Cloud API. Defaults to C<https://api.hetzner.cloud/v1>.
+
+=cut
+
+with 'WWW::Hetzner::Role::HTTP';
+
+around _request => sub {
+    my ($orig, $self, @args) = @_;
+    $self->_check_auth;
+    return $self->$orig(@args);
+};
+
+# Resource accessors
+has servers => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Servers->new(client => shift) },
+);
+
+=attr servers
+
+Returns a L<WWW::Hetzner::Cloud::API::Servers> instance for managing cloud servers.
+
+=cut
+
+has server_types => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::ServerTypes->new(client => shift) },
+);
+
+=attr server_types
+
+Returns a L<WWW::Hetzner::Cloud::API::ServerTypes> instance for listing server types.
+
+=cut
+
+has images => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Images->new(client => shift) },
+);
+
+=attr images
+
+Returns a L<WWW::Hetzner::Cloud::API::Images> instance for listing OS images.
+
+=cut
+
+has ssh_keys => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::SSHKeys->new(client => shift) },
+);
+
+=attr ssh_keys
+
+Returns a L<WWW::Hetzner::Cloud::API::SSHKeys> instance for managing SSH keys.
+
+=cut
+
+has locations => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Locations->new(client => shift) },
+);
+
+=attr locations
+
+Returns a L<WWW::Hetzner::Cloud::API::Locations> instance for listing locations.
+
+=cut
+
+has datacenters => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Datacenters->new(client => shift) },
+);
+
+=attr datacenters
+
+Returns a L<WWW::Hetzner::Cloud::API::Datacenters> instance for listing datacenters.
+
+=cut
+
+has zones => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Zones->new(client => shift) },
+);
+
+=attr zones
+
+Returns a L<WWW::Hetzner::Cloud::API::Zones> instance for managing DNS zones.
+
+=cut
+
+has volumes => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Volumes->new(client => shift) },
+);
+
+=attr volumes
+
+Returns a L<WWW::Hetzner::Cloud::API::Volumes> instance for managing block storage volumes.
+
+=cut
+
+has networks => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Networks->new(client => shift) },
+);
+
+=attr networks
+
+Returns a L<WWW::Hetzner::Cloud::API::Networks> instance for managing private networks.
+
+=cut
+
+has firewalls => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Firewalls->new(client => shift) },
+);
+
+=attr firewalls
+
+Returns a L<WWW::Hetzner::Cloud::API::Firewalls> instance for managing firewalls.
+
+=cut
+
+has floating_ips => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::FloatingIPs->new(client => shift) },
+);
+
+=attr floating_ips
+
+Returns a L<WWW::Hetzner::Cloud::API::FloatingIPs> instance for managing floating IPs.
+
+=cut
+
+has primary_ips => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::PrimaryIPs->new(client => shift) },
+);
+
+=attr primary_ips
+
+Returns a L<WWW::Hetzner::Cloud::API::PrimaryIPs> instance for managing primary IPs.
+
+=cut
+
+has load_balancers => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::LoadBalancers->new(client => shift) },
+);
+
+=attr load_balancers
+
+Returns a L<WWW::Hetzner::Cloud::API::LoadBalancers> instance for managing load balancers.
+
+=cut
+
+has certificates => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Certificates->new(client => shift) },
+);
+
+=attr certificates
+
+Returns a L<WWW::Hetzner::Cloud::API::Certificates> instance for managing TLS certificates.
+
+=cut
+
+has placement_groups => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::PlacementGroups->new(client => shift) },
+);
+
+=attr placement_groups
+
+Returns a L<WWW::Hetzner::Cloud::API::PlacementGroups> instance for managing placement groups.
+
+=cut
+
 =head1 DNS EXAMPLE
 
     # List DNS zones
@@ -287,3 +388,5 @@ See L<Log::Any::Adapter> for all available adapters.
 L<WWW::Hetzner>, L<WWW::Hetzner::Role::HTTP>
 
 =cut
+
+1;

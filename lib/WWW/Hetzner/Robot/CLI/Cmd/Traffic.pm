@@ -6,32 +6,12 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hrobot.pl traffic --ip <ip> --type <day|month|year> --from <date> --to <date>';
 
-=head1 NAME
-
-hrobot.pl traffic - Query traffic statistics
-
 =head1 SYNOPSIS
 
     hrobot.pl traffic --ip 1.2.3.4 --type day --from 2024-01-01T00 --to 2024-01-02T00
     hrobot.pl traffic --ip 1.2.3.4 --type month --from 2024-01-01 --to 2024-02-01
     hrobot.pl traffic --ip 1.2.3.4 --type year --from 2024-01 --to 2024-12
     hrobot.pl traffic --ip 1.2.3.4 --type day --from 2024-01-01T00 --to 2024-01-02T00 --single-values
-
-=head1 DESCRIPTION
-
-Query traffic statistics for IP addresses or subnets.
-
-Date format depends on type:
-
-=over 4
-
-=item * day: YYYY-MM-DDTHH (e.g., 2024-01-01T00)
-
-=item * month: YYYY-MM-DD (e.g., 2024-01-01)
-
-=item * year: YYYY-MM (e.g., 2024-01)
-
-=back
 
 =cut
 

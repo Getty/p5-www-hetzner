@@ -5,6 +5,25 @@ our $VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
+=head1 SYNOPSIS
+
+    my $image = $cloud->images->get_by_name('debian-13');
+
+    print $image->name, "\n";        # debian-13
+    print $image->description, "\n"; # Debian 13
+    print $image->type, "\n";        # system
+    print $image->os_flavor, "\n";   # debian
+    print $image->os_version, "\n";  # 13
+
+=head1 DESCRIPTION
+
+This class represents a Hetzner Cloud image. Objects are returned by
+L<WWW::Hetzner::Cloud::API::Images> methods.
+
+Images are read-only resources (snapshots and backups can be deleted via the API).
+
+=cut
+
 has _client => (
     is       => 'ro',
     required => 1,
@@ -13,17 +32,100 @@ has _client => (
 );
 
 has id => ( is => 'ro' );
+
+=attr id
+
+Image ID.
+
+=cut
+
 has name => ( is => 'ro' );
+
+=attr name
+
+Image name, e.g. "debian-13".
+
+=cut
+
 has description => ( is => 'ro' );
+
+=attr description
+
+Human-readable description.
+
+=cut
+
 has type => ( is => 'ro' );
+
+=attr type
+
+Image type: system, snapshot, or backup.
+
+=cut
+
 has status => ( is => 'ro' );
+
+=attr status
+
+Image status: available or creating.
+
+=cut
+
 has os_flavor => ( is => 'ro' );
+
+=attr os_flavor
+
+OS flavor: debian, ubuntu, centos, fedora, etc.
+
+=cut
+
 has os_version => ( is => 'ro' );
+
+=attr os_version
+
+OS version string.
+
+=cut
+
 has architecture => ( is => 'ro' );
+
+=attr architecture
+
+CPU architecture: x86 or arm.
+
+=cut
+
 has disk_size => ( is => 'ro' );
+
+=attr disk_size
+
+Minimum disk size in GB.
+
+=cut
+
 has created => ( is => 'ro' );
+
+=attr created
+
+Creation timestamp.
+
+=cut
+
 has deprecated => ( is => 'ro' );
+
+=attr deprecated
+
+Deprecation timestamp if deprecated, undef otherwise.
+
+=cut
+
 has labels => ( is => 'ro', default => sub { {} } );
+
+=attr labels
+
+Labels hash.
+
+=cut
 
 sub data {
     my ($self) = @_;
@@ -43,87 +145,12 @@ sub data {
     };
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::Image - Hetzner Cloud Image object
-
-=head1 SYNOPSIS
-
-    my $image = $cloud->images->get_by_name('debian-13');
-
-    print $image->name, "\n";        # debian-13
-    print $image->description, "\n"; # Debian 13
-    print $image->type, "\n";        # system
-    print $image->os_flavor, "\n";   # debian
-    print $image->os_version, "\n";  # 13
-
-=head1 DESCRIPTION
-
-This class represents a Hetzner Cloud image. Objects are returned by
-L<WWW::Hetzner::Cloud::API::Images> methods.
-
-Images are read-only resources (snapshots and backups can be deleted via the API).
-
-=head1 ATTRIBUTES
-
-=head2 id
-
-Image ID.
-
-=head2 name
-
-Image name, e.g. "debian-13".
-
-=head2 description
-
-Human-readable description.
-
-=head2 type
-
-Image type: system, snapshot, or backup.
-
-=head2 status
-
-Image status: available or creating.
-
-=head2 os_flavor
-
-OS flavor: debian, ubuntu, centos, fedora, etc.
-
-=head2 os_version
-
-OS version string.
-
-=head2 architecture
-
-CPU architecture: x86 or arm.
-
-=head2 disk_size
-
-Minimum disk size in GB.
-
-=head2 created
-
-Creation timestamp.
-
-=head2 deprecated
-
-Deprecation timestamp if deprecated, undef otherwise.
-
-=head2 labels
-
-Labels hash.
-
-=head1 METHODS
-
-=head2 data
+=method data
 
     my $hashref = $image->data;
 
 Returns all image data as a hashref (for JSON serialization).
 
 =cut
+
+1;

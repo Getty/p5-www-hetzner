@@ -6,6 +6,28 @@ use Moo;
 use Carp qw(croak);
 use namespace::clean;
 
+=head1 SYNOPSIS
+
+    my $cert = $cloud->certificates->get($id);
+
+    print $cert->name, "\n";
+    print $cert->type, "\n";  # uploaded or managed
+    print join(", ", @{$cert->domain_names}), "\n";
+
+    # Update
+    $cert->name('new-name');
+    $cert->update;
+
+    # Delete
+    $cert->delete;
+
+=head1 DESCRIPTION
+
+This class represents a Hetzner Cloud certificate. Objects are returned by
+L<WWW::Hetzner::Cloud::API::Certificates> methods.
+
+=cut
+
 has _client => (
     is       => 'ro',
     required => 1,
@@ -14,20 +36,109 @@ has _client => (
 );
 
 has id => ( is => 'ro' );
+
+=attr id
+
+Certificate ID (read-only).
+
+=cut
+
 has name => ( is => 'rw' );
+
+=attr name
+
+Certificate name (read-write).
+
+=cut
+
 has certificate => ( is => 'ro' );
+
+=attr certificate
+
+Certificate PEM content (read-only).
+
+=cut
+
 has domain_names => ( is => 'ro', default => sub { [] } );
+
+=attr domain_names
+
+Arrayref of domain names covered by this certificate (read-only).
+
+=cut
+
 has fingerprint => ( is => 'ro' );
+
+=attr fingerprint
+
+Certificate fingerprint (read-only).
+
+=cut
+
 has status => ( is => 'ro', default => sub { {} } );
+
+=attr status
+
+Certificate status hash (read-only).
+
+=cut
+
 has type => ( is => 'ro' );
+
+=attr type
+
+Certificate type: uploaded or managed (read-only).
+
+=cut
+
 has labels => ( is => 'rw', default => sub { {} } );
+
+=attr labels
+
+Labels hash (read-write).
+
+=cut
+
 has created => ( is => 'ro' );
+
+=attr created
+
+Creation timestamp (read-only).
+
+=cut
+
 has not_valid_before => ( is => 'ro' );
+
+=attr not_valid_before
+
+Certificate validity start timestamp (read-only).
+
+=cut
+
 has not_valid_after => ( is => 'ro' );
+
+=attr not_valid_after
+
+Certificate validity end timestamp (read-only).
+
+=cut
 
 # Convenience
 sub is_managed { shift->type eq 'managed' }
+
+=method is_managed
+
+Returns true if this is a managed certificate.
+
+=cut
+
 sub is_valid { (shift->status->{issuance} // '') eq 'completed' }
+
+=method is_valid
+
+Returns true if certificate issuance is completed.
+
+=cut
 
 # Actions
 sub update {
@@ -41,6 +152,15 @@ sub update {
     return $self;
 }
 
+=method update
+
+    $cert->name('new-name');
+    $cert->update;
+
+Saves changes to name and labels.
+
+=cut
+
 sub delete {
     my ($self) = @_;
     croak "Cannot delete certificate without ID" unless $self->id;
@@ -48,6 +168,14 @@ sub delete {
     $self->_client->delete("/certificates/" . $self->id);
     return 1;
 }
+
+=method delete
+
+    $cert->delete;
+
+Deletes the certificate.
+
+=cut
 
 sub retry {
     my ($self) = @_;
@@ -57,6 +185,14 @@ sub retry {
     $self->_client->post("/certificates/" . $self->id . "/actions/retry", {});
     return $self;
 }
+
+=method retry
+
+    $cert->retry;
+
+Retries issuance for a managed certificate.
+
+=cut
 
 sub data {
     my ($self) = @_;
@@ -75,27 +211,12 @@ sub data {
     };
 }
 
-1;
+=method data
 
-__END__
+    my $hashref = $cert->data;
 
-=head1 NAME
-
-WWW::Hetzner::Cloud::Certificate - Hetzner Cloud Certificate object
-
-=head1 SYNOPSIS
-
-    my $cert = $cloud->certificates->get($id);
-
-    print $cert->name, "\n";
-    print $cert->type, "\n";  # uploaded or managed
-    print join(", ", @{$cert->domain_names}), "\n";
-
-    # Update
-    $cert->name('new-name');
-    $cert->update;
-
-    # Delete
-    $cert->delete;
+Returns all certificate data as a hashref (for JSON serialization).
 
 =cut
+
+1;

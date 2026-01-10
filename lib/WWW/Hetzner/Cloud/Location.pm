@@ -5,40 +5,6 @@ our $VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
-has _client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-    init_arg => 'client',
-);
-
-has id => ( is => 'ro' );
-has name => ( is => 'ro' );
-has description => ( is => 'ro' );
-has city => ( is => 'ro' );
-has country => ( is => 'ro' );
-has network_zone => ( is => 'ro' );
-
-sub data {
-    my ($self) = @_;
-    return {
-        id           => $self->id,
-        name         => $self->name,
-        description  => $self->description,
-        city         => $self->city,
-        country      => $self->country,
-        network_zone => $self->network_zone,
-    };
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::Location - Hetzner Cloud Location object
-
 =head1 SYNOPSIS
 
     my $loc = $cloud->locations->get_by_name('fsn1');
@@ -55,38 +21,81 @@ Objects are returned by L<WWW::Hetzner::Cloud::API::Locations> methods.
 
 Locations are read-only resources.
 
-=head1 ATTRIBUTES
+=cut
 
-=head2 id
+has _client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+    init_arg => 'client',
+);
+
+has id => ( is => 'ro' );
+
+=attr id
 
 Location ID.
 
-=head2 name
+=cut
+
+has name => ( is => 'ro' );
+
+=attr name
 
 Location name, e.g. "fsn1", "nbg1", "hel1".
 
-=head2 description
+=cut
+
+has description => ( is => 'ro' );
+
+=attr description
 
 Human-readable description.
 
-=head2 city
+=cut
+
+has city => ( is => 'ro' );
+
+=attr city
 
 City name, e.g. "Falkenstein".
 
-=head2 country
+=cut
+
+has country => ( is => 'ro' );
+
+=attr country
 
 Country code, e.g. "DE".
 
-=head2 network_zone
+=cut
+
+has network_zone => ( is => 'ro' );
+
+=attr network_zone
 
 Network zone, e.g. "eu-central".
 
-=head1 METHODS
+=cut
 
-=head2 data
+sub data {
+    my ($self) = @_;
+    return {
+        id           => $self->id,
+        name         => $self->name,
+        description  => $self->description,
+        city         => $self->city,
+        country      => $self->country,
+        network_zone => $self->network_zone,
+    };
+}
+
+=method data
 
     my $hashref = $loc->data;
 
 Returns all location data as a hashref (for JSON serialization).
 
 =cut
+
+1;

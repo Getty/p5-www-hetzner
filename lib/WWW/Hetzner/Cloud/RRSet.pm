@@ -6,68 +6,6 @@ use Moo;
 use Carp qw(croak);
 use namespace::clean;
 
-has _client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-    init_arg => 'client',
-);
-
-has zone_id => ( is => 'ro', required => 1 );
-has name => ( is => 'ro' );
-has type => ( is => 'ro' );
-has ttl => ( is => 'rw' );
-has records => ( is => 'rw', default => sub { [] } );
-
-sub update {
-    my ($self) = @_;
-    croak "Cannot update RRSet without zone_id" unless $self->zone_id;
-    croak "Cannot update RRSet without name" unless $self->name;
-    croak "Cannot update RRSet without type" unless $self->type;
-
-    my $path = "/zones/" . $self->zone_id . "/rrsets/" . $self->name . "/" . $self->type;
-    $self->_client->put($path, {
-        ttl     => $self->ttl,
-        records => $self->records,
-    });
-    return $self;
-}
-
-sub delete {
-    my ($self) = @_;
-    croak "Cannot delete RRSet without zone_id" unless $self->zone_id;
-    croak "Cannot delete RRSet without name" unless $self->name;
-    croak "Cannot delete RRSet without type" unless $self->type;
-
-    my $path = "/zones/" . $self->zone_id . "/rrsets/" . $self->name . "/" . $self->type;
-    $self->_client->delete($path);
-    return 1;
-}
-
-sub values {
-    my ($self) = @_;
-    return [ map { $_->{value} } @{$self->records} ];
-}
-
-sub data {
-    my ($self) = @_;
-    return {
-        zone_id => $self->zone_id,
-        name    => $self->name,
-        type    => $self->type,
-        ttl     => $self->ttl,
-        records => $self->records,
-    };
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::RRSet - Hetzner Cloud DNS RRSet object
-
 =head1 SYNOPSIS
 
     my $record = $zone->rrsets->get('www', 'A');
@@ -93,37 +31,70 @@ WWW::Hetzner::Cloud::RRSet - Hetzner Cloud DNS RRSet object
 This class represents a Hetzner Cloud DNS RRSet (Resource Record Set).
 Objects are returned by L<WWW::Hetzner::Cloud::API::RRSets> methods.
 
-=head1 ATTRIBUTES
+=cut
 
-=head2 zone_id
+has _client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+    init_arg => 'client',
+);
+
+has zone_id => ( is => 'ro', required => 1 );
+
+=attr zone_id
 
 Zone ID this record belongs to (read-only).
 
-=head2 name
+=cut
+
+has name => ( is => 'ro' );
+
+=attr name
 
 Record name, e.g. "www" or "@" for apex (read-only).
 
-=head2 type
+=cut
+
+has type => ( is => 'ro' );
+
+=attr type
 
 Record type: A, AAAA, CNAME, MX, TXT, etc. (read-only).
 
-=head2 ttl
+=cut
+
+has ttl => ( is => 'rw' );
+
+=attr ttl
 
 Time to live in seconds (read-write).
 
-=head2 records
+=cut
+
+has records => ( is => 'rw', default => sub { [] } );
+
+=attr records
 
 Arrayref of record values: C<[{ value => '1.2.3.4' }, ...]> (read-write).
 
-=head1 METHODS
+=cut
 
-=head2 values
+sub update {
+    my ($self) = @_;
+    croak "Cannot update RRSet without zone_id" unless $self->zone_id;
+    croak "Cannot update RRSet without name" unless $self->name;
+    croak "Cannot update RRSet without type" unless $self->type;
 
-    my $values = $record->values;  # ['1.2.3.4', '5.6.7.8']
+    my $path = "/zones/" . $self->zone_id . "/rrsets/" . $self->name . "/" . $self->type;
+    $self->_client->put($path, {
+        ttl     => $self->ttl,
+        records => $self->records,
+    });
+    return $self;
+}
 
-Returns an arrayref of just the record values (without the hash structure).
-
-=head2 update
+=method update
 
     $record->ttl(600);
     $record->records([{ value => '5.6.7.8' }]);
@@ -131,16 +102,57 @@ Returns an arrayref of just the record values (without the hash structure).
 
 Saves changes to TTL and records back to the API.
 
-=head2 delete
+=cut
+
+sub delete {
+    my ($self) = @_;
+    croak "Cannot delete RRSet without zone_id" unless $self->zone_id;
+    croak "Cannot delete RRSet without name" unless $self->name;
+    croak "Cannot delete RRSet without type" unless $self->type;
+
+    my $path = "/zones/" . $self->zone_id . "/rrsets/" . $self->name . "/" . $self->type;
+    $self->_client->delete($path);
+    return 1;
+}
+
+=method delete
 
     $record->delete;
 
 Deletes the RRSet.
 
-=head2 data
+=cut
+
+sub values {
+    my ($self) = @_;
+    return [ map { $_->{value} } @{$self->records} ];
+}
+
+=method values
+
+    my $values = $record->values;  # ['1.2.3.4', '5.6.7.8']
+
+Returns an arrayref of just the record values (without the hash structure).
+
+=cut
+
+sub data {
+    my ($self) = @_;
+    return {
+        zone_id => $self->zone_id,
+        name    => $self->name,
+        type    => $self->type,
+        ttl     => $self->ttl,
+        records => $self->records,
+    };
+}
+
+=method data
 
     my $hashref = $record->data;
 
 Returns all RRSet data as a hashref (for JSON serialization).
 
 =cut
+
+1;

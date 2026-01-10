@@ -6,19 +6,10 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hrobot.pl key [options]';
 
-=head1 NAME
-
-hrobot.pl key - List SSH keys
-
 =head1 SYNOPSIS
 
     hrobot.pl key
     hrobot.pl key -o json
-
-=head1 DESCRIPTION
-
-Lists all SSH keys stored in your Hetzner Robot account.
-Shows name, fingerprint, type, and size for each key.
 
 =cut
 

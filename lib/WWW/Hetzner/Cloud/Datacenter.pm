@@ -5,38 +5,6 @@ our $VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
-has _client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-    init_arg => 'client',
-);
-
-has id => ( is => 'ro' );
-has name => ( is => 'ro' );
-has description => ( is => 'ro' );
-has location_data => ( is => 'ro', init_arg => 'location', default => sub { {} } );
-
-sub location { shift->location_data->{name} }
-
-sub data {
-    my ($self) = @_;
-    return {
-        id          => $self->id,
-        name        => $self->name,
-        description => $self->description,
-        location    => $self->location_data,
-    };
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::Datacenter - Hetzner Cloud Datacenter object
-
 =head1 SYNOPSIS
 
     my $dc = $cloud->datacenters->get_by_name('fsn1-dc14');
@@ -52,30 +20,65 @@ Objects are returned by L<WWW::Hetzner::Cloud::API::Datacenters> methods.
 
 Datacenters are read-only resources.
 
-=head1 ATTRIBUTES
+=cut
 
-=head2 id
+has _client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+    init_arg => 'client',
+);
+
+has id => ( is => 'ro' );
+
+=attr id
 
 Datacenter ID.
 
-=head2 name
+=cut
+
+has name => ( is => 'ro' );
+
+=attr name
 
 Datacenter name, e.g. "fsn1-dc14".
 
-=head2 description
+=cut
+
+has description => ( is => 'ro' );
+
+=attr description
 
 Human-readable description.
 
-=head2 location
+=cut
+
+has location_data => ( is => 'ro', init_arg => 'location', default => sub { {} } );
+
+sub location { shift->location_data->{name} }
+
+=method location
 
 Location name (convenience accessor).
 
-=head1 METHODS
+=cut
 
-=head2 data
+sub data {
+    my ($self) = @_;
+    return {
+        id          => $self->id,
+        name        => $self->name,
+        description => $self->description,
+        location    => $self->location_data,
+    };
+}
+
+=method data
 
     my $hashref = $dc->data;
 
 Returns all datacenter data as a hashref (for JSON serialization).
 
 =cut
+
+1;

@@ -9,30 +9,6 @@ use namespace::clean;
 
 our $VERSION = '0.002';
 
-has cloud => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Cloud->new },
-);
-
-has robot => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Robot->new },
-);
-
-# TODO: Storage API not yet implemented
-# has storage => (
-#     is      => 'lazy',
-#     builder => sub { WWW::Hetzner::Storage->new },
-# );
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner - Perl client for Hetzner APIs (Cloud, Storage, Robot)
-
 =head1 SYNOPSIS
 
     # Cloud API (Cloud Servers, DNS)
@@ -64,7 +40,9 @@ WWW::Hetzner - Perl client for Hetzner APIs (Cloud, Storage, Robot)
     my $dedicated = $robot->servers->list;
     $robot->reset->software(123456);  # Reset server
 
-=head1 HETZNER APIs
+=head1 DESCRIPTION
+
+WWW::Hetzner provides a unified interface to Hetzner's various APIs:
 
 =over 4
 
@@ -78,6 +56,36 @@ WWW::Hetzner - Perl client for Hetzner APIs (Cloud, Storage, Robot)
 
 B<Note:> The old standalone DNS API (dns.hetzner.com) no longer exists.
 DNS is now part of the Cloud API.
+
+=cut
+
+has cloud => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud->new },
+);
+
+=attr cloud
+
+Returns a L<WWW::Hetzner::Cloud> instance for the Cloud API.
+
+=cut
+
+has robot => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot->new },
+);
+
+=attr robot
+
+Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
+
+=cut
+
+# TODO: Storage API not yet implemented
+# has storage => (
+#     is      => 'lazy',
+#     builder => sub { WWW::Hetzner::Storage->new },
+# );
 
 =head1 CLOUD API CLASSES
 
@@ -391,3 +399,5 @@ See L<WWW::Hetzner::Robot::CLI>.
 =back
 
 =cut
+
+1;

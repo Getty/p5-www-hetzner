@@ -7,82 +7,6 @@ use Carp qw(croak);
 use WWW::Hetzner::Cloud::API::RRSets;
 use namespace::clean;
 
-has _client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-    init_arg => 'client',
-);
-
-has id => ( is => 'ro' );
-has name => ( is => 'rw' );
-has status => ( is => 'ro' );
-has ttl => ( is => 'rw' );
-has created => ( is => 'ro' );
-has ns => ( is => 'ro', default => sub { [] } );
-has records_count => ( is => 'ro' );
-has is_secondary_dns => ( is => 'ro' );
-has labels => ( is => 'rw', default => sub { {} } );
-
-sub update {
-    my ($self) = @_;
-    croak "Cannot update zone without ID" unless $self->id;
-
-    $self->_client->put("/zones/" . $self->id, {
-        name   => $self->name,
-        labels => $self->labels,
-    });
-    return $self;
-}
-
-sub delete {
-    my ($self) = @_;
-    croak "Cannot delete zone without ID" unless $self->id;
-
-    $self->_client->delete("/zones/" . $self->id);
-    return 1;
-}
-
-sub rrsets {
-    my ($self) = @_;
-    croak "Cannot get rrsets without zone ID" unless $self->id;
-
-    return WWW::Hetzner::Cloud::API::RRSets->new(
-        client  => $self->_client,
-        zone_id => $self->id,
-    );
-}
-
-sub export {
-    my ($self) = @_;
-    croak "Cannot export zone without ID" unless $self->id;
-
-    return $self->_client->get("/zones/" . $self->id . "/export");
-}
-
-sub data {
-    my ($self) = @_;
-    return {
-        id              => $self->id,
-        name            => $self->name,
-        status          => $self->status,
-        ttl             => $self->ttl,
-        created         => $self->created,
-        ns              => $self->ns,
-        records_count   => $self->records_count,
-        is_secondary_dns => $self->is_secondary_dns,
-        labels          => $self->labels,
-    };
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::Zone - Hetzner Cloud DNS Zone object
-
 =head1 SYNOPSIS
 
     my $zone = $cloud->zones->get($id);
@@ -114,75 +38,177 @@ WWW::Hetzner::Cloud::Zone - Hetzner Cloud DNS Zone object
 This class represents a Hetzner Cloud DNS zone. Objects are returned by
 L<WWW::Hetzner::Cloud::API::Zones> methods.
 
-=head1 ATTRIBUTES
+=cut
 
-=head2 id
+has _client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+    init_arg => 'client',
+);
+
+has id => ( is => 'ro' );
+
+=attr id
 
 Zone ID (read-only).
 
-=head2 name
+=cut
+
+has name => ( is => 'rw' );
+
+=attr name
 
 Zone name / domain (read-write).
 
-=head2 status
+=cut
+
+has status => ( is => 'ro' );
+
+=attr status
 
 Zone status: verified, pending, failed (read-only).
 
-=head2 ttl
+=cut
+
+has ttl => ( is => 'rw' );
+
+=attr ttl
 
 Default TTL for records (read-write).
 
-=head2 created
+=cut
+
+has created => ( is => 'ro' );
+
+=attr created
 
 Creation timestamp (read-only).
 
-=head2 ns
+=cut
+
+has ns => ( is => 'ro', default => sub { [] } );
+
+=attr ns
 
 Nameservers arrayref (read-only).
 
-=head2 records_count
+=cut
+
+has records_count => ( is => 'ro' );
+
+=attr records_count
 
 Number of records in the zone (read-only).
 
-=head2 is_secondary_dns
+=cut
+
+has is_secondary_dns => ( is => 'ro' );
+
+=attr is_secondary_dns
 
 Whether this is a secondary DNS zone (read-only).
 
-=head2 labels
+=cut
+
+has labels => ( is => 'rw', default => sub { {} } );
+
+=attr labels
 
 Labels hash (read-write).
 
-=head1 METHODS
+=cut
 
-=head2 update
+sub update {
+    my ($self) = @_;
+    croak "Cannot update zone without ID" unless $self->id;
+
+    $self->_client->put("/zones/" . $self->id, {
+        name   => $self->name,
+        labels => $self->labels,
+    });
+    return $self;
+}
+
+=method update
 
     $zone->name('newdomain.com');
     $zone->update;
 
 Saves changes to name and labels back to the API.
 
-=head2 delete
+=cut
+
+sub delete {
+    my ($self) = @_;
+    croak "Cannot delete zone without ID" unless $self->id;
+
+    $self->_client->delete("/zones/" . $self->id);
+    return 1;
+}
+
+=method delete
 
     $zone->delete;
 
 Deletes the zone and all its records.
 
-=head2 rrsets
+=cut
+
+sub rrsets {
+    my ($self) = @_;
+    croak "Cannot get rrsets without zone ID" unless $self->id;
+
+    return WWW::Hetzner::Cloud::API::RRSets->new(
+        client  => $self->_client,
+        zone_id => $self->id,
+    );
+}
+
+=method rrsets
 
     my $rrsets = $zone->rrsets;
 
 Returns a L<WWW::Hetzner::Cloud::API::RRSets> object for managing DNS records.
 
-=head2 export
+=cut
+
+sub export {
+    my ($self) = @_;
+    croak "Cannot export zone without ID" unless $self->id;
+
+    return $self->_client->get("/zones/" . $self->id . "/export");
+}
+
+=method export
 
     my $zonefile = $zone->export;
 
 Exports the zone as a standard zone file format.
 
-=head2 data
+=cut
+
+sub data {
+    my ($self) = @_;
+    return {
+        id              => $self->id,
+        name            => $self->name,
+        status          => $self->status,
+        ttl             => $self->ttl,
+        created         => $self->created,
+        ns              => $self->ns,
+        records_count   => $self->records_count,
+        is_secondary_dns => $self->is_secondary_dns,
+        labels          => $self->labels,
+    };
+}
+
+=method data
 
     my $hashref = $zone->data;
 
 Returns all zone data as a hashref (for JSON serialization).
 
 =cut
+
+1;

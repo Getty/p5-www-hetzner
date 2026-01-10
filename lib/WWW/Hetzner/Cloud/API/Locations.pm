@@ -7,59 +7,6 @@ use Carp qw(croak);
 use WWW::Hetzner::Cloud::Location;
 use namespace::clean;
 
-has client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-);
-
-sub _wrap {
-    my ($self, $data) = @_;
-    return WWW::Hetzner::Cloud::Location->new(
-        client => $self->client,
-        %$data,
-    );
-}
-
-sub _wrap_list {
-    my ($self, $list) = @_;
-    return [ map { $self->_wrap($_) } @$list ];
-}
-
-sub list {
-    my ($self, %params) = @_;
-
-    my $result = $self->client->get('/locations', params => \%params);
-    return $self->_wrap_list($result->{locations} // []);
-}
-
-sub get {
-    my ($self, $id) = @_;
-    croak "Location ID required" unless $id;
-
-    my $result = $self->client->get("/locations/$id");
-    return $self->_wrap($result->{location});
-}
-
-sub get_by_name {
-    my ($self, $name) = @_;
-    croak "Name required" unless $name;
-
-    my $locations = $self->list;
-    for my $loc (@$locations) {
-        return $loc if $loc->name eq $name;
-    }
-    return;
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::API::Locations - Hetzner Cloud Locations API
-
 =head1 SYNOPSIS
 
     use WWW::Hetzner::Cloud;
@@ -82,24 +29,75 @@ All methods return L<WWW::Hetzner::Cloud::Location> objects.
 Available locations: fsn1 (Falkenstein), nbg1 (Nuremberg), hel1 (Helsinki),
 ash (Ashburn), hil (Hillsboro), sin (Singapore).
 
-=head1 METHODS
+=cut
 
-=head2 list
+has client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+);
+
+sub _wrap {
+    my ($self, $data) = @_;
+    return WWW::Hetzner::Cloud::Location->new(
+        client => $self->client,
+        %$data,
+    );
+}
+
+sub _wrap_list {
+    my ($self, $list) = @_;
+    return [ map { $self->_wrap($_) } @$list ];
+}
+
+=method list
 
     my $locations = $cloud->locations->list;
 
 Returns an arrayref of L<WWW::Hetzner::Cloud::Location> objects.
 
-=head2 get
+=cut
+
+sub list {
+    my ($self, %params) = @_;
+
+    my $result = $self->client->get('/locations', params => \%params);
+    return $self->_wrap_list($result->{locations} // []);
+}
+
+=method get
 
     my $location = $cloud->locations->get($id);
 
 Returns a L<WWW::Hetzner::Cloud::Location> object.
 
-=head2 get_by_name
+=cut
+
+sub get {
+    my ($self, $id) = @_;
+    croak "Location ID required" unless $id;
+
+    my $result = $self->client->get("/locations/$id");
+    return $self->_wrap($result->{location});
+}
+
+=method get_by_name
 
     my $location = $cloud->locations->get_by_name('fsn1');
 
 Returns a L<WWW::Hetzner::Cloud::Location> object. Returns undef if not found.
 
 =cut
+
+sub get_by_name {
+    my ($self, $name) = @_;
+    croak "Name required" unless $name;
+
+    my $locations = $self->list;
+    for my $loc (@$locations) {
+        return $loc if $loc->name eq $name;
+    }
+    return;
+}
+
+1;

@@ -6,6 +6,41 @@ use Moo;
 use Carp qw(croak);
 use namespace::clean;
 
+=head1 SYNOPSIS
+
+    my $robot = WWW::Hetzner::Robot->new(...);
+
+    # Query daily traffic for an IP
+    my $traffic = $robot->traffic->query(
+        type => 'day',
+        from => '2024-01-01T00',
+        to   => '2024-01-02T00',
+        ip   => '1.2.3.4',
+    );
+
+    # Query monthly traffic for multiple IPs
+    my $traffic = $robot->traffic->query(
+        type => 'month',
+        from => '2024-01-01',
+        to   => '2024-02-01',
+        ip   => ['1.2.3.4', '5.6.7.8'],
+    );
+
+    # Query with single_values for hourly breakdown
+    my $traffic = $robot->traffic->query(
+        type          => 'day',
+        from          => '2024-01-01T00',
+        to            => '2024-01-02T00',
+        ip            => '1.2.3.4',
+        single_values => 1,
+    );
+
+=head1 DESCRIPTION
+
+Query traffic statistics for IPs and subnets.
+
+=cut
+
 has client => (
     is       => 'ro',
     required => 1,
@@ -48,50 +83,7 @@ sub query {
     return $result->{traffic};
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Robot::API::Traffic - Hetzner Robot Traffic API
-
-=head1 SYNOPSIS
-
-    my $robot = WWW::Hetzner::Robot->new(...);
-
-    # Query daily traffic for an IP
-    my $traffic = $robot->traffic->query(
-        type => 'day',
-        from => '2024-01-01T00',
-        to   => '2024-01-02T00',
-        ip   => '1.2.3.4',
-    );
-
-    # Query monthly traffic for multiple IPs
-    my $traffic = $robot->traffic->query(
-        type => 'month',
-        from => '2024-01-01',
-        to   => '2024-02-01',
-        ip   => ['1.2.3.4', '5.6.7.8'],
-    );
-
-    # Query with single_values for hourly breakdown
-    my $traffic = $robot->traffic->query(
-        type          => 'day',
-        from          => '2024-01-01T00',
-        to            => '2024-01-02T00',
-        ip            => '1.2.3.4',
-        single_values => 1,
-    );
-
-=head1 DESCRIPTION
-
-Query traffic statistics for IPs and subnets.
-
-=head1 METHODS
-
-=head2 query
+=method query
 
     my $traffic = $robot->traffic->query(%params);
 
@@ -153,3 +145,5 @@ B<Response structure:>
     }
 
 =cut
+
+1;

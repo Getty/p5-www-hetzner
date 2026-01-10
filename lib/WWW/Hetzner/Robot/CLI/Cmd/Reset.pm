@@ -6,30 +6,12 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hrobot.pl reset <server-number> [--type sw|hw|man]';
 
-=head1 NAME
-
-hrobot.pl reset - Reset a dedicated server
-
 =head1 SYNOPSIS
 
     hrobot.pl reset <server-number>
     hrobot.pl reset 123456
     hrobot.pl reset 123456 --type hw
     hrobot.pl reset 123456 -t man
-
-=head1 DESCRIPTION
-
-Triggers a reset of a dedicated server. Supports different reset types:
-
-=over 4
-
-=item B<sw> - Software reset (default, graceful)
-
-=item B<hw> - Hardware reset (immediate power cycle)
-
-=item B<man> - Manual reset (request technician intervention)
-
-=back
 
 =cut
 

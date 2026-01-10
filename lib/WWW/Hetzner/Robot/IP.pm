@@ -12,14 +12,76 @@ has client => (
 );
 
 has ip                => ( is => 'ro', required => 1 );
+
+=attr ip
+
+IP address.
+
+=cut
+
 has server_number     => ( is => 'ro' );
+
+=attr server_number
+
+Associated server.
+
+=cut
+
 has server_ip         => ( is => 'ro' );
+
+=attr server_ip
+
+Main server IP.
+
+=cut
+
 has locked            => ( is => 'ro' );
+
+=attr locked
+
+Lock status.
+
+=cut
+
 has separate_mac      => ( is => 'ro' );
+
+=attr separate_mac
+
+Separate MAC address.
+
+=cut
+
 has traffic_warnings  => ( is => 'rw' );
+
+=attr traffic_warnings
+
+Traffic warning enabled.
+
+=cut
+
 has traffic_hourly    => ( is => 'rw' );
+
+=attr traffic_hourly
+
+Hourly traffic limit.
+
+=cut
+
 has traffic_daily     => ( is => 'rw' );
+
+=attr traffic_daily
+
+Daily traffic limit.
+
+=cut
+
 has traffic_monthly   => ( is => 'rw' );
+
+=attr traffic_monthly
+
+Monthly traffic limit.
+
+=cut
 
 sub update {
     my ($self) = @_;
@@ -31,32 +93,11 @@ sub update {
     return $self->client->post("/ip/" . $self->ip, $body);
 }
 
-1;
+=method update
 
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Robot::IP - Hetzner Robot IP entity
-
-=head1 ATTRIBUTES
-
-=over 4
-
-=item * ip - IP address
-
-=item * server_number - Associated server
-
-=item * server_ip - Main server IP
-
-=item * locked - Lock status
-
-=item * separate_mac - Separate MAC address
-
-=item * traffic_warnings - Traffic warning enabled
-
-=item * traffic_hourly/daily/monthly - Traffic limits
-
-=back
+Updates the IP configuration via the API with current attribute values for
+traffic_warnings, traffic_hourly, traffic_daily, and traffic_monthly.
 
 =cut
+
+1;

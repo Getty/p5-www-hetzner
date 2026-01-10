@@ -9,6 +9,33 @@ use WWW::Hetzner::Robot;
 
 our $VERSION = '0.002';
 
+=head1 SYNOPSIS
+
+    use WWW::Hetzner::Robot::CLI;
+    WWW::Hetzner::Robot::CLI->new_with_cmd;
+
+=head1 DESCRIPTION
+
+CLI for the Hetzner Robot API (dedicated servers).
+
+This is a Perl implementation to manage dedicated servers via the Robot API.
+
+=head1 COMMANDS
+
+=over 4
+
+=item * server - Manage dedicated servers (list, describe)
+
+=item * key - Manage SSH keys (list)
+
+=item * reset - Reset a server (software, hardware, manual)
+
+=item * wol - Send Wake-on-LAN packet
+
+=back
+
+=cut
+
 option user => (
     is     => 'ro',
     format => 's',
@@ -16,6 +43,13 @@ option user => (
     doc    => 'Robot user (default: HETZNER_ROBOT_USER env)',
     default => sub { $ENV{HETZNER_ROBOT_USER} },
 );
+
+=attr user
+
+Robot webservice username. Use C<--user> or C<-u> flag, or set via
+C<HETZNER_ROBOT_USER> environment variable.
+
+=cut
 
 option password => (
     is     => 'ro',
@@ -25,6 +59,13 @@ option password => (
     default => sub { $ENV{HETZNER_ROBOT_PASSWORD} },
 );
 
+=attr password
+
+Robot webservice password. Use C<--password> or C<-p> flag, or set via
+C<HETZNER_ROBOT_PASSWORD> environment variable.
+
+=cut
+
 option output => (
     is      => 'ro',
     format  => 's',
@@ -32,6 +73,12 @@ option output => (
     doc     => 'Output format: table, json (default: table)',
     default => 'table',
 );
+
+=attr output
+
+Output format: C<table> (default) or C<json>. Use C<--output> or C<-o> flag.
+
+=cut
 
 has robot => (
     is      => 'lazy',
@@ -43,6 +90,12 @@ has robot => (
         );
     },
 );
+
+=attr robot
+
+L<WWW::Hetzner::Robot> instance.
+
+=cut
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -68,61 +121,16 @@ sub execute {
     print "\nRun 'hrobot.pl <command> --help' for command-specific options.\n";
 }
 
-1;
+=method execute
 
-__END__
+Main entry point. Shows help when no subcommand is given.
 
-=head1 NAME
-
-WWW::Hetzner::Robot::CLI - Command-line interface for Hetzner Robot
-
-=head1 SYNOPSIS
-
-    use WWW::Hetzner::Robot::CLI;
-    WWW::Hetzner::Robot::CLI->new_with_cmd;
-
-=head1 DESCRIPTION
-
-CLI for the Hetzner Robot API (dedicated servers).
-
-This is a Perl implementation to manage dedicated servers via the Robot API.
-
-=head1 ATTRIBUTES
-
-=head2 user
-
-Robot webservice username. Use C<--user> or C<-u> flag, or set via
-C<HETZNER_ROBOT_USER> environment variable.
-
-=head2 password
-
-Robot webservice password. Use C<--password> or C<-p> flag, or set via
-C<HETZNER_ROBOT_PASSWORD> environment variable.
-
-=head2 output
-
-Output format: C<table> (default) or C<json>. Use C<--output> or C<-o> flag.
-
-=head2 robot
-
-L<WWW::Hetzner::Robot> instance.
-
-=head1 COMMANDS
-
-=over 4
-
-=item * server - Manage dedicated servers (list, describe)
-
-=item * key - Manage SSH keys (list)
-
-=item * reset - Reset a server (software, hardware, manual)
-
-=item * wol - Send Wake-on-LAN packet
-
-=back
+=cut
 
 =head1 SEE ALSO
 
 L<WWW::Hetzner::Robot>
 
 =cut
+
+1;

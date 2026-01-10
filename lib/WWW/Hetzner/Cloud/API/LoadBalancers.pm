@@ -7,146 +7,6 @@ use Carp qw(croak);
 use WWW::Hetzner::Cloud::LoadBalancer;
 use namespace::clean;
 
-has client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-);
-
-sub _wrap {
-    my ($self, $data) = @_;
-    return WWW::Hetzner::Cloud::LoadBalancer->new(
-        client => $self->client,
-        %$data,
-    );
-}
-
-sub _wrap_list {
-    my ($self, $list) = @_;
-    return [ map { $self->_wrap($_) } @$list ];
-}
-
-sub list {
-    my ($self, %params) = @_;
-
-    my $result = $self->client->get('/load_balancers', params => \%params);
-    return $self->_wrap_list($result->{load_balancers} // []);
-}
-
-sub get {
-    my ($self, $id) = @_;
-    croak "Load Balancer ID required" unless $id;
-
-    my $result = $self->client->get("/load_balancers/$id");
-    return $self->_wrap($result->{load_balancer});
-}
-
-sub create {
-    my ($self, %params) = @_;
-
-    croak "name required" unless $params{name};
-    croak "load_balancer_type required" unless $params{load_balancer_type};
-    croak "location required" unless $params{location};
-
-    my $body = {
-        name               => $params{name},
-        load_balancer_type => $params{load_balancer_type},
-        location           => $params{location},
-    };
-
-    $body->{algorithm}   = $params{algorithm}   if $params{algorithm};
-    $body->{labels}      = $params{labels}      if $params{labels};
-    $body->{network}     = $params{network}     if $params{network};
-    $body->{network_zone}= $params{network_zone}if $params{network_zone};
-    $body->{public_interface} = $params{public_interface} if exists $params{public_interface};
-    $body->{services}    = $params{services}    if $params{services};
-    $body->{targets}     = $params{targets}     if $params{targets};
-
-    my $result = $self->client->post('/load_balancers', $body);
-    return $self->_wrap($result->{load_balancer});
-}
-
-sub update {
-    my ($self, $id, %params) = @_;
-    croak "Load Balancer ID required" unless $id;
-
-    my $body = {};
-    $body->{name}   = $params{name}   if exists $params{name};
-    $body->{labels} = $params{labels} if exists $params{labels};
-
-    my $result = $self->client->put("/load_balancers/$id", $body);
-    return $self->_wrap($result->{load_balancer});
-}
-
-sub delete {
-    my ($self, $id) = @_;
-    croak "Load Balancer ID required" unless $id;
-
-    return $self->client->delete("/load_balancers/$id");
-}
-
-sub add_target {
-    my ($self, $id, %opts) = @_;
-    croak "Load Balancer ID required" unless $id;
-    croak "type required" unless $opts{type};
-
-    return $self->client->post("/load_balancers/$id/actions/add_target", \%opts);
-}
-
-sub remove_target {
-    my ($self, $id, %opts) = @_;
-    croak "Load Balancer ID required" unless $id;
-    croak "type required" unless $opts{type};
-
-    return $self->client->post("/load_balancers/$id/actions/remove_target", \%opts);
-}
-
-sub add_service {
-    my ($self, $id, %opts) = @_;
-    croak "Load Balancer ID required" unless $id;
-
-    return $self->client->post("/load_balancers/$id/actions/add_service", \%opts);
-}
-
-sub delete_service {
-    my ($self, $id, $listen_port) = @_;
-    croak "Load Balancer ID required" unless $id;
-    croak "listen_port required" unless $listen_port;
-
-    return $self->client->post("/load_balancers/$id/actions/delete_service", {
-        listen_port => $listen_port,
-    });
-}
-
-sub attach_to_network {
-    my ($self, $id, $network_id, %opts) = @_;
-    croak "Load Balancer ID required" unless $id;
-    croak "network required" unless $network_id;
-
-    my $body = { network => $network_id };
-    $body->{ip} = $opts{ip} if $opts{ip};
-
-    return $self->client->post("/load_balancers/$id/actions/attach_to_network", $body);
-}
-
-sub detach_from_network {
-    my ($self, $id, $network_id) = @_;
-    croak "Load Balancer ID required" unless $id;
-    croak "network required" unless $network_id;
-
-    return $self->client->post("/load_balancers/$id/actions/detach_from_network", {
-        network => $network_id,
-    });
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::API::LoadBalancers - Hetzner Cloud Load Balancers API
-
 =head1 SYNOPSIS
 
     my $cloud = WWW::Hetzner::Cloud->new(token => $token);
@@ -177,4 +37,253 @@ WWW::Hetzner::Cloud::API::LoadBalancers - Hetzner Cloud Load Balancers API
     # Delete
     $cloud->load_balancers->delete($lb->id);
 
+=head1 DESCRIPTION
+
+This module provides the API for managing Hetzner Cloud load balancers.
+All methods return L<WWW::Hetzner::Cloud::LoadBalancer> objects.
+
 =cut
+
+has client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+);
+
+sub _wrap {
+    my ($self, $data) = @_;
+    return WWW::Hetzner::Cloud::LoadBalancer->new(
+        client => $self->client,
+        %$data,
+    );
+}
+
+sub _wrap_list {
+    my ($self, $list) = @_;
+    return [ map { $self->_wrap($_) } @$list ];
+}
+
+=method list
+
+    my $lbs = $cloud->load_balancers->list;
+    my $lbs = $cloud->load_balancers->list(label_selector => 'env=prod');
+
+Returns arrayref of L<WWW::Hetzner::Cloud::LoadBalancer> objects.
+
+=cut
+
+sub list {
+    my ($self, %params) = @_;
+
+    my $result = $self->client->get('/load_balancers', params => \%params);
+    return $self->_wrap_list($result->{load_balancers} // []);
+}
+
+=method get
+
+    my $lb = $cloud->load_balancers->get($id);
+
+Returns L<WWW::Hetzner::Cloud::LoadBalancer> object.
+
+=cut
+
+sub get {
+    my ($self, $id) = @_;
+    croak "Load Balancer ID required" unless $id;
+
+    my $result = $self->client->get("/load_balancers/$id");
+    return $self->_wrap($result->{load_balancer});
+}
+
+=method create
+
+    my $lb = $cloud->load_balancers->create(
+        name               => 'my-lb',       # required
+        load_balancer_type => 'lb11',        # required
+        location           => 'fsn1',        # required
+        algorithm          => { type => 'round_robin' },  # optional
+        labels             => { ... },       # optional
+        network            => $network_id,   # optional
+        network_zone       => 'eu-central',  # optional
+        public_interface   => 1,             # optional
+        services           => [ ... ],       # optional
+        targets            => [ ... ],       # optional
+    );
+
+Creates load balancer. Returns L<WWW::Hetzner::Cloud::LoadBalancer> object.
+
+=cut
+
+sub create {
+    my ($self, %params) = @_;
+
+    croak "name required" unless $params{name};
+    croak "load_balancer_type required" unless $params{load_balancer_type};
+    croak "location required" unless $params{location};
+
+    my $body = {
+        name               => $params{name},
+        load_balancer_type => $params{load_balancer_type},
+        location           => $params{location},
+    };
+
+    $body->{algorithm}   = $params{algorithm}   if $params{algorithm};
+    $body->{labels}      = $params{labels}      if $params{labels};
+    $body->{network}     = $params{network}     if $params{network};
+    $body->{network_zone}= $params{network_zone}if $params{network_zone};
+    $body->{public_interface} = $params{public_interface} if exists $params{public_interface};
+    $body->{services}    = $params{services}    if $params{services};
+    $body->{targets}     = $params{targets}     if $params{targets};
+
+    my $result = $self->client->post('/load_balancers', $body);
+    return $self->_wrap($result->{load_balancer});
+}
+
+=method update
+
+    $cloud->load_balancers->update($id, name => 'new-name', labels => { ... });
+
+Updates load balancer. Returns L<WWW::Hetzner::Cloud::LoadBalancer> object.
+
+=cut
+
+sub update {
+    my ($self, $id, %params) = @_;
+    croak "Load Balancer ID required" unless $id;
+
+    my $body = {};
+    $body->{name}   = $params{name}   if exists $params{name};
+    $body->{labels} = $params{labels} if exists $params{labels};
+
+    my $result = $self->client->put("/load_balancers/$id", $body);
+    return $self->_wrap($result->{load_balancer});
+}
+
+=method delete
+
+    $cloud->load_balancers->delete($id);
+
+Deletes load balancer.
+
+=cut
+
+sub delete {
+    my ($self, $id) = @_;
+    croak "Load Balancer ID required" unless $id;
+
+    return $self->client->delete("/load_balancers/$id");
+}
+
+=method add_target
+
+    $cloud->load_balancers->add_target($id,
+        type   => 'server',
+        server => { id => 123 },
+    );
+
+Add a target to the load balancer.
+
+=cut
+
+sub add_target {
+    my ($self, $id, %opts) = @_;
+    croak "Load Balancer ID required" unless $id;
+    croak "type required" unless $opts{type};
+
+    return $self->client->post("/load_balancers/$id/actions/add_target", \%opts);
+}
+
+=method remove_target
+
+    $cloud->load_balancers->remove_target($id,
+        type   => 'server',
+        server => { id => 123 },
+    );
+
+Remove a target from the load balancer.
+
+=cut
+
+sub remove_target {
+    my ($self, $id, %opts) = @_;
+    croak "Load Balancer ID required" unless $id;
+    croak "type required" unless $opts{type};
+
+    return $self->client->post("/load_balancers/$id/actions/remove_target", \%opts);
+}
+
+=method add_service
+
+    $cloud->load_balancers->add_service($id,
+        protocol         => 'http',
+        listen_port      => 80,
+        destination_port => 8080,
+    );
+
+Add a service to the load balancer.
+
+=cut
+
+sub add_service {
+    my ($self, $id, %opts) = @_;
+    croak "Load Balancer ID required" unless $id;
+
+    return $self->client->post("/load_balancers/$id/actions/add_service", \%opts);
+}
+
+=method delete_service
+
+    $cloud->load_balancers->delete_service($id, $listen_port);
+
+Delete a service from the load balancer.
+
+=cut
+
+sub delete_service {
+    my ($self, $id, $listen_port) = @_;
+    croak "Load Balancer ID required" unless $id;
+    croak "listen_port required" unless $listen_port;
+
+    return $self->client->post("/load_balancers/$id/actions/delete_service", {
+        listen_port => $listen_port,
+    });
+}
+
+=method attach_to_network
+
+    $cloud->load_balancers->attach_to_network($id, $network_id, ip => '10.0.0.5');
+
+Attach load balancer to a network.
+
+=cut
+
+sub attach_to_network {
+    my ($self, $id, $network_id, %opts) = @_;
+    croak "Load Balancer ID required" unless $id;
+    croak "network required" unless $network_id;
+
+    my $body = { network => $network_id };
+    $body->{ip} = $opts{ip} if $opts{ip};
+
+    return $self->client->post("/load_balancers/$id/actions/attach_to_network", $body);
+}
+
+=method detach_from_network
+
+    $cloud->load_balancers->detach_from_network($id, $network_id);
+
+Detach load balancer from a network.
+
+=cut
+
+sub detach_from_network {
+    my ($self, $id, $network_id) = @_;
+    croak "Load Balancer ID required" unless $id;
+    croak "network required" unless $network_id;
+
+    return $self->client->post("/load_balancers/$id/actions/detach_from_network", {
+        network => $network_id,
+    });
+}
+
+1;

@@ -7,103 +7,6 @@ use Carp qw(croak);
 use WWW::Hetzner::Cloud::Volume;
 use namespace::clean;
 
-has client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-);
-
-sub _wrap {
-    my ($self, $data) = @_;
-    return WWW::Hetzner::Cloud::Volume->new(
-        client => $self->client,
-        %$data,
-    );
-}
-
-sub _wrap_list {
-    my ($self, $list) = @_;
-    return [ map { $self->_wrap($_) } @$list ];
-}
-
-sub list {
-    my ($self, %params) = @_;
-
-    my $result = $self->client->get('/volumes', params => \%params);
-    return $self->_wrap_list($result->{volumes} // []);
-}
-
-sub get {
-    my ($self, $id) = @_;
-    croak "Volume ID required" unless $id;
-
-    my $result = $self->client->get("/volumes/$id");
-    return $self->_wrap($result->{volume});
-}
-
-sub create {
-    my ($self, %params) = @_;
-
-    croak "name required" unless $params{name};
-    croak "size required" unless $params{size};
-    croak "location required" unless $params{location};
-
-    my $body = {
-        name     => $params{name},
-        size     => $params{size},
-        location => $params{location},
-    };
-
-    $body->{format}    = $params{format}    if $params{format};
-    $body->{labels}    = $params{labels}    if $params{labels};
-    $body->{automount} = $params{automount} if exists $params{automount};
-    $body->{server}    = $params{server}    if $params{server};
-
-    my $result = $self->client->post('/volumes', $body);
-    return $self->_wrap($result->{volume});
-}
-
-sub delete {
-    my ($self, $id) = @_;
-    croak "Volume ID required" unless $id;
-
-    return $self->client->delete("/volumes/$id");
-}
-
-sub attach {
-    my ($self, $id, $server_id, %opts) = @_;
-    croak "Volume ID required" unless $id;
-    croak "Server ID required" unless $server_id;
-
-    my $body = { server => $server_id };
-    $body->{automount} = $opts{automount} ? \1 : \0 if exists $opts{automount};
-
-    return $self->client->post("/volumes/$id/actions/attach", $body);
-}
-
-sub detach {
-    my ($self, $id) = @_;
-    croak "Volume ID required" unless $id;
-
-    return $self->client->post("/volumes/$id/actions/detach", {});
-}
-
-sub resize {
-    my ($self, $id, $size) = @_;
-    croak "Volume ID required" unless $id;
-    croak "Size required" unless $size;
-
-    return $self->client->post("/volumes/$id/actions/resize", { size => $size });
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::API::Volumes - Hetzner Cloud Volumes API
-
 =head1 SYNOPSIS
 
     my $cloud = WWW::Hetzner::Cloud->new(token => $token);
@@ -128,34 +31,165 @@ WWW::Hetzner::Cloud::API::Volumes - Hetzner Cloud Volumes API
     # Delete
     $cloud->volumes->delete($volume->id);
 
-=head1 METHODS
+=head1 DESCRIPTION
 
-=head2 list(%params)
+This module provides the API for managing Hetzner Cloud volumes.
+All methods return L<WWW::Hetzner::Cloud::Volume> objects.
 
-Returns arrayref of Volume objects.
+=cut
 
-=head2 get($id)
+has client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+);
 
-Returns Volume object.
+sub _wrap {
+    my ($self, $data) = @_;
+    return WWW::Hetzner::Cloud::Volume->new(
+        client => $self->client,
+        %$data,
+    );
+}
 
-=head2 create(%params)
+sub _wrap_list {
+    my ($self, $list) = @_;
+    return [ map { $self->_wrap($_) } @$list ];
+}
 
-Creates volume. Required: name, size, location. Optional: format, labels, automount, server.
+=method list
 
-=head2 delete($id)
+    my $volumes = $cloud->volumes->list;
+    my $volumes = $cloud->volumes->list(label_selector => 'env=prod');
+
+Returns arrayref of L<WWW::Hetzner::Cloud::Volume> objects.
+
+=cut
+
+sub list {
+    my ($self, %params) = @_;
+
+    my $result = $self->client->get('/volumes', params => \%params);
+    return $self->_wrap_list($result->{volumes} // []);
+}
+
+=method get
+
+    my $volume = $cloud->volumes->get($id);
+
+Returns L<WWW::Hetzner::Cloud::Volume> object.
+
+=cut
+
+sub get {
+    my ($self, $id) = @_;
+    croak "Volume ID required" unless $id;
+
+    my $result = $self->client->get("/volumes/$id");
+    return $self->_wrap($result->{volume});
+}
+
+=method create
+
+    my $volume = $cloud->volumes->create(
+        name     => 'my-volume',  # required
+        size     => 50,           # required (GB)
+        location => 'fsn1',       # required
+        format   => 'ext4',       # optional
+        labels   => { ... },      # optional
+        automount => 1,           # optional
+        server   => $server_id,   # optional
+    );
+
+Creates volume. Returns L<WWW::Hetzner::Cloud::Volume> object.
+
+=cut
+
+sub create {
+    my ($self, %params) = @_;
+
+    croak "name required" unless $params{name};
+    croak "size required" unless $params{size};
+    croak "location required" unless $params{location};
+
+    my $body = {
+        name     => $params{name},
+        size     => $params{size},
+        location => $params{location},
+    };
+
+    $body->{format}    = $params{format}    if $params{format};
+    $body->{labels}    = $params{labels}    if $params{labels};
+    $body->{automount} = $params{automount} if exists $params{automount};
+    $body->{server}    = $params{server}    if $params{server};
+
+    my $result = $self->client->post('/volumes', $body);
+    return $self->_wrap($result->{volume});
+}
+
+=method delete
+
+    $cloud->volumes->delete($id);
 
 Deletes volume.
 
-=head2 attach($volume_id, $server_id, %opts)
+=cut
+
+sub delete {
+    my ($self, $id) = @_;
+    croak "Volume ID required" unless $id;
+
+    return $self->client->delete("/volumes/$id");
+}
+
+=method attach
+
+    $cloud->volumes->attach($volume_id, $server_id, automount => 1);
 
 Attaches volume to server.
 
-=head2 detach($volume_id)
+=cut
+
+sub attach {
+    my ($self, $id, $server_id, %opts) = @_;
+    croak "Volume ID required" unless $id;
+    croak "Server ID required" unless $server_id;
+
+    my $body = { server => $server_id };
+    $body->{automount} = $opts{automount} ? \1 : \0 if exists $opts{automount};
+
+    return $self->client->post("/volumes/$id/actions/attach", $body);
+}
+
+=method detach
+
+    $cloud->volumes->detach($volume_id);
 
 Detaches volume.
 
-=head2 resize($volume_id, $size)
+=cut
 
-Resizes volume.
+sub detach {
+    my ($self, $id) = @_;
+    croak "Volume ID required" unless $id;
+
+    return $self->client->post("/volumes/$id/actions/detach", {});
+}
+
+=method resize
+
+    $cloud->volumes->resize($volume_id, $size);
+
+Resizes volume to the specified size in GB.
 
 =cut
+
+sub resize {
+    my ($self, $id, $size) = @_;
+    croak "Volume ID required" unless $id;
+    croak "Size required" unless $size;
+
+    return $self->client->post("/volumes/$id/actions/resize", { size => $size });
+}
+
+1;

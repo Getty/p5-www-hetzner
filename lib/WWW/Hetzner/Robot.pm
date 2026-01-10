@@ -12,86 +12,6 @@ use namespace::clean;
 
 our $VERSION = '0.002';
 
-has user => (
-    is      => 'ro',
-    default => sub { $ENV{HETZNER_ROBOT_USER} },
-);
-
-has password => (
-    is      => 'ro',
-    default => sub { $ENV{HETZNER_ROBOT_PASSWORD} },
-);
-
-# For Role::HTTP compatibility
-sub token {
-    my $self = shift;
-    return $self->user && $self->password;
-}
-
-sub _check_auth {
-    my ($self) = @_;
-    unless ($self->user && $self->password) {
-        die "No Robot credentials configured.\n\n" .
-            "Set credentials via:\n" .
-            "  Environment: HETZNER_ROBOT_USER and HETZNER_ROBOT_PASSWORD\n" .
-            "  Options:     --user and --password\n\n" .
-            "Get credentials at: https://robot.hetzner.com/preferences/index\n";
-    }
-}
-
-has base_url => (
-    is      => 'ro',
-    default => 'https://robot-ws.your-server.de',
-);
-
-with 'WWW::Hetzner::Role::HTTP';
-
-around _request => sub {
-    my ($orig, $self, @args) = @_;
-    $self->_check_auth;
-    return $self->$orig(@args);
-};
-
-# Override auth for Basic Auth
-sub _set_auth {
-    my ($self, $request) = @_;
-    $request->authorization_basic($self->user, $self->password);
-}
-
-# Resource accessors
-has servers => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Robot::API::Servers->new(client => shift) },
-);
-
-has keys => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Robot::API::Keys->new(client => shift) },
-);
-
-has ips => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Robot::API::IPs->new(client => shift) },
-);
-
-has reset => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Robot::API::Reset->new(client => shift) },
-);
-
-has traffic => (
-    is      => 'lazy',
-    builder => sub { WWW::Hetzner::Robot::API::Traffic->new(client => shift) },
-);
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Robot - Perl client for Hetzner Robot API (Dedicated Servers)
-
 =head1 SYNOPSIS
 
     use WWW::Hetzner::Robot;
@@ -143,6 +63,134 @@ Uses HTTP Basic Auth (user/password) instead of Bearer tokens.
 
 =back
 
+=cut
+
+has user => (
+    is      => 'ro',
+    default => sub { $ENV{HETZNER_ROBOT_USER} },
+);
+
+=attr user
+
+Robot webservice username. Defaults to C<HETZNER_ROBOT_USER> environment variable.
+
+=cut
+
+has password => (
+    is      => 'ro',
+    default => sub { $ENV{HETZNER_ROBOT_PASSWORD} },
+);
+
+=attr password
+
+Robot webservice password. Defaults to C<HETZNER_ROBOT_PASSWORD> environment variable.
+
+=cut
+
+# For Role::HTTP compatibility
+sub token {
+    my $self = shift;
+    return $self->user && $self->password;
+}
+
+sub _check_auth {
+    my ($self) = @_;
+    unless ($self->user && $self->password) {
+        die "No Robot credentials configured.\n\n" .
+            "Set credentials via:\n" .
+            "  Environment: HETZNER_ROBOT_USER and HETZNER_ROBOT_PASSWORD\n" .
+            "  Options:     --user and --password\n\n" .
+            "Get credentials at: https://robot.hetzner.com/preferences/index\n";
+    }
+}
+
+has base_url => (
+    is      => 'ro',
+    default => 'https://robot-ws.your-server.de',
+);
+
+=attr base_url
+
+Base URL for the Robot API. Defaults to C<https://robot-ws.your-server.de>.
+
+=cut
+
+with 'WWW::Hetzner::Role::HTTP';
+
+around _request => sub {
+    my ($orig, $self, @args) = @_;
+    $self->_check_auth;
+    return $self->$orig(@args);
+};
+
+# Override auth for Basic Auth
+sub _set_auth {
+    my ($self, $request) = @_;
+    $request->authorization_basic($self->user, $self->password);
+}
+
+=method _set_auth
+
+Override for Basic Auth instead of Bearer token authentication.
+
+=cut
+
+# Resource accessors
+has servers => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Servers->new(client => shift) },
+);
+
+=attr servers
+
+Returns a L<WWW::Hetzner::Robot::API::Servers> instance for managing dedicated servers.
+
+=cut
+
+has keys => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Keys->new(client => shift) },
+);
+
+=attr keys
+
+Returns a L<WWW::Hetzner::Robot::API::Keys> instance for managing SSH keys.
+
+=cut
+
+has ips => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::IPs->new(client => shift) },
+);
+
+=attr ips
+
+Returns a L<WWW::Hetzner::Robot::API::IPs> instance for managing IP addresses.
+
+=cut
+
+has reset => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Reset->new(client => shift) },
+);
+
+=attr reset
+
+Returns a L<WWW::Hetzner::Robot::API::Reset> instance for server reset operations.
+
+=cut
+
+has traffic => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Traffic->new(client => shift) },
+);
+
+=attr traffic
+
+Returns a L<WWW::Hetzner::Robot::API::Traffic> instance for traffic statistics.
+
+=cut
+
 =head1 ENVIRONMENT
 
 =over 4
@@ -158,3 +206,5 @@ Uses HTTP Basic Auth (user/password) instead of Bearer tokens.
 L<WWW::Hetzner>, L<https://robot.hetzner.com/doc/webservice/en.html>
 
 =cut
+
+1;

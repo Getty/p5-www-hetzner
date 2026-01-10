@@ -12,15 +12,55 @@ has client => (
 );
 
 has name        => ( is => 'rw', required => 1 );
+
+=attr name
+
+Key name.
+
+=cut
+
 has fingerprint => ( is => 'ro', required => 1 );
+
+=attr fingerprint
+
+Key fingerprint (unique ID).
+
+=cut
+
 has type        => ( is => 'ro' );
+
+=attr type
+
+Key type (e.g. ED25519, RSA).
+
+=cut
+
 has size        => ( is => 'ro' );
+
+=attr size
+
+Key size in bits.
+
+=cut
+
 has data        => ( is => 'ro' );
+
+=attr data
+
+Public key data.
+
+=cut
 
 sub delete {
     my ($self) = @_;
     return $self->client->delete("/key/" . $self->fingerprint);
 }
+
+=method delete
+
+    $key->delete;
+
+=cut
 
 sub update {
     my ($self) = @_;
@@ -29,39 +69,11 @@ sub update {
     });
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Robot::Key - Hetzner Robot SSH Key entity
-
-=head1 ATTRIBUTES
-
-=over 4
-
-=item * name - Key name
-
-=item * fingerprint - Key fingerprint (unique ID)
-
-=item * type - Key type (e.g. ED25519, RSA)
-
-=item * size - Key size in bits
-
-=item * data - Public key data
-
-=back
-
-=head1 METHODS
-
-=head2 delete
-
-    $key->delete;
-
-=head2 update
+=method update
 
     $key->name('new-name');
     $key->update;
 
 =cut
+
+1;

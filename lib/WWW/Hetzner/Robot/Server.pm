@@ -12,19 +12,101 @@ has client => (
 );
 
 has server_number => ( is => 'ro', required => 1 );
+
+=attr server_number
+
+Unique server ID.
+
+=cut
+
 has server_name   => ( is => 'rw' );
+
+=attr server_name
+
+Server name.
+
+=cut
+
 has server_ip     => ( is => 'ro' );
+
+=attr server_ip
+
+Primary IP address.
+
+=cut
+
 has product       => ( is => 'ro' );
+
+=attr product
+
+Server product type.
+
+=cut
+
 has dc            => ( is => 'ro' );
+
+=attr dc
+
+Datacenter.
+
+=cut
+
 has traffic       => ( is => 'ro' );
+
+=attr traffic
+
+Traffic limit.
+
+=cut
+
 has status        => ( is => 'ro' );
+
+=attr status
+
+Server status (ready, in process).
+
+=cut
+
 has cancelled     => ( is => 'ro' );
+
+=attr cancelled
+
+Cancellation status.
+
+=cut
+
 has paid_until    => ( is => 'ro' );
+
+=attr paid_until
+
+Paid until date.
+
+=cut
 
 # Convenience accessors
 sub id   { shift->server_number }
+
+=method id
+
+Convenience accessor for C<server_number>.
+
+=cut
+
 sub name { shift->server_name }
+
+=method name
+
+Convenience accessor for C<server_name>.
+
+=cut
+
 sub ip   { shift->server_ip }
+
+=method ip
+
+Convenience accessor for C<server_ip>.
+
+=cut
 
 sub reset {
     my ($self, $type) = @_;
@@ -32,12 +114,26 @@ sub reset {
     return $self->client->post("/reset/" . $self->server_number, { type => $type });
 }
 
+=method reset
+
+    $server->reset('sw');  # software reset
+    $server->reset('hw');  # hardware reset
+
+=cut
+
 sub update {
     my ($self) = @_;
     return $self->client->post("/server/" . $self->server_number, {
         server_name => $self->server_name,
     });
 }
+
+=method update
+
+    $server->server_name('new-name');
+    $server->update;
+
+=cut
 
 sub refresh {
     my ($self) = @_;
@@ -52,52 +148,10 @@ sub refresh {
     return $self;
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Robot::Server - Hetzner Robot Server entity
-
-=head1 ATTRIBUTES
-
-=over 4
-
-=item * server_number - Unique server ID
-
-=item * server_name - Server name
-
-=item * server_ip - Primary IP address
-
-=item * product - Server product type
-
-=item * dc - Datacenter
-
-=item * traffic - Traffic limit
-
-=item * status - Server status (ready, in process)
-
-=item * cancelled - Cancellation status
-
-=item * paid_until - Paid until date
-
-=back
-
-=head1 METHODS
-
-=head2 reset
-
-    $server->reset('sw');  # software reset
-    $server->reset('hw');  # hardware reset
-
-=head2 update
-
-    $server->server_name('new-name');
-    $server->update;
-
-=head2 refresh
+=method refresh
 
     $server->refresh;  # reload from API
 
 =cut
+
+1;

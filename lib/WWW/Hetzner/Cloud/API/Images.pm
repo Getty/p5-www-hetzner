@@ -7,59 +7,6 @@ use Carp qw(croak);
 use WWW::Hetzner::Cloud::Image;
 use namespace::clean;
 
-has client => (
-    is       => 'ro',
-    required => 1,
-    weak_ref => 1,
-);
-
-sub _wrap {
-    my ($self, $data) = @_;
-    return WWW::Hetzner::Cloud::Image->new(
-        client => $self->client,
-        %$data,
-    );
-}
-
-sub _wrap_list {
-    my ($self, $list) = @_;
-    return [ map { $self->_wrap($_) } @$list ];
-}
-
-sub list {
-    my ($self, %params) = @_;
-
-    my $result = $self->client->get('/images', params => \%params);
-    return $self->_wrap_list($result->{images} // []);
-}
-
-sub get {
-    my ($self, $id) = @_;
-    croak "Image ID required" unless $id;
-
-    my $result = $self->client->get("/images/$id");
-    return $self->_wrap($result->{image});
-}
-
-sub get_by_name {
-    my ($self, $name) = @_;
-    croak "Name required" unless $name;
-
-    my $images = $self->list;
-    for my $image (@$images) {
-        return $image if $image->name eq $name;
-    }
-    return;
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-WWW::Hetzner::Cloud::API::Images - Hetzner Cloud Images API
-
 =head1 SYNOPSIS
 
     use WWW::Hetzner::Cloud;
@@ -82,9 +29,28 @@ This module provides access to Hetzner Cloud images. Images can be system
 images (provided by Hetzner), snapshots (user-created), or backups.
 All methods return L<WWW::Hetzner::Cloud::Image> objects.
 
-=head1 METHODS
+=cut
 
-=head2 list
+has client => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
+);
+
+sub _wrap {
+    my ($self, $data) = @_;
+    return WWW::Hetzner::Cloud::Image->new(
+        client => $self->client,
+        %$data,
+    );
+}
+
+sub _wrap_list {
+    my ($self, $list) = @_;
+    return [ map { $self->_wrap($_) } @$list ];
+}
+
+=method list
 
     my $images = $cloud->images->list;
     my $images = $cloud->images->list(type => 'system');
@@ -101,16 +67,48 @@ Returns an arrayref of L<WWW::Hetzner::Cloud::Image> objects. Optional parameter
 
 =back
 
-=head2 get
+=cut
+
+sub list {
+    my ($self, %params) = @_;
+
+    my $result = $self->client->get('/images', params => \%params);
+    return $self->_wrap_list($result->{images} // []);
+}
+
+=method get
 
     my $image = $cloud->images->get($id);
 
 Returns a L<WWW::Hetzner::Cloud::Image> object.
 
-=head2 get_by_name
+=cut
+
+sub get {
+    my ($self, $id) = @_;
+    croak "Image ID required" unless $id;
+
+    my $result = $self->client->get("/images/$id");
+    return $self->_wrap($result->{image});
+}
+
+=method get_by_name
 
     my $image = $cloud->images->get_by_name('debian-13');
 
 Returns a L<WWW::Hetzner::Cloud::Image> object. Returns undef if not found.
 
 =cut
+
+sub get_by_name {
+    my ($self, $name) = @_;
+    croak "Name required" unless $name;
+
+    my $images = $self->list;
+    for my $image (@$images) {
+        return $image if $image->name eq $name;
+    }
+    return;
+}
+
+1;
