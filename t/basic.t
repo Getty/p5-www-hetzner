@@ -20,6 +20,14 @@ use_ok('WWW::Hetzner::Cloud::API::Locations');
 use_ok('WWW::Hetzner::Cloud::API::Datacenters');
 use_ok('WWW::Hetzner::Cloud::API::Zones');
 use_ok('WWW::Hetzner::Cloud::API::RRSets');
+use_ok('WWW::Hetzner::Cloud::API::Volumes');
+use_ok('WWW::Hetzner::Cloud::API::Networks');
+use_ok('WWW::Hetzner::Cloud::API::Firewalls');
+use_ok('WWW::Hetzner::Cloud::API::FloatingIPs');
+use_ok('WWW::Hetzner::Cloud::API::PrimaryIPs');
+use_ok('WWW::Hetzner::Cloud::API::LoadBalancers');
+use_ok('WWW::Hetzner::Cloud::API::Certificates');
+use_ok('WWW::Hetzner::Cloud::API::PlacementGroups');
 
 # Cloud entities
 use_ok('WWW::Hetzner::Cloud::Server');
@@ -30,6 +38,14 @@ use_ok('WWW::Hetzner::Cloud::Location');
 use_ok('WWW::Hetzner::Cloud::Datacenter');
 use_ok('WWW::Hetzner::Cloud::Zone');
 use_ok('WWW::Hetzner::Cloud::RRSet');
+use_ok('WWW::Hetzner::Cloud::Volume');
+use_ok('WWW::Hetzner::Cloud::Network');
+use_ok('WWW::Hetzner::Cloud::Firewall');
+use_ok('WWW::Hetzner::Cloud::FloatingIP');
+use_ok('WWW::Hetzner::Cloud::PrimaryIP');
+use_ok('WWW::Hetzner::Cloud::LoadBalancer');
+use_ok('WWW::Hetzner::Cloud::Certificate');
+use_ok('WWW::Hetzner::Cloud::PlacementGroup');
 
 # Robot API
 use_ok('WWW::Hetzner::Robot');

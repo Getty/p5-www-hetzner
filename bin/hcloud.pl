@@ -6,6 +6,79 @@ use strict;
 use warnings;
 use lib 'lib';
 
+# Map hyphenated commands to MooX::Cmd package names
+# (Perl packages can't have hyphens, so we translate)
+my %cmd_aliases = (
+    'floating-ip'     => 'floatingip',
+    'primary-ip'      => 'primaryip',
+    'load-balancer'   => 'loadbalancer',
+    'placement-group' => 'placementgroup',
+    'add-subnet'      => 'addsubnet',
+    'add-route'       => 'addroute',
+    'add-rule'        => 'addrule',
+    'apply-to'        => 'applyto',
+    'remove-from'     => 'removefrom',
+    'add-target'      => 'addtarget',
+    'add-service'     => 'addservice',
+);
+
+for my $i (0 .. $#ARGV) {
+    if (exists $cmd_aliases{lc $ARGV[$i]}) {
+        $ARGV[$i] = $cmd_aliases{lc $ARGV[$i]};
+    }
+}
+
+# Custom help for commands with hyphenated subcommands
+# (MooX::Cmd shows package names, we want hyphenated names)
+my %custom_help = (
+    network => sub {
+        print "Usage: hcloud.pl network <subcommand>\n\n";
+        print "Subcommands:\n";
+        print "  list         List all networks\n";
+        print "  describe     Show network details\n";
+        print "  create       Create a network\n";
+        print "  delete       Delete a network\n";
+        print "  add-subnet   Add a subnet to network\n";
+        print "  add-route    Add a route to network\n";
+    },
+    firewall => sub {
+        print "Usage: hcloud.pl firewall <subcommand>\n\n";
+        print "Subcommands:\n";
+        print "  list           List all firewalls\n";
+        print "  describe       Show firewall details\n";
+        print "  create         Create a firewall\n";
+        print "  delete         Delete a firewall\n";
+        print "  add-rule       Add a rule to firewall\n";
+        print "  apply-to       Apply firewall to server\n";
+        print "  remove-from    Remove firewall from server\n";
+    },
+    loadbalancer => sub {
+        print "Usage: hcloud.pl load-balancer <subcommand>\n\n";
+        print "Subcommands:\n";
+        print "  list           List all load balancers\n";
+        print "  describe       Show load balancer details\n";
+        print "  create         Create a load balancer\n";
+        print "  delete         Delete a load balancer\n";
+        print "  add-target     Add a target to load balancer\n";
+        print "  add-service    Add a service to load balancer\n";
+    },
+);
+
+# Check if help was requested for a command with custom help
+# Only intercept if: command --help (not: command subcommand --help)
+if (@ARGV >= 1) {
+    my $cmd = lc $ARGV[0];
+    $cmd =~ s/-//g;  # normalize: load-balancer -> loadbalancer
+    if (exists $custom_help{$cmd}) {
+        # Check second arg: is it --help or a subcommand?
+        my $second = $ARGV[1] // '';
+        if ($second =~ /^(-h|--help|--usage|--man)$/) {
+            $custom_help{$cmd}->();
+            exit 0;
+        }
+    }
+}
+
 use WWW::Hetzner::CLI;
 
 WWW::Hetzner::CLI->new_with_cmd;

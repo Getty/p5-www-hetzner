@@ -41,19 +41,34 @@ sub execute {
     print "Global options (must come BEFORE the command):\n";
     print "  -t, --token    API token\n";
     print "  -o, --output   Output format: table, json\n";
-    print "\nCommands:\n";
-    print "  server      Manage servers\n";
-    print "  sshkey      Manage SSH keys\n";
-    print "  zone        Manage DNS zones\n";
-    print "  record      Manage DNS records\n";
-    print "  image       List images\n";
-    print "  servertype  List server types\n";
-    print "  location    List locations\n";
-    print "  datacenter  List datacenters\n";
+    print "\nServer & Compute:\n";
+    print "  server           Manage cloud servers\n";
+    print "  servertype       List server types\n";
+    print "  image            List images\n";
+    print "  sshkey           Manage SSH keys\n";
+    print "  placement-group  Manage placement groups\n";
+    print "\nNetworking:\n";
+    print "  network          Manage private networks\n";
+    print "  firewall         Manage firewalls\n";
+    print "  floating-ip      Manage floating IPs\n";
+    print "  primary-ip       Manage primary IPs\n";
+    print "  load-balancer    Manage load balancers\n";
+    print "\nStorage:\n";
+    print "  volume           Manage volumes\n";
+    print "\nDNS:\n";
+    print "  zone             Manage DNS zones\n";
+    print "  record           Manage DNS records\n";
+    print "\nSecurity:\n";
+    print "  certificate      Manage TLS certificates\n";
+    print "\nInfo:\n";
+    print "  location         List locations\n";
+    print "  datacenter       List datacenters\n";
     print "\nExamples:\n";
     print "  hcloud.pl server list\n";
     print "  hcloud.pl -t mytoken server list\n";
     print "  hcloud.pl --output json server describe 12345\n";
+    print "  hcloud.pl volume create --name data --size 50 --location fsn1\n";
+    print "  hcloud.pl firewall create --name web-fw\n";
     print "\nEnvironment variables:\n";
     print "  HETZNER_API_TOKEN  Default for --token\n";
     print "\nRun 'hcloud.pl <command> --help' for command-specific options.\n";
@@ -98,19 +113,67 @@ L<WWW::Hetzner::Cloud> instance.
 
 =head1 COMMANDS
 
+=head2 Server & Compute
+
 =over 4
 
-=item * server - Manage servers (list, create, delete, describe)
+=item * server - Manage cloud servers (list, create, delete, describe, poweron, poweroff, reboot, shutdown, reset, rebuild, rescue)
 
-=item * sshkey - Manage SSH keys
+=item * servertype - List server types
+
+=item * image - List images
+
+=item * sshkey - Manage SSH keys (list, create, delete, describe)
+
+=item * placement-group - Manage placement groups (list, create, delete, describe)
+
+=back
+
+=head2 Networking
+
+=over 4
+
+=item * network - Manage private networks (list, create, delete, describe, add-subnet, add-route)
+
+=item * firewall - Manage firewalls (list, create, delete, describe, add-rule, apply-to, remove-from)
+
+=item * floating-ip - Manage floating IPs (list, create, delete, describe, assign, unassign)
+
+=item * primary-ip - Manage primary IPs (list, create, delete, describe, assign, unassign)
+
+=item * load-balancer - Manage load balancers (list, create, delete, describe, add-target, add-service)
+
+=back
+
+=head2 Storage
+
+=over 4
+
+=item * volume - Manage volumes (list, create, delete, describe, attach, detach, resize)
+
+=back
+
+=head2 DNS
+
+=over 4
 
 =item * zone - Manage DNS zones (list, create, delete, describe)
 
 =item * record - Manage DNS records (list, create, delete, describe)
 
-=item * image - List images
+=back
 
-=item * servertype - List server types
+=head2 Security
+
+=over 4
+
+=item * certificate - Manage TLS certificates (list, create, delete, describe)
+
+=back
+
+=head2 Info
+
+=over 4
 
 =item * location - List locations
 

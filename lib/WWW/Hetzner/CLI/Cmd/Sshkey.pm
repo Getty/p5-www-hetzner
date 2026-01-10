@@ -4,7 +4,7 @@ package WWW::Hetzner::CLI::Cmd::Sshkey;
 
 use Moo;
 use MooX::Cmd;
-use MooX::Options usage_string => 'USAGE: hcloud.pl sshkey [list] [options]';
+use MooX::Options usage_string => 'USAGE: hcloud.pl sshkey <command> [options]';
 use JSON::MaybeXS qw(encode_json);
 
 sub execute {
