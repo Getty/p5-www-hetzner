@@ -1,6 +1,9 @@
 Revision history for WWW-Hetzner
 
 {{$NEXT}}
+    - Refactor POD to use inline PodWeaver commands (=attr, =method)
+    - Fix ABSTRACT/VERSION order for PodWeaver compatibility
+    - Adapt to new dzil plugin structure
 
 0.001     2026-01-10 01:50:52Z
     - Initial release
