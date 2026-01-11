@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Primary IP commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

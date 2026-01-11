@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Create;
-our $VERSION = '0.002';
 # ABSTRACT: Create a primary IP
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

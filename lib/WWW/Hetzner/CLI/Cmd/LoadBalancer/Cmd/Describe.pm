@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::Describe;
-our $VERSION = '0.002';
 # ABSTRACT: Describe a load balancer
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

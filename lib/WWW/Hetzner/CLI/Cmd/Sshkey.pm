@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Sshkey;
-our $VERSION = '0.002';
 # ABSTRACT: SSH key commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

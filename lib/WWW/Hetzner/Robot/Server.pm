@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::Server;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot Server entity
+
+our $VERSION = '0.002';
 
 use Moo;
 use namespace::clean;

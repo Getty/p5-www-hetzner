@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Volume::Cmd::Attach;
-our $VERSION = '0.002';
 # ABSTRACT: Attach a volume to a server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server;
-our $VERSION = '0.002';
 # ABSTRACT: Server commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

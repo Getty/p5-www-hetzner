@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Traffic;
-our $VERSION = '0.002';
 # ABSTRACT: Query traffic statistics
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

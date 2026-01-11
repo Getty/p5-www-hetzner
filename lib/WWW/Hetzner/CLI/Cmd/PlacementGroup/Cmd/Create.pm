@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PlacementGroup::Cmd::Create;
-our $VERSION = '0.002';
 # ABSTRACT: Create a placement group
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

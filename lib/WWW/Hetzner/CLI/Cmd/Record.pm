@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Record;
-our $VERSION = '0.002';
 # ABSTRACT: DNS Record commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

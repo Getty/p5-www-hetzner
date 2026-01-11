@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Create;
-our $VERSION = '0.002';
 # ABSTRACT: Create a server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

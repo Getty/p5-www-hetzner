@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Floating IP commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::Volume;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Volume object
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::API::LoadBalancers;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Load Balancers API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

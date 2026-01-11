@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::Describe;
-our $VERSION = '0.002';
 # ABSTRACT: Describe a dedicated server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

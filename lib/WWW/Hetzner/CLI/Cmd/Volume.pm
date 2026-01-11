@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Volume;
-our $VERSION = '0.002';
 # ABSTRACT: Volume commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

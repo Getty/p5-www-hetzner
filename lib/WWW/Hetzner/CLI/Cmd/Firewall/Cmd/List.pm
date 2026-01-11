@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::List;
-our $VERSION = '0.002';
 # ABSTRACT: List firewalls
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

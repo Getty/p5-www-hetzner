@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Location;
-our $VERSION = '0.002';
 # ABSTRACT: Location commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

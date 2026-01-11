@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::Describe;
-our $VERSION = '0.002';
 # ABSTRACT: Describe a network
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

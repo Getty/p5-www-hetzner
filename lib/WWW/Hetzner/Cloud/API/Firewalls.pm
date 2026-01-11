@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::API::Firewalls;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Firewalls API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Datacenter;
-our $VERSION = '0.002';
 # ABSTRACT: Datacenter commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::AddRule;
-our $VERSION = '0.002';
 # ABSTRACT: Add a rule to a firewall
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

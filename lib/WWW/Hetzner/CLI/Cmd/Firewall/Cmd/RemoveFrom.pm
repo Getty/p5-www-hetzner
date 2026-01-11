@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::RemoveFrom;
-our $VERSION = '0.002';
 # ABSTRACT: Remove a firewall from a server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

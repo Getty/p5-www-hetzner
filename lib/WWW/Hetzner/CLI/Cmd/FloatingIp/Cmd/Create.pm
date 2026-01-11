@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Create;
-our $VERSION = '0.002';
 # ABSTRACT: Create a floating IP
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

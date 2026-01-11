@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PlacementGroup::Cmd::Delete;
-our $VERSION = '0.002';
 # ABSTRACT: Delete a placement group
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

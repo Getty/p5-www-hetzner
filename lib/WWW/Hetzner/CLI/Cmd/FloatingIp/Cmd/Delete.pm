@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Delete;
-our $VERSION = '0.002';
 # ABSTRACT: Delete a floating IP
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

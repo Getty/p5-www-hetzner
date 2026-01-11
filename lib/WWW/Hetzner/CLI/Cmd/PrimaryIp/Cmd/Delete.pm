@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Delete;
-our $VERSION = '0.002';
 # ABSTRACT: Delete a primary IP
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

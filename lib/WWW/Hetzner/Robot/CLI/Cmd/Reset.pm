@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Reset;
-our $VERSION = '0.002';
 # ABSTRACT: Reset a dedicated server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

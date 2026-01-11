@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Zone::Cmd::List;
-our $VERSION = '0.002';
 # ABSTRACT: List DNS zones
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

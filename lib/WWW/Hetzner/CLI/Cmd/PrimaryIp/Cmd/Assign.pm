@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Assign;
-our $VERSION = '0.002';
 # ABSTRACT: Assign a primary IP to a server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

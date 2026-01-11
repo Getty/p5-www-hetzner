@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Volume::Cmd::Delete;
-our $VERSION = '0.002';
 # ABSTRACT: Delete a volume
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

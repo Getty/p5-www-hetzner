@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Volume::Cmd::Resize;
-our $VERSION = '0.002';
 # ABSTRACT: Resize a volume
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

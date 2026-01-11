@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::API::Locations;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Locations API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

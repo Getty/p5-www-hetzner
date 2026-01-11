@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::ServerType;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud ServerType object
+
+our $VERSION = '0.002';
 
 use Moo;
 use namespace::clean;

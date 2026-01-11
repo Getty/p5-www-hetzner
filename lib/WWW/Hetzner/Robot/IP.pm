@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::IP;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot IP entity
+
+our $VERSION = '0.002';
 
 use Moo;
 use namespace::clean;

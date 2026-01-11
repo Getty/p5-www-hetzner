@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::PrimaryIP;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud Primary IP object
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

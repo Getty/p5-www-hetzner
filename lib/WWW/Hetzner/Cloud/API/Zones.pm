@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::API::Zones;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud DNS Zones API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

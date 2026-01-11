@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::List;
-our $VERSION = '0.002';
 # ABSTRACT: List networks
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

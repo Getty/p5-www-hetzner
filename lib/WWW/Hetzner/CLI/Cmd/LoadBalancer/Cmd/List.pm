@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::List;
-our $VERSION = '0.002';
 # ABSTRACT: List load balancers
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

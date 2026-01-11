@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::API::Traffic;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot Traffic API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

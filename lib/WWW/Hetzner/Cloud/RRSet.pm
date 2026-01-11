@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::RRSet;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud DNS RRSet object
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

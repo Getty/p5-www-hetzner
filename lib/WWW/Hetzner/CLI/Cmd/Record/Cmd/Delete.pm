@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Record::Cmd::Delete;
-our $VERSION = '0.002';
 # ABSTRACT: Delete a DNS record
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

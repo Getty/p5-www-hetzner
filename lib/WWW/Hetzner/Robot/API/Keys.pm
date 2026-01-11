@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::API::Keys;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot SSH Keys API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

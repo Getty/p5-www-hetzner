@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::API::Servers;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Robot Servers API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);

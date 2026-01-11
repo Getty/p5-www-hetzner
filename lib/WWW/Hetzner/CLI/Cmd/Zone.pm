@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Zone;
-our $VERSION = '0.002';
 # ABSTRACT: DNS Zone commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

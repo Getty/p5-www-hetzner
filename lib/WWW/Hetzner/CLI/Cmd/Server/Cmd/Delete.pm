@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Delete;
-our $VERSION = '0.002';
 # ABSTRACT: Delete a server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

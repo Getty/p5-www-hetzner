@@ -1,6 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Wol;
-our $VERSION = '0.002';
 # ABSTRACT: Send Wake-on-LAN to a server
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

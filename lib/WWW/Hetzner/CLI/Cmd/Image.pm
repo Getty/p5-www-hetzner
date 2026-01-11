@@ -1,6 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Image;
-our $VERSION = '0.002';
 # ABSTRACT: Image commands
+
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::Cmd;

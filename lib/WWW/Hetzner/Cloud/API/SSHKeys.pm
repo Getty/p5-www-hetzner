@@ -1,6 +1,7 @@
 package WWW::Hetzner::Cloud::API::SSHKeys;
-our $VERSION = '0.002';
 # ABSTRACT: Hetzner Cloud SSH Keys API
+
+our $VERSION = '0.002';
 
 use Moo;
 use Carp qw(croak);
