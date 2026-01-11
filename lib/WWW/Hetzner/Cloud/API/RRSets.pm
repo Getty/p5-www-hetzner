@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::RRSets;
 # ABSTRACT: Hetzner Cloud DNS RRSets (Records) API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);

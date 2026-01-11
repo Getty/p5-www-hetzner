@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::PlacementGroup;
 # ABSTRACT: Hetzner Cloud Placement Group object
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);

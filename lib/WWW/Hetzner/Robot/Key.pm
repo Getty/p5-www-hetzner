@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::Key;
 # ABSTRACT: Hetzner Robot SSH Key entity
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use namespace::clean;
