@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::API::Keys;
 # ABSTRACT: Hetzner Robot SSH Keys API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -107,4 +107,20 @@ sub delete {
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot> - Main Robot API client
+
+=item * L<WWW::Hetzner::Robot::Key> - Key entity class
+
+=item * L<WWW::Hetzner::Robot::CLI::Cmd::Key> - Key CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Networks;
 # ABSTRACT: Hetzner Cloud Networks API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -258,5 +258,21 @@ sub delete_route {
         gateway     => $opts{gateway},
     });
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::Network> - Network entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::Network> - Network CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;

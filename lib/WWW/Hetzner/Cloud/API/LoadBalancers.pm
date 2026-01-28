@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::LoadBalancers;
 # ABSTRACT: Hetzner Cloud Load Balancers API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -286,5 +286,21 @@ sub detach_from_network {
         network => $network_id,
     });
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::LoadBalancer> - LoadBalancer entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::LoadBalancer> - LoadBalancer CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;

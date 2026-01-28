@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::FloatingIPs;
 # ABSTRACT: Hetzner Cloud Floating IPs API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -216,5 +216,21 @@ sub change_dns_ptr {
         dns_ptr => $dns_ptr,
     });
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::FloatingIP> - FloatingIP entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::FloatingIp> - FloatingIP CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;

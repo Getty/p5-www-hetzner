@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::LoadBalancer;
 # ABSTRACT: Hetzner Cloud Load Balancer object
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -395,4 +395,24 @@ Returns all load balancer data as a hashref (for JSON serialization).
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud::API::LoadBalancers> - Load Balancers API
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::Server> - Server entity
+
+=item * L<WWW::Hetzner::Cloud::Network> - Network entity
+
+=item * L<WWW::Hetzner::Cloud::Location> - Location entity
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

@@ -7,7 +7,7 @@ use MooX::Cmd;
 use MooX::Options;
 use WWW::Hetzner::Robot;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 SYNOPSIS
 
@@ -24,13 +24,15 @@ This is a Perl implementation to manage dedicated servers via the Robot API.
 
 =over 4
 
-=item * server - Manage dedicated servers (list, describe)
+=item * L<server|WWW::Hetzner::Robot::CLI::Cmd::Server> - Manage dedicated servers
 
-=item * key - Manage SSH keys (list)
+=item * L<key|WWW::Hetzner::Robot::CLI::Cmd::Key> - Manage SSH keys
 
-=item * reset - Reset a server (software, hardware, manual)
+=item * L<reset|WWW::Hetzner::Robot::CLI::Cmd::Reset> - Reset a server
 
-=item * wol - Send Wake-on-LAN packet
+=item * L<wol|WWW::Hetzner::Robot::CLI::Cmd::Wol> - Send Wake-on-LAN packet
+
+=item * L<traffic|WWW::Hetzner::Robot::CLI::Cmd::Traffic> - Query traffic statistics
 
 =back
 
@@ -127,9 +129,17 @@ Main entry point. Shows help when no subcommand is given.
 
 =cut
 
-=head1 SEE ALSO
+=seealso
 
-L<WWW::Hetzner::Robot>
+=over 4
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=item * L<WWW::Hetzner::Robot> - Robot API client
+
+=item * L<https://robot.hetzner.com/doc/webservice/en.html> - Official Robot API documentation
+
+=back
 
 =cut
 

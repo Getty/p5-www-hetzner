@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::Server;
 # ABSTRACT: Hetzner Robot Server entity
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use namespace::clean;
@@ -155,4 +155,18 @@ sub refresh {
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot::API::Servers> - Servers API
+
+=item * L<WWW::Hetzner::Robot> - Main Robot API client
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

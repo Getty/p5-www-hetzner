@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Server;
 # ABSTRACT: Hetzner Cloud Server object
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -343,4 +343,24 @@ Returns all server data as a hashref (for JSON serialization).
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud::API::Servers> - Servers API
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::ServerType> - Server type entity
+
+=item * L<WWW::Hetzner::Cloud::Image> - Image entity
+
+=item * L<WWW::Hetzner::Cloud::Datacenter> - Datacenter entity
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

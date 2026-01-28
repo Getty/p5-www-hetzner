@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::IP;
 # ABSTRACT: Hetzner Robot IP entity
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use namespace::clean;
@@ -101,4 +101,20 @@ traffic_warnings, traffic_hourly, traffic_daily, and traffic_monthly.
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot::API::IPs> - IPs API
+
+=item * L<WWW::Hetzner::Robot> - Main Robot API client
+
+=item * L<WWW::Hetzner::Robot::Server> - Server entity
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

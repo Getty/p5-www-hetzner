@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Network;
 # ABSTRACT: Hetzner Cloud Network object
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -305,6 +305,20 @@ sub data {
     my $hashref = $network->data;
 
 Returns all network data as a hashref (for JSON serialization).
+
+=cut
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud::API::Networks> - Networks API
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
 
 =cut
 

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Zone;
 # ABSTRACT: Hetzner Cloud DNS Zone object
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -212,4 +212,22 @@ Returns all zone data as a hashref (for JSON serialization).
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud::API::Zones> - Zones API
+
+=item * L<WWW::Hetzner::Cloud::API::RRSets> - DNS records API
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::RRSet> - DNS record entity
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

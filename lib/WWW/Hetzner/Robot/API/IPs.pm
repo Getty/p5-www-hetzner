@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::API::IPs;
 # ABSTRACT: Hetzner Robot IPs API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -66,4 +66,18 @@ Returns L<WWW::Hetzner::Robot::IP> object.
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot> - Main Robot API client
+
+=item * L<WWW::Hetzner::Robot::IP> - IP entity class
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

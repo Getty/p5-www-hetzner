@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::SSHKeys;
 # ABSTRACT: Hetzner Cloud SSH Keys API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -205,5 +205,21 @@ sub ensure {
 
     return $self->create(name => $name, public_key => $public_key);
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::SSHKey> - SSHKey entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::Sshkey> - SSH Key CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;

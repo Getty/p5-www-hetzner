@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Firewalls;
 # ABSTRACT: Hetzner Cloud Firewalls API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -220,5 +220,21 @@ sub remove_from_resources {
         remove_from => \@resources,
     });
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::Firewall> - Firewall entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::Firewall> - Firewall CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;

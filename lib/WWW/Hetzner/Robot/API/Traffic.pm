@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::API::Traffic;
 # ABSTRACT: Hetzner Robot Traffic API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -147,4 +147,18 @@ B<Response structure:>
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot> - Main Robot API client
+
+=item * L<WWW::Hetzner::Robot::CLI::Cmd::Traffic> - Traffic CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

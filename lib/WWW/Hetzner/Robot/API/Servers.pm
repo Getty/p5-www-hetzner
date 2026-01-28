@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::API::Servers;
 # ABSTRACT: Hetzner Robot Servers API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -93,4 +93,20 @@ Updates server and returns L<WWW::Hetzner::Robot::Server> object.
 
 =cut
 
-1;
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Robot> - Main Robot API client
+
+=item * L<WWW::Hetzner::Robot::Server> - Server entity class
+
+=item * L<WWW::Hetzner::Robot::CLI::Cmd::Server> - Server CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
+
+1.

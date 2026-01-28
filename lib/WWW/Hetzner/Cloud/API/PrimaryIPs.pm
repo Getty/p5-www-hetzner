@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::PrimaryIPs;
 # ABSTRACT: Hetzner Cloud Primary IPs API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -223,5 +223,21 @@ sub change_dns_ptr {
         dns_ptr => $dns_ptr,
     });
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::PrimaryIP> - PrimaryIP entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::PrimaryIp> - PrimaryIP CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;

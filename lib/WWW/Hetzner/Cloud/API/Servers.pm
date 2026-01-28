@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Servers;
 # ABSTRACT: Hetzner Cloud Servers API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -498,5 +498,21 @@ sub wait_for_status {
 
     croak "Timeout waiting for server $id to reach status '$status'";
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::Server> - Server entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::Server> - Server CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;

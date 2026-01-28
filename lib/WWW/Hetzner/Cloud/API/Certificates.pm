@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Certificates;
 # ABSTRACT: Hetzner Cloud Certificates API
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Carp qw(croak);
@@ -187,5 +187,21 @@ sub retry {
 
     return $self->client->post("/certificates/$id/actions/retry", {});
 }
+
+=seealso
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud> - Main Cloud API client
+
+=item * L<WWW::Hetzner::Cloud::Certificate> - Certificate entity class
+
+=item * L<WWW::Hetzner::CLI::Cmd::Certificate> - Certificate CLI commands
+
+=item * L<WWW::Hetzner> - Main umbrella module
+
+=back
+
+=cut
 
 1;
