@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::Describe;
 # ABSTRACT: Describe an SSH key
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

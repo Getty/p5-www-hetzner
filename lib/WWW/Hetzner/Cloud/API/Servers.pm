@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Servers;
 # ABSTRACT: Hetzner Cloud Servers API
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use Carp qw(croak);

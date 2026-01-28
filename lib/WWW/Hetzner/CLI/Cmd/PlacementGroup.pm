@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PlacementGroup;
 # ABSTRACT: Hetzner Cloud Placement Group commands
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

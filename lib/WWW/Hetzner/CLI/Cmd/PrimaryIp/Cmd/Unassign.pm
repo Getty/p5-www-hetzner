@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Unassign;
 # ABSTRACT: Unassign a primary IP from its server
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

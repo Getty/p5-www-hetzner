@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Describe;
 # ABSTRACT: Describe a floating IP
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

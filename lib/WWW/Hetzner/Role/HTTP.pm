@@ -8,7 +8,7 @@ use JSON::MaybeXS qw(decode_json encode_json);
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 SYNOPSIS
 

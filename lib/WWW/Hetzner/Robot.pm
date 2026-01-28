@@ -10,7 +10,7 @@ use WWW::Hetzner::Robot::API::Reset;
 use WWW::Hetzner::Robot::API::Traffic;
 use namespace::clean;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 SYNOPSIS
 

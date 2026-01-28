@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Rebuild;
 # ABSTRACT: Rebuild a server with a new image
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

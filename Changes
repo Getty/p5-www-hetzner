@@ -1,5 +1,7 @@
 Revision history for WWW-Hetzner
 
+{{$NEXT}}
+
 0.003     2026-01-28 05:56:39Z
     - Add comprehensive POD documentation for all API modules
 

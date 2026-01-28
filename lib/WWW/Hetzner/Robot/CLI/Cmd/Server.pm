@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Server;
 # ABSTRACT: Robot server commands
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

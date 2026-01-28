@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::AddSubnet;
 # ABSTRACT: Add a subnet to a network
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

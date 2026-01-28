@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Record::Cmd::Describe;
 # ABSTRACT: Describe a DNS record
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

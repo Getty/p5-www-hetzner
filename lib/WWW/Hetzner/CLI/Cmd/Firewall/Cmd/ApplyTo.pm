@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::ApplyTo;
 # ABSTRACT: Apply a firewall to a server
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use MooX::Cmd;

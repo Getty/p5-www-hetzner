@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::FloatingIP;
 # ABSTRACT: Hetzner Cloud Floating IP object
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use Carp qw(croak);
