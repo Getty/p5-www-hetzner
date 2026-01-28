@@ -20,7 +20,7 @@ use WWW::Hetzner::Cloud::API::Certificates;
 use WWW::Hetzner::Cloud::API::PlacementGroups;
 use namespace::clean;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 SYNOPSIS
 

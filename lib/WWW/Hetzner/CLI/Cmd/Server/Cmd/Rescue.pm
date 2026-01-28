@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Rescue;
 # ABSTRACT: Enable or disable rescue mode
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use MooX::Cmd;

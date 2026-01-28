@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Network;
 # ABSTRACT: Hetzner Cloud Network commands
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use MooX::Cmd;
