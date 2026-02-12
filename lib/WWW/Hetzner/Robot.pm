@@ -125,8 +125,10 @@ around _request => sub {
 
 # Override auth for Basic Auth
 sub _set_auth {
-    my ($self, $request) = @_;
-    $request->authorization_basic($self->user, $self->password);
+    my ($self, $headers) = @_;
+    require MIME::Base64;
+    $headers->{Authorization} = 'Basic ' .
+        MIME::Base64::encode_base64($self->user . ':' . $self->password, '');
 }
 
 =method _set_auth

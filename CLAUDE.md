@@ -49,6 +49,11 @@ lib/WWW/Hetzner/Cloud/API/      # API modules (Servers, Volumes, Networks, etc.)
 lib/WWW/Hetzner/Cloud/*.pm      # Entity classes (Server, Volume, Network, etc.)
 lib/WWW/Hetzner/Robot.pm        # Robot API client
 lib/WWW/Hetzner/Robot/API/      # Robot API modules
+lib/WWW/Hetzner/Role/HTTP.pm    # HTTP role (_build_request, _parse_response)
+lib/WWW/Hetzner/Role/IO.pm      # IO backend interface (requires 'call')
+lib/WWW/Hetzner/HTTPRequest.pm  # Transport-independent request object
+lib/WWW/Hetzner/HTTPResponse.pm # Transport-independent response object
+lib/WWW/Hetzner/LWPIO.pm        # Default sync IO backend (LWP::UserAgent)
 lib/WWW/Hetzner/CLI.pm          # Cloud CLI main
 lib/WWW/Hetzner/CLI/Cmd/        # CLI subcommands
 lib/WWW/Hetzner/Robot/CLI.pm    # Robot CLI main
@@ -78,6 +83,19 @@ t/                              # Tests with mock fixtures in t/fixtures/
 | Datacenters | API::Datacenters | Datacenter | datacenter |
 | DNS Zones | API::Zones | Zone | zone |
 | DNS Records | API::RRSets | RRSet | record |
+
+## IO Architecture
+
+HTTP transport is pluggable via `Role::IO`. The request flow is:
+
+1. `_build_request()` - builds `HTTPRequest` (method, url, headers, content)
+2. `io->call($req)` - executes via IO backend, returns `HTTPResponse`
+3. `_parse_response()` - decodes JSON, checks errors
+
+Default backend: `LWPIO` (LWP::UserAgent). For async: see `Net::Async::Hetzner`.
+
+Tests use `Test::WWW::Hetzner::MockIO` (in `t/lib/`) which implements `Role::IO`
+and matches routes against fixture data.
 
 ## Tech
 
