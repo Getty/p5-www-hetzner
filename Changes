@@ -1,6 +1,6 @@
 Revision history for WWW-Hetzner
 
-{{$NEXT}}
+0.100     2026-02-12 17:13:58Z
     - Pluggable HTTP transport via WWW::Hetzner::Role::IO
       - New: WWW::Hetzner::HTTPRequest, WWW::Hetzner::HTTPResponse
       - New: WWW::Hetzner::Role::IO interface role
