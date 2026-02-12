@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Poweroff;
 # ABSTRACT: Power off a server (hard)
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;

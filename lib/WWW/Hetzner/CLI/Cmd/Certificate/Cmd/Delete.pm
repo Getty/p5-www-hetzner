@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Certificate::Cmd::Delete;
 # ABSTRACT: Delete a certificate
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;

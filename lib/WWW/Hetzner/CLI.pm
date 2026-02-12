@@ -7,7 +7,7 @@ use MooX::Cmd;
 use MooX::Options;
 use WWW::Hetzner::Cloud;
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 =head1 SYNOPSIS
 

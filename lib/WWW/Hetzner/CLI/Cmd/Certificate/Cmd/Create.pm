@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Certificate::Cmd::Create;
 # ABSTRACT: Create a managed certificate
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;

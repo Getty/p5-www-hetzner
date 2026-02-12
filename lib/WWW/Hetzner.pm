@@ -7,7 +7,7 @@ use WWW::Hetzner::Cloud;
 use WWW::Hetzner::Robot;
 use namespace::clean;
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::ServerTypes;
 # ABSTRACT: Hetzner Cloud Server Types API
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 use Moo;
 use Carp qw(croak);

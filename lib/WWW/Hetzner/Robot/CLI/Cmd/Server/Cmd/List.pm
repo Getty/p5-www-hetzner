@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::List;
 # ABSTRACT: List dedicated servers
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;

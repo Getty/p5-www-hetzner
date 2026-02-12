@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Key;
 # ABSTRACT: Robot SSH key commands
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;

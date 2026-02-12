@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Certificate;
 # ABSTRACT: Hetzner Cloud Certificate object
 
-our $VERSION = '0.004';
+our $VERSION = '0.101';
 
 use Moo;
 use Carp qw(croak);
