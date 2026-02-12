@@ -19,6 +19,12 @@ Perl client for Hetzner APIs (Cloud, Robot).
 dzil build          # Build distribution
 dzil test           # Run all tests
 prove -lv t/        # Run tests directly
+
+# Test coverage
+PERL5OPT="-MDevel::Cover" prove -l t/ && cover -report text
+
+# HTTP debugging (full request/response dumps)
+perl -MLWP::ConsoleLogger::Everywhere your_script.pl
 ```
 
 ## CLI Usage
@@ -61,6 +67,7 @@ lib/WWW/Hetzner/Robot/CLI/Cmd/  # Robot CLI subcommands
 bin/hcloud.pl                   # Cloud CLI executable
 bin/hrobot.pl                   # Robot CLI executable
 t/                              # Tests with mock fixtures in t/fixtures/
+t/lib/Test/WWW/Hetzner/Mock.pm  # MockIO test backend (implements Role::IO)
 ```
 
 ## Cloud API Resources
@@ -92,14 +99,42 @@ HTTP transport is pluggable via `Role::IO`. The request flow is:
 2. `io->call($req)` - executes via IO backend, returns `HTTPResponse`
 3. `_parse_response()` - decodes JSON, checks errors
 
-Default backend: `LWPIO` (LWP::UserAgent). For async: see `Net::Async::Hetzner`.
+Default backend: `LWPIO` (LWP::UserAgent). Custom backends implement `Role::IO`
+with a `call($req)` method that receives an `HTTPRequest` and returns an `HTTPResponse`.
+
+For async usage, see [Net::Async::Hetzner](https://github.com/Getty/p5-net-async-hetzner)
+which reuses `_build_request`/`_parse_response` with async HTTP transport.
+
+## Testing
 
 Tests use `Test::WWW::Hetzner::MockIO` (in `t/lib/`) which implements `Role::IO`
-and matches routes against fixture data.
+and matches routes against fixture data. Inject via constructor:
+
+```perl
+my $mock = Test::WWW::Hetzner::MockIO->new(
+    base_url => 'https://api.hetzner.cloud/v1',
+    routes   => { '/servers' => { servers => [...] } },
+);
+my $cloud = WWW::Hetzner::Cloud->new(token => 'test', io => $mock);
+```
+
+Key test files:
+- `t/basic.t` - Module loading
+- `t/cloud.t` - Cloud API with mock fixtures
+- `t/robot.t` - Robot API with mock fixtures
+- `t/io.t` - IO architecture (HTTPRequest, HTTPResponse, Role::IO, LWPIO, MockIO)
+- `t/logging.t` - Log::Any integration
+- `t/cli_cloud.t`, `t/cli_robot.t` - CLI tests
 
 ## Tech
 
 - **Moo** for OOP
 - **MooX::Cmd** + **MooX::Options** for CLI
 - **Log::Any** for logging
+- **LWP::UserAgent** for default sync HTTP (via LWPIO)
+- **MIME::Base64** for Robot Basic Auth
 - **Dist::Zilla** with `[@Author::GETTY]`
+
+## Related
+
+- [Net::Async::Hetzner](https://github.com/Getty/p5-net-async-hetzner) - Async client using IO::Async, reuses this module's request/response logic
