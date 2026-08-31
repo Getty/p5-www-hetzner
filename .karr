@@ -1,0 +1,7 @@
+claude: true
+prompt: >
+  Drain the WWW-Hetzner karr board. Pick the next actionable ticket, delegate
+  behavior-relevant work to the www-hetzner-worker (tests to www-hetzner-test-writer,
+  POD to www-hetzner-doc-writer, pre-release audit to www-hetzner-release-checker),
+  verify with `prove -lr t/`, then hand the ticket to review. Never run `dzil release`
+  or push without explicit instruction. Stop when nothing actionable remains.
