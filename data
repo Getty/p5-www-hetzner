@@ -1,0 +1,54 @@
+---
+class: standard
+completed: 2026-09-05T20:27:50Z
+created: 2026-09-05T18:51:40Z
+id: 1
+priority: high
+started: 2026-09-05T20:27:50Z
+status: done
+tags:
+- release
+- cpan
+- escalated-from:kubernetes-ocp#133
+title: 'WWW::Hetzner 0.101: releasen oder OCPs Pin auf 0.100 zuruecknehmen (blockiert
+  OCPs Image-Build)'
+updated: 2026-09-05T20:27:50Z
+---
+
+CPAN hat 0.100 (2026-02-12), kubernetes-ocp verlangt 0.101.
+
+Das blockiert dort den Docker-Image-Build: cpm install --cpanfile --snapshot
+bricht mit "FAIL resolve" ab, belegt durch den ersten echten CI-Lauf von
+kubernetes-ocp (GitHub Actions run 33928559437, 2026-09-04). Vier
+Distributionen sind betroffen, diese ist eine davon -- aber die einzige, bei
+der es nichts zu releasen GIBT.
+
+BEFUND
+Der Diff 0.100..HEAD sind 144 Dateien, 146 insertions / 143 deletions, und das
+ist ausschliesslich die $VERSION-Zeile pro Modul. Ausserhalb von lib/ nur der
+.claude-Umbau auf den getty-agent-team-Hausstand und ein committetes LICENSE.
+Changes {{$NEXT}} ist LEER. 0.101 waere ein Release ohne einen einzigen
+Changes-Eintrag.
+
+WOHER DER PIN KOMMT
+kubernetes-ocp k125 (commit 7fb412b, 2026-09-01) hat die Sibling-Versionen im
+cpanfile auf die Staende gehoben, die auf dem Entwicklungsrechner INSTALLIERT
+waren -- nicht auf die, die inhaltlich gebraucht werden. Fuer IO::K8s,
+Kubernetes::REST und Net::Async::Kubernetes stimmt der Pin trotzdem, dort gibt
+es echten Inhalt. Hier nicht.
+
+ZWEI WEGE, ENTSCHEIDUNG DES MAINTAINERS
+A) kubernetes-ocps cpanfile zurueck auf requires WWW::Hetzner 0.100. Eine
+   Zeile, kein CPAN-Release. 0.100 ist erfuellt, auch wenn auf dem Dev-Rechner
+   0.101 installiert ist. Empfehlung.
+B) 0.101 trotzdem releasen. Dann braucht Changes einen Eintrag, der sagt, was
+   drin ist -- und drin ist nichts ausser der Versionsnummer.
+
+Weg A wird in kubernetes-ocp erledigt (dort k133), nicht hier; dieses Ticket
+schliesst dann als "nicht noetig". Weg B wird hier erledigt.
+
+ERLEDIGT 2026-09-05 -- Weg A, ohne Release. Der Maintainer hat entschieden: kubernetes-ocps cpanfile geht zurueck auf 'requires WWW::Hetzner 0.100'. Dort umgesetzt, mit einem Kommentar an der Zeile, der festhaelt, warum 0.101 nicht genommen wird -- damit der naechste Deps-Durchgang den Pin nicht wieder auf den zufaellig installierten Stand hebt, was genau der Fehler in ocp k125 war.
+
+Hier ist damit NICHTS zu tun. 0.101 bleibt unveroeffentlicht im Arbeitsbaum liegen; sobald diese Distribution echten Inhalt bekommt, wird daraus ein Release mit echtem Changes-Eintrag. Bis dahin ist der $VERSION-Bump im Baum kein offener Posten.
+
+kubernetes-ocp k133 ist entsprechend von vier Blockern auf drei zurueck; needs p5-www-hetzner#1 ist dort entfernt.
