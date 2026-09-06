@@ -1,0 +1,25 @@
+---
+class: standard
+created: 2026-09-06T05:24:33Z
+id: 3
+priority: medium
+status: backlog
+tags:
+- cloud
+- api-coverage
+title: 'Cloud read-only Controller: ISOs, LoadBalancerTypes, Pricing'
+updated: 2026-09-06T05:24:33Z
+---
+
+Drei fehlende Cloud-Ressourcen, alle read-only, nach dem Muster von
+Cloud::API::ServerTypes.
+
+ISOs: attach_iso existiert (Cloud/API/Servers.pm:407), aber ISOs lassen sich
+nicht auflisten -- der Name muss geraten werden.
+LoadBalancerTypes: das Gegenstück zu ServerTypes fehlt komplett.
+Pricing: /pricing ist gar nicht angebunden.
+
+Je Ressource: API-Controller, Entity, CLI-Subcommand, Fixture-Test.
+
+Unabhängig von #2, weil read-only keine Actions auslöst. Kann jederzeit
+laufen; billig und risikoarm.
