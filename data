@@ -1,0 +1,27 @@
+---
+class: standard
+created: 2026-09-06T05:24:42Z
+depends_on:
+- 2
+id: 5
+priority: medium
+status: backlog
+tags:
+- storage
+- architecture
+- spec-needed
+title: 'Storage Boxes (api.hetzner.com): dritter API-Host'
+updated: 2026-09-06T05:24:42Z
+---
+
+Das ABSTRACT von WWW::Hetzner bewirbt "Cloud, Storage, Robot" -- Storage ist
+aber ein auskommentierter TODO in lib/WWW/Hetzner.pm:84. Die Doku verspricht
+etwas, das nicht existiert.
+
+UMFANG
+Eigener Client für api.hetzner.com mit eigener Auth, Entities, CLI-Aufsatz,
+Fixture-Harness. Grösster Brocken der vier.
+
+Braucht eine eigene Spec, nicht nur ein Design im Chat.
+
+Hängt an #2, weil die Storage-Box-API selbst Actions verwendet.
