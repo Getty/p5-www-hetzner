@@ -1,0 +1,64 @@
+---
+class: standard
+created: 2026-09-06T05:24:12Z
+id: 2
+priority: high
+status: backlog
+tags:
+- cloud
+- actions
+- design-approved
+title: 'Cloud Actions: Action-Entity, /actions-Controller und Warten auf Aktionsabschluss'
+updated: 2026-09-06T18:17:20Z
+---
+
+BEFUND
+Jeder mutierende Cloud-Call gibt eine Action zurück; Fortschritt und Fehler
+werden aktuell verworfen. Das einzige Warten ist wait_for_status
+(Cloud/API/Servers.pm:488), und das pollt den Server-Status, nicht die Action.
+Ein create mit fehlgeschlagener Action sieht damit aus wie Erfolg.
+
+UMFANG
+Action-Entity, Controller für /actions, Zugriff auf die pro-Ressource-Action-
+Endpunkte, blockierendes Warten auf Abschluss mit Fehlerweitergabe.
+
+RISIKO / CROSS-REPO
+Blockierendes Warten gehört möglicherweise hinter den io->call-Seam
+(Role/HTTP.pm:148 und :193). Falls sich die Form von _build_request oder
+_parse_response ändert, ist das ein Ticket auf dem Board von
+p5-net-async-hetzner -- niemals ein stiller Cross-Repo-Edit.
+
+REIHENFOLGE
+Zuerst, weil es den Rückgabevertrag jedes mutierenden Calls ändert. Alles
+danach würde sonst gegen den alten Vertrag gebaut.
+
+STAND
+Design steht aus, Brainstorming läuft.
+
+2026-09-06 18:17 DESIGN GENEHMIGT
+Spec: docs/superpowers/specs/2026-09-06-cloud-actions-design.md (Branch
+cloud-actions, Commit b45311b).
+
+KORREKTUR ZUR CROSS-REPO-NOTIZ OBEN
+Geprüft: Net::Async::Hetzner::Cloud implementiert Role::IO nicht. Es baut
+intern ein WWW::Hetzner::Cloud und borgt daraus nur _build_request und
+_parse_response (Net/Async/Hetzner/Cloud.pm:100 und :103); Controller und
+Entities existieren dort gar nicht. Solange diese beiden Methoden in ihrer
+Form unangetastet bleiben -- und das sieht die Spec ausdrücklich vor -- ist
+kein Ticket auf dem Board von p5-net-async-hetzner nötig.
+
+ENTSCHEIDUNGEN
+E1 Bibliothek wartet nicht ungefragt, Action-Objekt zurück, ->wait explizit.
+E2 Blockierendes Warten sitzt in der CLI, --no-wait schaltet es ab.
+E3 create gibt weiterhin das Entity zurück, mit ->action und ->next_actions.
+E4 Injizierbarer sleeper am Client, damit Polling ohne Wanduhr testbar ist.
+
+UMFANG laut Spec: 38 Controller- und 28 Entity-Methoden geben statt eines
+Hashrefs ein Action-Objekt zurück (brechend, gehört in Changes). Sechs
+Entities bekommen action/next_actions.
+
+OFFEN VOR DER IMPLEMENTIERUNG
+1. Ist der globale /actions/{id} noch aktuell oder nur noch
+   /{resource}/actions/{id}? Bestimmt die poll_path-Werte.
+2. Liefert Firewall-create eine Action (Plural actions)? Die Fixture nicht.
+Beides gegen die aktuelle API-Doku prüfen, nicht raten.
