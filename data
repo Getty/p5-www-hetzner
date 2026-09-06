@@ -1,0 +1,24 @@
+---
+class: standard
+created: 2026-09-06T05:24:37Z
+id: 4
+priority: medium
+status: backlog
+tags:
+- robot
+- api-coverage
+title: 'Robot: boot, rdns und failover ergänzen'
+updated: 2026-09-06T05:24:37Z
+---
+
+Robot hat nur 5 von rund 12 Ressourcen: servers, keys, ips, reset, traffic.
+
+IM UMFANG
+boot (Rescue-System, Linux-Install, VNC, Windows), rdns, failover.
+Mit reset allein lässt sich eine Dedicated-Maschine nicht hochziehen -- dafür
+braucht es boot. Das ist der eigentliche Grund für dieses Ticket.
+
+NICHT IM UMFANG
+subnet, vswitch, firewall, cancellation. Eigene Tickets, falls gewünscht.
+
+Eigener API-Host, keine Berührung mit Cloud Actions, daher unabhängig von #2.
