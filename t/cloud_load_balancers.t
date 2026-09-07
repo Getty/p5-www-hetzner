@@ -106,7 +106,8 @@ subtest 'add target' => sub {
         type   => 'server',
         server => { id => 456 },
     );
-    is($result->{action}{command}, 'add_target', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'add_target', 'action command');
 };
 
 subtest 'add service' => sub {
@@ -127,7 +128,8 @@ subtest 'add service' => sub {
         listen_port      => 443,
         destination_port => 8443,
     );
-    is($result->{action}{command}, 'add_service', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'add_service', 'action command');
 };
 
 done_testing;
