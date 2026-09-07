@@ -68,6 +68,17 @@ Defaults to L<WWW::Hetzner::LWPIO>.
 
 =cut
 
+has sleeper => (
+    is      => 'rw',
+    default => sub { sub { sleep $_[0] } },
+);
+
+=attr sleeper
+
+Injectable sleep function, C<sub ($seconds) { ... }>. Defaults to C<sleep>.
+
+=cut
+
 sub get {
     my ($self, $path, %params) = @_;
     return $self->_request('GET', $path, %params);
