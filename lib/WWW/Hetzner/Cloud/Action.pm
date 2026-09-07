@@ -127,7 +127,7 @@ L</password> for typed readers over this hash (read-only).
 
 =cut
 
-sub root_password { $_[0]->result->{root_password} }
+sub root_password { shift->result->{root_password} }
 
 =method root_password
 
@@ -138,7 +138,7 @@ absent.
 
 =cut
 
-sub image { $_[0]->result->{image} }
+sub image { shift->result->{image} }
 
 =method image
 
@@ -148,7 +148,7 @@ Convenience reader for C<< $action->result->{image} >>. Undef when absent.
 
 =cut
 
-sub wss_url { $_[0]->result->{wss_url} }
+sub wss_url { shift->result->{wss_url} }
 
 =method wss_url
 
@@ -158,7 +158,7 @@ Convenience reader for C<< $action->result->{wss_url} >>. Undef when absent.
 
 =cut
 
-sub password { $_[0]->result->{password} }
+sub password { shift->result->{password} }
 
 =method password
 
