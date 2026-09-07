@@ -95,7 +95,9 @@ subtest 'set rules' => sub {
     my $result = $cloud->firewalls->set_rules(300, [
         { direction => 'in', protocol => 'tcp', port => '443', source_ips => ['0.0.0.0/0'] },
     ]);
-    is($result->{actions}[0]{command}, 'set_firewall_rules', 'action command');
+    is(ref $result, 'ARRAY', 'returns arrayref of actions');
+    isa_ok($result->[0], 'WWW::Hetzner::Cloud::Action');
+    is($result->[0]->command, 'set_firewall_rules', 'action command');
 };
 
 subtest 'apply to resources' => sub {
@@ -114,7 +116,8 @@ subtest 'apply to resources' => sub {
     my $result = $cloud->firewalls->apply_to_resources(300,
         { type => 'server', server => { id => 456 } },
     );
-    is($result->{actions}[0]{command}, 'apply_to_resources', 'action command');
+    isa_ok($result->[0], 'WWW::Hetzner::Cloud::Action');
+    is($result->[0]->command, 'apply_to_resources', 'action command');
 };
 
 subtest 'remove from resources' => sub {
@@ -132,7 +135,8 @@ subtest 'remove from resources' => sub {
     my $result = $cloud->firewalls->remove_from_resources(300,
         { type => 'server', server => { id => 456 } },
     );
-    is($result->{actions}[0]{command}, 'remove_from_resources', 'action command');
+    isa_ok($result->[0], 'WWW::Hetzner::Cloud::Action');
+    is($result->[0]->command, 'remove_from_resources', 'action command');
 };
 
 subtest 'firewall entity methods' => sub {
