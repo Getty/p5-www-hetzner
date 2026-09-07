@@ -163,8 +163,14 @@ Liste), nicht ein einzelnes `action`. `Firewall` konsumiert daher **nicht**
 Nicht konsumiert von `Network`, `RRSet`, `SSHKey` — deren `create`-Antwort
 enthält laut Spec keine Action.
 
-`action` ist der Zustand zum Zeitpunkt der Erzeugung. Nach `->refresh` ist es
-`undef`. Das steht so in der POD.
+`action` ist der Zustand zum Zeitpunkt der Erzeugung — ein Snapshot. Es ist
+`ro` und wird von `->refresh` des Entities nicht angefasst, bleibt also als
+(dann ggf. veralteter) Erzeugungs-Snapshot erhalten. Das steht so in der POD.
+
+(Korrektur 2026-09-07: Der ursprüngliche Entwurf sagte „nach `->refresh`
+`undef`". Das war eine nicht umgesetzte Über-Spezifikation; ein erhaltener
+Snapshot ist harmlos und nützlicher als ein Nullen. Die POD dokumentiert die
+tatsächliche Behaviour.)
 
 **`WWW::Hetzner::CLI::Role::WaitsForAction`** — liefert die Option `--no-wait`
 und einen `handle_action`-Helfer. Es gibt keine CLI-Basisklasse; jedes Kommando
