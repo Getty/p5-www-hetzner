@@ -1,0 +1,20 @@
+---
+class: standard
+completed: 2026-09-07T20:42:15Z
+created: 2026-09-07T19:18:15Z
+id: 6
+priority: medium
+started: 2026-09-07T20:42:15Z
+status: done
+tags:
+- cli
+- regression
+title: Rescue enable_rescue lost root_password / breaks --output json (Task 4 regression)
+updated: 2026-09-07T20:42:15Z
+---
+
+Server::Cmd::Rescue enable branch (lib/WWW/Hetzner/CLI/Cmd/Server/Cmd/Rescue.pm) reads $result->{root_password} and encode_json($result) off the return of $cloud->servers->enable_rescue. Since 482cf4c (Task 4, karr #2) enable_rescue returns a WWW::Hetzner::Cloud::Action (via HasActions/_wrap_action) instead of the raw {action=>{...}, root_password=>...} hash the Hetzner API actually sends, so root_password is silently dropped and `hcloud.pl server rescue <id> --output json` will die trying to encode_json a blessed Action object (JSON::MaybeXS refuses blessed refs by default).
+
+Not fixed as part of the CLI WaitsForAction wiring (karr #2 task 7) since it requires touching the Servers controller / Action contract, which is out of scope there and shared with p5-net-async-hetzner. Two ways to fix, need a decision: (a) have enable_rescue return {action=>Action, root_password=>...} instead of a bare Action, breaking the "controllers return Action directly" contract for this one method, or (b) have Action (or the enable_rescue call site) carry root_password through some other channel. Whichever is chosen, update Rescue.pm accordingly.
+
+2026-09-07 20:42 RESOLVED durch karr #2 Task 7b (Commit 34627ca). Entscheidung (Maintainer, spec E5): Variante (b) — die Action traegt die Sidecar-Daten via Action->result + getippte Leser ($action->root_password). Rescue.pm und Rebuild.pm lesen jetzt ueber diese Accessoren und { %{$action->data}, %{$action->result} } fuer --output json. Regressionstest t/cli_server_rescue.t reproduziert den urspruenglichen Crash RED, dann GREEN.
