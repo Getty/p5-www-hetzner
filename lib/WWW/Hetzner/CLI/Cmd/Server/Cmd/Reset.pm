@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl server reset <id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -15,8 +16,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Resetting server $id...\n";
-    $cloud->servers->reset($id);
-    print "Server reset initiated.\n";
+    my $action = $cloud->servers->reset($id);
+    $self->handle_action($action);
+    print $self->no_wait ? "Server reset requested.\n" : "Server reset.\n";
 }
 
 1;

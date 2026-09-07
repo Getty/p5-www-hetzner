@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl volume detach <id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -15,8 +16,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Detaching volume $id...\n";
-    $cloud->volumes->detach($id);
-    print "Volume detached.\n";
+    my $action = $cloud->volumes->detach($id);
+    $self->handle_action($action);
+    print $self->no_wait ? "Volume detach requested.\n" : "Volume detached.\n";
 }
 
 1;

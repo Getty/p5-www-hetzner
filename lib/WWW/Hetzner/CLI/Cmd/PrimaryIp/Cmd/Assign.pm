@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl primary-ip assign <id> --server <server-id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option server => (
     is       => 'ro',
@@ -22,8 +23,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Assigning primary IP $id to server ", $self->server, "...\n";
-    $cloud->primary_ips->assign($id, $self->server, 'server');
-    print "Primary IP assigned.\n";
+    my $action = $cloud->primary_ips->assign($id, $self->server, 'server');
+    $self->handle_action($action);
+    print $self->no_wait ? "Primary IP assignment requested.\n" : "Primary IP assigned.\n";
 }
 
 1;

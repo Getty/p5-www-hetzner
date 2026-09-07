@@ -7,6 +7,7 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl volume create --name <name> --size <gb> --location <loc>';
 use JSON::MaybeXS qw(encode_json);
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -64,6 +65,7 @@ sub execute {
         server    => $self->server,
         automount => $self->automount,
     );
+    $self->handle_action($volume->action);
 
     if ($main->output eq 'json') {
         print encode_json($volume->data), "\n";

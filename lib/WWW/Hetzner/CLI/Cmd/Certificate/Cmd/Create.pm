@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl certificate create --name <name> --domain <domain> [--domain <domain>...]';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -33,6 +34,7 @@ sub execute {
         type         => 'managed',
         domain_names => $self->domain,
     );
+    $self->handle_action($cert->action);
     print "Certificate created with ID ", $cert->id, "\n";
 }
 

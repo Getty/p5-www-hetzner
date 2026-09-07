@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl server poweroff <id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -15,8 +16,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Powering off server $id...\n";
-    $cloud->servers->power_off($id);
-    print "Server powered off.\n";
+    my $action = $cloud->servers->power_off($id);
+    $self->handle_action($action);
+    print $self->no_wait ? "Power-off requested.\n" : "Server powered off.\n";
 }
 
 1;

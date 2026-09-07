@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl network add-subnet <id> --ip-range <cidr> --type <type> --network-zone <zone>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option 'ip_range' => (
     is       => 'ro',
@@ -38,12 +39,13 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Adding subnet ", $self->ip_range, " to network $id...\n";
-    $cloud->networks->add_subnet($id,
+    my $action = $cloud->networks->add_subnet($id,
         ip_range     => $self->ip_range,
         type         => $self->type,
         network_zone => $self->network_zone,
     );
-    print "Subnet added.\n";
+    $self->handle_action($action);
+    print $self->no_wait ? "Subnet add requested.\n" : "Subnet added.\n";
 }
 
 1;

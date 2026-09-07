@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl firewall add-rule <id> --direction <in|out> --protocol <tcp|udp|icmp|gre|esp> --port <port> [--source-ips <ips>]';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option direction => (
     is       => 'ro',
@@ -62,8 +63,9 @@ sub execute {
     push @rules, $rule;
 
     print "Adding rule to firewall $id...\n";
-    $cloud->firewalls->set_rules($id, @rules);
-    print "Rule added.\n";
+    my $actions = $cloud->firewalls->set_rules($id, @rules);
+    $self->handle_action($actions);
+    print $self->no_wait ? "Rule add requested.\n" : "Rule added.\n";
 }
 
 1;

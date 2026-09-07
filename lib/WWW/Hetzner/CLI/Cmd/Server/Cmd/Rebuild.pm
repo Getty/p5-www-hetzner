@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl server rebuild <id> --image <image>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option image => (
     is       => 'ro',
@@ -22,8 +23,11 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Rebuilding server $id with image ", $self->image, "...\n";
-    $cloud->servers->rebuild($id, $self->image);
-    print "Server rebuild initiated. Data on the server will be lost.\n";
+    my $action = $cloud->servers->rebuild($id, $self->image);
+    $self->handle_action($action);
+    print $self->no_wait
+        ? "Server rebuild requested. Data on the server will be lost.\n"
+        : "Server rebuilt. Data on the server has been lost.\n";
 }
 
 1;
