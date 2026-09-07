@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::LoadBalancer;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Cloud::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 

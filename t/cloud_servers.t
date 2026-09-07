@@ -86,6 +86,9 @@ subtest 'create server' => sub {
     is($server->name, 'test-full-params', 'new server name');
     is($server->status, 'initializing', 'new server status');
     ok(!$server->is_running, 'is_running returns false for initializing');
+    isa_ok($server->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    is($server->action->command, 'create_server', 'action command');
+    is(scalar @{ $server->next_actions }, 1, 'next_actions populated');
 };
 
 subtest 'delete server' => sub {

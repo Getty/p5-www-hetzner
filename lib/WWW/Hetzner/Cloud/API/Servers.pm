@@ -64,10 +64,11 @@ has client => (
 with 'WWW::Hetzner::Cloud::Role::HasActions';
 
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::Server->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -207,7 +208,11 @@ sub create {
     }
 
     my $result = $self->client->post('/servers', $body);
-    return $self->_wrap($result->{server});
+    return $self->_wrap(
+        $result->{server},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 =method delete

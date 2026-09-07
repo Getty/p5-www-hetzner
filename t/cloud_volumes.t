@@ -72,6 +72,9 @@ subtest 'create volume' => sub {
     is($volume->id, 777, 'new volume id');
     is($volume->name, 'new-volume', 'new volume name');
     is($volume->status, 'creating', 'new volume status');
+    isa_ok($volume->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    is($volume->action->command, 'create_volume', 'action command');
+    is(scalar @{ $volume->next_actions }, 1, 'next_actions populated');
 };
 
 subtest 'delete volume' => sub {

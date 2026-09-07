@@ -60,6 +60,8 @@ subtest 'create certificate' => sub {
 
     isa_ok($cert, 'WWW::Hetzner::Cloud::Certificate');
     is($cert->id, 1200, 'new certificate id');
+    isa_ok($cert->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    is($cert->action->command, 'create_certificate', 'action command');
 };
 
 subtest 'retry certificate' => sub {

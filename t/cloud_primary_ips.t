@@ -71,6 +71,8 @@ subtest 'create primary IP' => sub {
     is($pip->id, 800, 'new primary IP id');
     is($pip->ip, '203.0.113.80', 'new IP address');
     ok(!$pip->is_assigned, 'not assigned');
+    isa_ok($pip->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    is($pip->action->command, 'create_primary_ip', 'action command');
 };
 
 subtest 'delete primary IP' => sub {

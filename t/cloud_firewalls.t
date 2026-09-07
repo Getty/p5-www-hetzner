@@ -62,6 +62,8 @@ subtest 'create firewall' => sub {
     isa_ok($fw, 'WWW::Hetzner::Cloud::Firewall');
     is($fw->id, 400, 'new firewall id');
     is($fw->name, 'new-firewall', 'new firewall name');
+    isa_ok($fw->actions->[0], 'WWW::Hetzner::Cloud::Action', 'firewall create yields actions list');
+    is($fw->actions->[0]->command, 'apply_firewall', 'action command');
 };
 
 subtest 'delete firewall' => sub {

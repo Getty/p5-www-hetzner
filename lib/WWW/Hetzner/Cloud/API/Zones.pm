@@ -53,11 +53,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::Zone->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -138,7 +141,10 @@ sub create {
     $body->{ttl}    = $params{ttl}    if $params{ttl};
 
     my $result = $self->client->post('/zones', $body);
-    return $self->_wrap($result->{zone});
+    return $self->_wrap(
+        $result->{zone},
+        action => $self->_wrap_action($result->{action}),
+    );
 }
 
 =method update

@@ -47,10 +47,11 @@ has client => (
 with 'WWW::Hetzner::Cloud::Role::HasActions';
 
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::FloatingIP->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -123,7 +124,11 @@ sub create {
     $body->{labels}      = $params{labels}      if $params{labels};
 
     my $result = $self->client->post('/floating_ips', $body);
-    return $self->_wrap($result->{floating_ip});
+    return $self->_wrap(
+        $result->{floating_ip},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 =method update

@@ -58,10 +58,11 @@ has client => (
 with 'WWW::Hetzner::Cloud::Role::HasActions';
 
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::Firewall->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -129,7 +130,10 @@ sub create {
     $body->{apply_to} = $params{apply_to} if $params{apply_to};
 
     my $result = $self->client->post('/firewalls', $body);
-    return $self->_wrap($result->{firewall});
+    return $self->_wrap(
+        $result->{firewall},
+        actions => $self->_wrap_actions($result->{actions}),
+    );
 }
 
 =method update

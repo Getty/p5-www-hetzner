@@ -67,6 +67,8 @@ subtest 'create floating IP' => sub {
     is($fip->id, 600, 'new floating IP id');
     is($fip->ip, '203.0.113.60', 'new IP address');
     ok(!$fip->is_assigned, 'not assigned');
+    isa_ok($fip->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    is($fip->action->command, 'create_floating_ip', 'action command');
 };
 
 subtest 'delete floating IP' => sub {

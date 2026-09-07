@@ -66,6 +66,8 @@ subtest 'create load balancer' => sub {
 
     isa_ok($lb, 'WWW::Hetzner::Cloud::LoadBalancer');
     is($lb->id, 1000, 'new load balancer id');
+    isa_ok($lb->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    is($lb->action->command, 'create_load_balancer', 'action command');
 };
 
 subtest 'delete load balancer' => sub {

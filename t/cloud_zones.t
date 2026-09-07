@@ -74,6 +74,8 @@ subtest 'create zone' => sub {
     is($zone->{id}, 'zone789012', 'new zone id');
     is($zone->{name}, 'newdomain.com', 'new zone name');
     is($zone->{status}, 'pending', 'new zone status');
+    isa_ok($zone->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    is($zone->action->command, 'create_zone', 'action command');
 };
 
 subtest 'update zone' => sub {

@@ -92,6 +92,16 @@ Creation timestamp (read-only).
 
 =cut
 
+has actions => ( is => 'ro', default => sub { [] } );
+
+=attr actions
+
+Arrayref of L<WWW::Hetzner::Cloud::Action> objects returned by C<create>.
+Empty arrayref when the API did not emit any (read-only). Not maintained
+afterwards.
+
+=cut
+
 # Actions
 sub update {
     my ($self) = @_;

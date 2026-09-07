@@ -54,10 +54,11 @@ has client => (
 with 'WWW::Hetzner::Cloud::Role::HasActions';
 
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::LoadBalancer->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -139,7 +140,11 @@ sub create {
     $body->{targets}     = $params{targets}     if $params{targets};
 
     my $result = $self->client->post('/load_balancers', $body);
-    return $self->_wrap($result->{load_balancer});
+    return $self->_wrap(
+        $result->{load_balancer},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 =method update
