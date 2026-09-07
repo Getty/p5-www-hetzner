@@ -311,8 +311,8 @@ sub rebuild {
     croak "Server ID required" unless $id;
     croak "Image required" unless $image;
 
-    return $self->_wrap_action(
-        $self->client->post("/servers/$id/actions/rebuild", { image => $image })->{action}
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/rebuild", { image => $image })
     );
 }
 
@@ -369,8 +369,8 @@ sub enable_rescue {
     my $body = { type => $opts{type} // 'linux64' };
     $body->{ssh_keys} = $opts{ssh_keys} if $opts{ssh_keys};
 
-    return $self->_wrap_action(
-        $self->client->post("/servers/$id/actions/enable_rescue", $body)->{action}
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/enable_rescue", $body)
     );
 }
 
@@ -403,8 +403,8 @@ sub request_console {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->_wrap_action(
-        $self->client->post("/servers/$id/actions/request_console", {})->{action}
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/request_console", {})
     );
 }
 
@@ -420,8 +420,8 @@ sub reset_password {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->_wrap_action(
-        $self->client->post("/servers/$id/actions/reset_password", {})->{action}
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/reset_password", {})
     );
 }
 

@@ -115,6 +115,60 @@ Error hashref (C<{ code, message }>) when the action failed, else undef
 
 =cut
 
+has result => ( is => 'ro', default => sub { {} } );
+
+=attr result
+
+Hashref (default C<{}>) of sidecar fields some endpoints return alongside
+C<action> -- e.g. C<root_password> from L<WWW::Hetzner::Cloud::API::Servers>'
+C<enable_rescue>/C<rebuild>/C<reset_password>, C<password>/C<wss_url> from
+C<request_console>. See L</root_password>, L</image>, L</wss_url> and
+L</password> for typed readers over this hash (read-only).
+
+=cut
+
+sub root_password { $_[0]->result->{root_password} }
+
+=method root_password
+
+    my $pw = $action->root_password;
+
+Convenience reader for C<< $action->result->{root_password} >>. Undef when
+absent.
+
+=cut
+
+sub image { $_[0]->result->{image} }
+
+=method image
+
+    my $image_id = $action->image;
+
+Convenience reader for C<< $action->result->{image} >>. Undef when absent.
+
+=cut
+
+sub wss_url { $_[0]->result->{wss_url} }
+
+=method wss_url
+
+    my $url = $action->wss_url;
+
+Convenience reader for C<< $action->result->{wss_url} >>. Undef when absent.
+
+=cut
+
+sub password { $_[0]->result->{password} }
+
+=method password
+
+    my $pw = $action->password;
+
+Convenience reader for C<< $action->result->{password} >>. Undef when
+absent.
+
+=cut
+
 sub is_running { shift->status eq 'running' }
 
 =method is_running

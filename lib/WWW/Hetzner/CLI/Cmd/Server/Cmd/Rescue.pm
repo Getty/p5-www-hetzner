@@ -50,11 +50,11 @@ sub execute {
         $self->handle_action($action);
 
         if ($main->output eq 'json') {
-            print encode_json($action), "\n";
+            print encode_json({ %{ $action->data }, %{ $action->result } }), "\n";
         } else {
             print $self->no_wait ? "Rescue-mode-enable requested.\n" : "Rescue mode enabled.\n";
-            if ($action->{root_password}) {
-                print "Root password: $action->{root_password}\n";
+            if (defined $action->root_password) {
+                print "Root password: ", $action->root_password, "\n";
             }
             print "Reboot the server to enter rescue mode.\n";
         }

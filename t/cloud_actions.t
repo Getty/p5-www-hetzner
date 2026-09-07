@@ -74,9 +74,28 @@ ok(!$a->is_success && !$a->is_error, 'not terminal');
 {
     my $w = My::WrapTest->new(client => $cloud);
     is($w->_wrap_action(undef), undef, 'undef action -> undef');
-    isa_ok($w->_wrap_action({ id => 5, status => 'running' }), 'WWW::Hetzner::Cloud::Action');
+    my $plain = $w->_wrap_action({ id => 5, status => 'running' });
+    isa_ok($plain, 'WWW::Hetzner::Cloud::Action');
+    is($plain->root_password, undef, '_wrap_action: no sidecar -> root_password undef');
+    is_deeply($plain->result, {}, '_wrap_action: result defaults to {}');
     is(scalar @{ $w->_wrap_actions([{id=>1,status=>'running'},{id=>2,status=>'success'}]) }, 2, 'plural');
     is_deeply($w->_wrap_actions(undef), [], 'undef list -> empty arrayref');
+}
+
+# 7. HasActions role: _wrap_action_result carries sidecar fields on the Action
+{
+    my $w = My::WrapTest->new(client => $cloud);
+    is($w->_wrap_action_result({}), undef, 'no action key -> undef');
+
+    my $wrapped = $w->_wrap_action_result({
+        action        => { id => 9, command => 'reset_password', status => 'running' },
+        root_password => 'pw123',
+    });
+    isa_ok($wrapped, 'WWW::Hetzner::Cloud::Action');
+    is($wrapped->id, 9, 'action fields still set');
+    is($wrapped->root_password, 'pw123', 'sidecar preserved via _wrap_action_result');
+    is_deeply($wrapped->result, { root_password => 'pw123' },
+        'result holds only the sidecar, not the action key');
 }
 
 done_testing;

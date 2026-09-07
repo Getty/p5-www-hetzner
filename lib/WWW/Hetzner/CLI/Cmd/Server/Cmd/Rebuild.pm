@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl server rebuild <id> --image <image>';
+use JSON::MaybeXS qw(encode_json);
 with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option image => (
@@ -25,9 +26,17 @@ sub execute {
     print "Rebuilding server $id with image ", $self->image, "...\n";
     my $action = $cloud->servers->rebuild($id, $self->image);
     $self->handle_action($action);
-    print $self->no_wait
-        ? "Server rebuild requested. Data on the server will be lost.\n"
-        : "Server rebuilt. Data on the server has been lost.\n";
+
+    if ($main->output eq 'json') {
+        print encode_json({ %{ $action->data }, %{ $action->result } }), "\n";
+    } else {
+        print $self->no_wait
+            ? "Server rebuild requested. Data on the server will be lost.\n"
+            : "Server rebuilt. Data on the server has been lost.\n";
+        if (defined $action->root_password) {
+            print "Root password: ", $action->root_password, "\n";
+        }
+    }
 }
 
 1;

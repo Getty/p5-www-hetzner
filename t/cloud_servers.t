@@ -167,6 +167,7 @@ subtest 'shutdown' => sub {
 subtest 'rebuild' => sub {
     my $fixture = load_fixture('servers_action');
     $fixture->{action}{command} = 'rebuild';
+    $fixture->{root_password} = 'the-generated-pw';
 
     my $cloud = mock_cloud(
         'POST /servers/123456/actions/rebuild' => sub {
@@ -179,6 +180,60 @@ subtest 'rebuild' => sub {
     my $result = $cloud->servers->rebuild(123456, 'debian-13');
     isa_ok($result, 'WWW::Hetzner::Cloud::Action');
     is($result->command, 'rebuild', 'action command');
+    is($result->root_password, 'the-generated-pw', 'root_password preserved on the Action');
+    is($result->result->{root_password}, 'the-generated-pw', 'result carries sidecar');
+};
+
+subtest 'enable_rescue' => sub {
+    my $fixture = load_fixture('servers_action');
+    $fixture->{action}{command} = 'enable_rescue';
+    $fixture->{root_password} = 'rescue-pw';
+
+    my $cloud = mock_cloud(
+        'POST /servers/123456/actions/enable_rescue' => $fixture,
+    );
+
+    my $result = $cloud->servers->enable_rescue(123456);
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'enable_rescue', 'action command');
+    is($result->root_password, 'rescue-pw', 'root_password preserved on the Action');
+    is($result->result->{root_password}, 'rescue-pw', 'result carries sidecar');
+};
+
+subtest 'reset_password' => sub {
+    my $fixture = load_fixture('servers_action');
+    $fixture->{action}{command} = 'reset_password';
+    $fixture->{root_password} = 'the-generated-pw';
+
+    my $cloud = mock_cloud(
+        'POST /servers/123456/actions/reset_password' => $fixture,
+    );
+
+    my $action = $cloud->servers->reset_password(123456);
+    isa_ok($action, 'WWW::Hetzner::Cloud::Action');
+    is($action->root_password, 'the-generated-pw', 'root_password preserved on the Action');
+    is($action->result->{root_password}, 'the-generated-pw', 'result carries sidecar');
+};
+
+subtest 'request_console' => sub {
+    my $fixture = load_fixture('servers_action');
+    $fixture->{action}{command} = 'request_console';
+    $fixture->{password} = 'console-pw';
+    $fixture->{wss_url}  = 'wss://console.hetzner.cloud/?token=abc123';
+
+    my $cloud = mock_cloud(
+        'POST /servers/123456/actions/request_console' => $fixture,
+    );
+
+    my $result = $cloud->servers->request_console(123456);
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'request_console', 'action command');
+    is($result->password, 'console-pw', 'password preserved on the Action');
+    is($result->wss_url, 'wss://console.hetzner.cloud/?token=abc123', 'wss_url preserved on the Action');
+    is_deeply($result->result, {
+        password => 'console-pw',
+        wss_url  => 'wss://console.hetzner.cloud/?token=abc123',
+    }, 'result carries both sidecar fields');
 };
 
 subtest 'change_type' => sub {

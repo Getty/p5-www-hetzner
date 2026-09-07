@@ -59,6 +59,25 @@ arrayref when C<$arrayref> is undef.
 
 =cut
 
+sub _wrap_action_result {
+    my ($self, $result) = @_;
+    my %sidecar = %$result;
+    my $action = delete $sidecar{action};
+    return undef unless defined $action;
+    WWW::Hetzner::Cloud::Action->new(client => $self->client, %$action, result => \%sidecar);
+}
+
+=method _wrap_action_result
+
+    my $action = $self->_wrap_action_result($result);
+
+Wraps a full decoded-JSON response hashref as a L<WWW::Hetzner::Cloud::Action>,
+same as L</_wrap_action>, but keeps whatever the endpoint returned alongside
+C<action> (e.g. C<root_password>) as the Action's L<WWW::Hetzner::Cloud::Action/result>.
+Returns undef when C<$result> carries no C<action> key.
+
+=cut
+
 =seealso
 
 =over 4
