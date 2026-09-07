@@ -44,6 +44,8 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
     my ($self, $data) = @_;
     return WWW::Hetzner::Cloud::FloatingIP->new(
@@ -177,9 +179,11 @@ sub assign {
     croak "Floating IP ID required" unless $id;
     croak "Server ID required" unless $server_id;
 
-    return $self->client->post("/floating_ips/$id/actions/assign", {
-        server => $server_id,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/floating_ips/$id/actions/assign", {
+            server => $server_id,
+        })->{action}
+    );
 }
 
 =method unassign
@@ -194,7 +198,9 @@ sub unassign {
     my ($self, $id) = @_;
     croak "Floating IP ID required" unless $id;
 
-    return $self->client->post("/floating_ips/$id/actions/unassign", {});
+    return $self->_wrap_action(
+        $self->client->post("/floating_ips/$id/actions/unassign", {})->{action}
+    );
 }
 
 =method change_dns_ptr
@@ -211,10 +217,12 @@ sub change_dns_ptr {
     croak "IP required" unless $ip;
     croak "dns_ptr required" unless defined $dns_ptr;
 
-    return $self->client->post("/floating_ips/$id/actions/change_dns_ptr", {
-        ip      => $ip,
-        dns_ptr => $dns_ptr,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/floating_ips/$id/actions/change_dns_ptr", {
+            ip      => $ip,
+            dns_ptr => $dns_ptr,
+        })->{action}
+    );
 }
 
 =seealso

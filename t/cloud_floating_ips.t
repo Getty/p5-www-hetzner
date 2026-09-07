@@ -100,7 +100,8 @@ subtest 'assign floating IP' => sub {
     );
 
     my $result = $cloud->floating_ips->assign(500, 456);
-    is($result->{action}{command}, 'assign_floating_ip', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'assign_floating_ip', 'action command');
 };
 
 subtest 'unassign floating IP' => sub {
@@ -112,7 +113,8 @@ subtest 'unassign floating IP' => sub {
     );
 
     my $result = $cloud->floating_ips->unassign(500);
-    is($result->{action}{command}, 'unassign_floating_ip', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'unassign_floating_ip', 'action command');
 };
 
 subtest 'change dns ptr' => sub {
@@ -129,7 +131,8 @@ subtest 'change dns ptr' => sub {
     );
 
     my $result = $cloud->floating_ips->change_dns_ptr(500, '203.0.113.50', 'new.example.com');
-    is($result->{action}{command}, 'change_dns_ptr', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'change_dns_ptr', 'action command');
 };
 
 subtest 'floating IP entity methods' => sub {
