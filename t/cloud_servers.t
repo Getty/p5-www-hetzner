@@ -118,7 +118,8 @@ subtest 'power_on' => sub {
     );
 
     my $result = $cloud->servers->power_on(123456);
-    is($result->{action}{command}, 'poweron', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'poweron', 'action command');
 };
 
 subtest 'power_off' => sub {
@@ -130,7 +131,8 @@ subtest 'power_off' => sub {
     );
 
     my $result = $cloud->servers->power_off(123456);
-    is($result->{action}{command}, 'poweroff', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'poweroff', 'action command');
 };
 
 subtest 'reboot' => sub {
@@ -142,7 +144,8 @@ subtest 'reboot' => sub {
     );
 
     my $result = $cloud->servers->reboot(123456);
-    is($result->{action}{command}, 'reboot', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'reboot', 'action command');
 };
 
 subtest 'shutdown' => sub {
@@ -154,7 +157,8 @@ subtest 'shutdown' => sub {
     );
 
     my $result = $cloud->servers->shutdown(123456);
-    is($result->{action}{command}, 'shutdown', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'shutdown', 'action command');
 };
 
 subtest 'rebuild' => sub {
@@ -170,7 +174,8 @@ subtest 'rebuild' => sub {
     );
 
     my $result = $cloud->servers->rebuild(123456, 'debian-13');
-    is($result->{action}{command}, 'rebuild', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'rebuild', 'action command');
 };
 
 subtest 'change_type' => sub {
@@ -186,7 +191,8 @@ subtest 'change_type' => sub {
     );
 
     my $result = $cloud->servers->change_type(123456, 'cx33');
-    is($result->{action}{command}, 'change_type', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'change_type', 'action command');
 };
 
 subtest 'update server' => sub {

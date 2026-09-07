@@ -61,6 +61,8 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
     my ($self, $data) = @_;
     return WWW::Hetzner::Cloud::Server->new(
@@ -235,7 +237,9 @@ sub power_on {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/poweron", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/poweron", {})->{action}
+    );
 }
 
 =method power_off
@@ -250,7 +254,9 @@ sub power_off {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/poweroff", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/poweroff", {})->{action}
+    );
 }
 
 =method reboot
@@ -265,7 +271,9 @@ sub reboot {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/reboot", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/reboot", {})->{action}
+    );
 }
 
 =method shutdown
@@ -280,7 +288,9 @@ sub shutdown {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/shutdown", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/shutdown", {})->{action}
+    );
 }
 
 =method rebuild
@@ -296,7 +306,9 @@ sub rebuild {
     croak "Server ID required" unless $id;
     croak "Image required" unless $image;
 
-    return $self->client->post("/servers/$id/actions/rebuild", { image => $image });
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/rebuild", { image => $image })->{action}
+    );
 }
 
 =method change_type
@@ -312,10 +324,12 @@ sub change_type {
     croak "Server ID required" unless $id;
     croak "Server type required" unless $server_type;
 
-    return $self->client->post("/servers/$id/actions/change_type", {
-        server_type     => $server_type,
-        upgrade_disk    => $opts{upgrade_disk} // 1,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/change_type", {
+            server_type     => $server_type,
+            upgrade_disk    => $opts{upgrade_disk} // 1,
+        })->{action}
+    );
 }
 
 =method reset
@@ -330,7 +344,9 @@ sub reset {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/reset", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/reset", {})->{action}
+    );
 }
 
 =method enable_rescue
@@ -348,7 +364,9 @@ sub enable_rescue {
     my $body = { type => $opts{type} // 'linux64' };
     $body->{ssh_keys} = $opts{ssh_keys} if $opts{ssh_keys};
 
-    return $self->client->post("/servers/$id/actions/enable_rescue", $body);
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/enable_rescue", $body)->{action}
+    );
 }
 
 =method disable_rescue
@@ -363,7 +381,9 @@ sub disable_rescue {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/disable_rescue", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/disable_rescue", {})->{action}
+    );
 }
 
 =method request_console
@@ -378,7 +398,9 @@ sub request_console {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/request_console", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/request_console", {})->{action}
+    );
 }
 
 =method reset_password
@@ -393,7 +415,9 @@ sub reset_password {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/reset_password", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/reset_password", {})->{action}
+    );
 }
 
 =method attach_iso
@@ -409,7 +433,9 @@ sub attach_iso {
     croak "Server ID required" unless $id;
     croak "ISO required" unless $iso;
 
-    return $self->client->post("/servers/$id/actions/attach_iso", { iso => $iso });
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/attach_iso", { iso => $iso })->{action}
+    );
 }
 
 =method detach_iso
@@ -424,7 +450,9 @@ sub detach_iso {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/detach_iso", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/detach_iso", {})->{action}
+    );
 }
 
 =method enable_backup
@@ -439,7 +467,9 @@ sub enable_backup {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/enable_backup", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/enable_backup", {})->{action}
+    );
 }
 
 =method disable_backup
@@ -454,7 +484,9 @@ sub disable_backup {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/disable_backup", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/disable_backup", {})->{action}
+    );
 }
 
 =method update
