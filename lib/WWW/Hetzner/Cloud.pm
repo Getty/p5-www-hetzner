@@ -3,6 +3,7 @@ package WWW::Hetzner::Cloud;
 # ABSTRACT: Perl client for Hetzner Cloud API
 
 use Moo;
+use WWW::Hetzner::Cloud::API::Actions;
 use WWW::Hetzner::Cloud::API::Servers;
 use WWW::Hetzner::Cloud::API::ServerTypes;
 use WWW::Hetzner::Cloud::API::Images;
@@ -170,6 +171,17 @@ has servers => (
 =attr servers
 
 Returns a L<WWW::Hetzner::Cloud::API::Servers> instance for managing cloud servers.
+
+=cut
+
+has actions => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Actions->new(client => shift) },
+);
+
+=attr actions
+
+Returns a L<WWW::Hetzner::Cloud::API::Actions> instance for reading Cloud actions.
 
 =cut
 
