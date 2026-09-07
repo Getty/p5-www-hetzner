@@ -108,7 +108,8 @@ subtest 'attach volume' => sub {
     );
 
     my $result = $cloud->volumes->attach(555, 12345);
-    is($result->{action}{command}, 'attach_volume', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'attach_volume', 'action command');
 };
 
 subtest 'detach volume' => sub {
@@ -120,7 +121,8 @@ subtest 'detach volume' => sub {
     );
 
     my $result = $cloud->volumes->detach(555);
-    is($result->{action}{command}, 'detach_volume', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'detach_volume', 'action command');
 };
 
 subtest 'resize volume' => sub {
@@ -136,7 +138,8 @@ subtest 'resize volume' => sub {
     );
 
     my $result = $cloud->volumes->resize(555, 100);
-    is($result->{action}{command}, 'resize_volume', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'resize_volume', 'action command');
 };
 
 subtest 'volume entity methods' => sub {

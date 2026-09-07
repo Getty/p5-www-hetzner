@@ -45,6 +45,8 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
     my ($self, $data) = @_;
     return WWW::Hetzner::Cloud::Volume->new(
@@ -159,7 +161,9 @@ sub attach {
     my $body = { server => $server_id };
     $body->{automount} = $opts{automount} ? \1 : \0 if exists $opts{automount};
 
-    return $self->client->post("/volumes/$id/actions/attach", $body);
+    return $self->_wrap_action(
+        $self->client->post("/volumes/$id/actions/attach", $body)->{action}
+    );
 }
 
 =method detach
@@ -174,7 +178,9 @@ sub detach {
     my ($self, $id) = @_;
     croak "Volume ID required" unless $id;
 
-    return $self->client->post("/volumes/$id/actions/detach", {});
+    return $self->_wrap_action(
+        $self->client->post("/volumes/$id/actions/detach", {})->{action}
+    );
 }
 
 =method resize
@@ -190,7 +196,9 @@ sub resize {
     croak "Volume ID required" unless $id;
     croak "Size required" unless $size;
 
-    return $self->client->post("/volumes/$id/actions/resize", { size => $size });
+    return $self->_wrap_action(
+        $self->client->post("/volumes/$id/actions/resize", { size => $size })->{action}
+    );
 }
 
 =seealso
