@@ -139,9 +139,13 @@ subtest 'change dns ptr' => sub {
 
 subtest 'floating IP entity methods' => sub {
     my $fixture = load_fixture('floating_ips_get');
+    my $action_fixture = load_fixture('floating_ips_action');
 
     my $cloud = mock_cloud(
         '/floating_ips/500' => $fixture,
+        'POST /floating_ips/500/actions/assign' => $action_fixture,
+        'POST /floating_ips/500/actions/unassign' => $action_fixture,
+        'POST /floating_ips/500/actions/change_dns_ptr' => $action_fixture,
     );
 
     my $fip = $cloud->floating_ips->get(500);
@@ -150,6 +154,10 @@ subtest 'floating IP entity methods' => sub {
     is($data->{id}, 500, 'data id');
     is($data->{ip}, '203.0.113.50', 'data ip');
     is($data->{type}, 'ipv4', 'data type');
+
+    isa_ok($fip->assign(456), 'WWW::Hetzner::Cloud::Action', 'entity assign returns Action');
+    isa_ok($fip->unassign, 'WWW::Hetzner::Cloud::Action', 'entity unassign returns Action');
+    isa_ok($fip->change_dns_ptr('203.0.113.50', 'new.example.com'), 'WWW::Hetzner::Cloud::Action', 'entity change_dns_ptr returns Action');
 };
 
 done_testing;

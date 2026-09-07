@@ -132,9 +132,13 @@ subtest 'unassign primary IP' => sub {
 
 subtest 'primary IP entity methods' => sub {
     my $fixture = load_fixture('primary_ips_get');
+    my $action_fixture = load_fixture('primary_ips_action');
 
     my $cloud = mock_cloud(
         '/primary_ips/700' => $fixture,
+        'POST /primary_ips/700/actions/assign' => $action_fixture,
+        'POST /primary_ips/700/actions/unassign' => $action_fixture,
+        'POST /primary_ips/700/actions/change_dns_ptr' => $action_fixture,
     );
 
     my $pip = $cloud->primary_ips->get(700);
@@ -143,6 +147,10 @@ subtest 'primary IP entity methods' => sub {
     is($data->{id}, 700, 'data id');
     is($data->{ip}, '203.0.113.70', 'data ip');
     is($data->{type}, 'ipv4', 'data type');
+
+    isa_ok($pip->assign(456), 'WWW::Hetzner::Cloud::Action', 'entity assign returns Action');
+    isa_ok($pip->unassign, 'WWW::Hetzner::Cloud::Action', 'entity unassign returns Action');
+    isa_ok($pip->change_dns_ptr('203.0.113.70', 'new.example.com'), 'WWW::Hetzner::Cloud::Action', 'entity change_dns_ptr returns Action');
 };
 
 done_testing;

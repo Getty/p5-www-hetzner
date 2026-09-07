@@ -147,9 +147,13 @@ subtest 'resize volume' => sub {
 
 subtest 'volume entity methods' => sub {
     my $fixture = load_fixture('volumes_get');
+    my $action_fixture = load_fixture('volumes_action');
 
     my $cloud = mock_cloud(
         '/volumes/555' => $fixture,
+        'POST /volumes/555/actions/attach' => $action_fixture,
+        'POST /volumes/555/actions/detach' => $action_fixture,
+        'POST /volumes/555/actions/resize' => $action_fixture,
     );
 
     my $volume = $cloud->volumes->get(555);
@@ -159,6 +163,10 @@ subtest 'volume entity methods' => sub {
     is($data->{id}, 555, 'data id');
     is($data->{name}, 'my-data', 'data name');
     is($data->{size}, 50, 'data size');
+
+    isa_ok($volume->attach(12345), 'WWW::Hetzner::Cloud::Action', 'entity attach returns Action');
+    isa_ok($volume->detach, 'WWW::Hetzner::Cloud::Action', 'entity detach returns Action');
+    isa_ok($volume->resize(100), 'WWW::Hetzner::Cloud::Action', 'entity resize returns Action');
 };
 
 done_testing;

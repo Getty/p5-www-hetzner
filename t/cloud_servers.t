@@ -220,6 +220,47 @@ subtest 'update server' => sub {
     is($server->labels->{env}, 'production', 'labels updated');
 };
 
+subtest 'server entity action methods return Action' => sub {
+    my $get_fixture = load_fixture('servers_get');
+
+    my $cloud = mock_cloud(
+        '/servers/123456' => $get_fixture,
+        'POST /servers/123456/actions/poweron' => sub {
+            my $f = load_fixture('servers_action');
+            $f->{action}{command} = 'poweron';
+            return $f;
+        },
+        'POST /servers/123456/actions/poweroff' => sub {
+            my $f = load_fixture('servers_action');
+            $f->{action}{command} = 'poweroff';
+            return $f;
+        },
+        'POST /servers/123456/actions/reboot' => sub {
+            my $f = load_fixture('servers_action');
+            $f->{action}{command} = 'reboot';
+            return $f;
+        },
+        'POST /servers/123456/actions/shutdown' => sub {
+            my $f = load_fixture('servers_action');
+            $f->{action}{command} = 'shutdown';
+            return $f;
+        },
+        'POST /servers/123456/actions/rebuild' => sub {
+            my $f = load_fixture('servers_action');
+            $f->{action}{command} = 'rebuild';
+            return $f;
+        },
+    );
+
+    my $server = $cloud->servers->get(123456);
+
+    isa_ok($server->power_on, 'WWW::Hetzner::Cloud::Action', 'entity power_on returns Action');
+    isa_ok($server->power_off, 'WWW::Hetzner::Cloud::Action', 'entity power_off returns Action');
+    isa_ok($server->reboot, 'WWW::Hetzner::Cloud::Action', 'entity reboot returns Action');
+    isa_ok($server->shutdown, 'WWW::Hetzner::Cloud::Action', 'entity shutdown returns Action');
+    isa_ok($server->rebuild('debian-13'), 'WWW::Hetzner::Cloud::Action', 'entity rebuild returns Action');
+};
+
 subtest 'wait_for_status' => sub {
     my $call_count = 0;
     my $fixture = load_fixture('servers_get');

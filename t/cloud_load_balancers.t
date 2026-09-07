@@ -134,4 +134,31 @@ subtest 'add service' => sub {
     is($result->command, 'add_service', 'action command');
 };
 
+subtest 'load balancer entity action methods' => sub {
+    my $fixture = load_fixture('load_balancers_get');
+    my $action_fixture = load_fixture('load_balancers_action');
+
+    my $cloud = mock_cloud(
+        '/load_balancers/900' => $fixture,
+        'POST /load_balancers/900/actions/add_target' => $action_fixture,
+        'POST /load_balancers/900/actions/remove_target' => $action_fixture,
+        'POST /load_balancers/900/actions/add_service' => $action_fixture,
+        'POST /load_balancers/900/actions/delete_service' => $action_fixture,
+        'POST /load_balancers/900/actions/attach_to_network' => $action_fixture,
+        'POST /load_balancers/900/actions/detach_from_network' => $action_fixture,
+    );
+
+    my $lb = $cloud->load_balancers->get(900);
+
+    isa_ok($lb->add_target(type => 'server', server => { id => 456 }),
+        'WWW::Hetzner::Cloud::Action', 'entity add_target returns Action');
+    isa_ok($lb->remove_target(type => 'server', server => { id => 456 }),
+        'WWW::Hetzner::Cloud::Action', 'entity remove_target returns Action');
+    isa_ok($lb->add_service(protocol => 'http', listen_port => 80, destination_port => 8080),
+        'WWW::Hetzner::Cloud::Action', 'entity add_service returns Action');
+    isa_ok($lb->delete_service(80), 'WWW::Hetzner::Cloud::Action', 'entity delete_service returns Action');
+    isa_ok($lb->attach_to_network(123), 'WWW::Hetzner::Cloud::Action', 'entity attach_to_network returns Action');
+    isa_ok($lb->detach_from_network(123), 'WWW::Hetzner::Cloud::Action', 'entity detach_from_network returns Action');
+};
+
 done_testing;

@@ -180,15 +180,7 @@ sub add_subnet {
     croak "network_zone required" unless $opts{network_zone};
     croak "type required" unless $opts{type};
 
-    my $body = {
-        ip_range     => $opts{ip_range},
-        network_zone => $opts{network_zone},
-        type         => $opts{type},
-    };
-    $body->{vswitch_id} = $opts{vswitch_id} if $opts{vswitch_id};
-
-    $self->_client->post("/networks/" . $self->id . "/actions/add_subnet", $body);
-    return $self;
+    return $self->_client->networks->add_subnet($self->id, %opts);
 }
 
 =method add_subnet
@@ -208,10 +200,7 @@ sub delete_subnet {
     croak "Cannot modify network without ID" unless $self->id;
     croak "ip_range required" unless $ip_range;
 
-    $self->_client->post("/networks/" . $self->id . "/actions/delete_subnet", {
-        ip_range => $ip_range,
-    });
-    return $self;
+    return $self->_client->networks->delete_subnet($self->id, $ip_range);
 }
 
 =method delete_subnet
@@ -228,11 +217,7 @@ sub add_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    $self->_client->post("/networks/" . $self->id . "/actions/add_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
-    return $self;
+    return $self->_client->networks->add_route($self->id, %opts);
 }
 
 =method add_route
@@ -249,11 +234,7 @@ sub delete_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    $self->_client->post("/networks/" . $self->id . "/actions/delete_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
-    return $self;
+    return $self->_client->networks->delete_route($self->id, %opts);
 }
 
 =method delete_route
