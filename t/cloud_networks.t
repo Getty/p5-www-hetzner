@@ -105,7 +105,8 @@ subtest 'add subnet' => sub {
         network_zone => 'eu-central',
         type         => 'cloud',
     );
-    is($result->{action}{command}, 'add_subnet', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'add_subnet', 'action command');
 };
 
 subtest 'delete subnet' => sub {
@@ -121,7 +122,8 @@ subtest 'delete subnet' => sub {
     );
 
     my $result = $cloud->networks->delete_subnet(100, '10.0.2.0/24');
-    is($result->{action}{command}, 'delete_subnet', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'delete_subnet', 'action command');
 };
 
 subtest 'add route' => sub {
@@ -141,7 +143,8 @@ subtest 'add route' => sub {
         destination => '10.200.0.0/16',
         gateway     => '10.0.0.1',
     );
-    is($result->{action}{command}, 'add_route', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'add_route', 'action command');
 };
 
 subtest 'delete route' => sub {
@@ -161,7 +164,8 @@ subtest 'delete route' => sub {
         destination => '10.200.0.0/16',
         gateway     => '10.0.0.1',
     );
-    is($result->{action}{command}, 'delete_route', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'delete_route', 'action command');
 };
 
 subtest 'network entity methods' => sub {

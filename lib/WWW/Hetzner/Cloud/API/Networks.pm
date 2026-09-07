@@ -50,6 +50,8 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
     my ($self, $data) = @_;
     return WWW::Hetzner::Cloud::Network->new(
@@ -192,7 +194,9 @@ sub add_subnet {
     };
     $body->{vswitch_id} = $opts{vswitch_id} if $opts{vswitch_id};
 
-    return $self->client->post("/networks/$id/actions/add_subnet", $body);
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/add_subnet", $body)->{action}
+    );
 }
 
 =method delete_subnet
@@ -208,9 +212,11 @@ sub delete_subnet {
     croak "Network ID required" unless $id;
     croak "ip_range required" unless $ip_range;
 
-    return $self->client->post("/networks/$id/actions/delete_subnet", {
-        ip_range => $ip_range,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/delete_subnet", {
+            ip_range => $ip_range,
+        })->{action}
+    );
 }
 
 =method add_route
@@ -230,10 +236,12 @@ sub add_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    return $self->client->post("/networks/$id/actions/add_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/add_route", {
+            destination => $opts{destination},
+            gateway     => $opts{gateway},
+        })->{action}
+    );
 }
 
 =method delete_route
@@ -253,10 +261,12 @@ sub delete_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    return $self->client->post("/networks/$id/actions/delete_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/delete_route", {
+            destination => $opts{destination},
+            gateway     => $opts{gateway},
+        })->{action}
+    );
 }
 
 =seealso
