@@ -519,6 +519,9 @@ sub update {
     $cloud->servers->wait_for_status($id, 'running', 120);
 
 Polls until server reaches the specified status. Default timeout is 120 seconds.
+This polls the server's own status, not an action -- to wait on the
+L<WWW::Hetzner::Cloud::Action> returned by C<create> or one of the power/rebuild
+methods above instead, call L<WWW::Hetzner::Cloud::Action/wait> on that action.
 
 =cut
 
@@ -543,6 +546,8 @@ sub wait_for_status {
 =item * L<WWW::Hetzner::Cloud> - Main Cloud API client
 
 =item * L<WWW::Hetzner::Cloud::Server> - Server entity class
+
+=item * L<WWW::Hetzner::Cloud::Action> - Action object returned by the methods above
 
 =item * L<WWW::Hetzner::CLI::Cmd::Server> - Server CLI commands
 
