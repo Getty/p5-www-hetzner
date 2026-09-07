@@ -73,6 +73,34 @@ Grund: Intervall- **und** Timeout-Pfad werden ohne Wanduhr testbar, und die
 Anzahl der Polls ist prüfbar. Ein Timeout-Test, der echte Sekunden braucht, ist
 ein flaky Test.
 
+### E5 — Action-Methoden mit Sidecar-Daten: die Action trägt sie
+
+Fünf Server-Action-Methoden liefern laut `cloud.spec.json` Nutzdaten *neben*
+`action`, die bei der pauschalen Umstellung auf „gib die Action zurück"
+verloren gingen:
+
+| Methode | Sidecar |
+|---|---|
+| `enable_rescue`, `rebuild`, `reset_password` | `root_password` |
+| `request_console` | `password`, `wss_url` |
+| `create_image` | `image` |
+
+Festlegung (Maintainer, 2026-09-07): Diese Methoden geben weiterhin eine
+`Action` zurück, die die Sidecar-Felder trägt. Die `Action` bekommt ein
+Attribut `result` (Hashref, Default `{}`) mit den Zusatzfeldern, plus getippte
+Bequemlichkeits-Leser (`root_password`, `image`, `wss_url`, `password`), die
+aus `result` lesen und `undef` liefern, wenn das Feld fehlt.
+
+Grund: Der einheitliche Action-Rückgabevertrag bleibt (jeder mutierende Aufruf
+gibt eine `Action`), es geht nichts verloren, und die Sidecar-Daten sind am
+Objekt auffindbar. Verworfen: ein eigenes Result-Objekt mit `->action` (wie
+E3) — konzeptuell sauber, aber eigene Rückgabeform pro Methode und mehr Code,
+ohne Mehrwert gegenüber dem `result`-Attribut.
+
+Folge: Die CLI-Kommandos, die diese Daten anzeigen (`server rescue`,
+`reset-password`, `rebuild`, `create-image`), lesen sie über den neuen Zugriff
+(`$action->root_password` bzw. `$action->result`). Das behebt zugleich karr #6.
+
 ## Architektur
 
 ### Neue Klassen

@@ -493,6 +493,64 @@ The current unconditional `"Server powered on."` (line 19) is the bug this fixes
 
 ---
 
+## Task 7b: Preserve sidecar data on Action (spec E5) — fixes karr #6
+
+**Recommended agent:** `www-hetzner-worker`
+
+Five server action methods return sidecar fields alongside `action` that the Task 4 blanket conversion discarded (verified against `cloud.spec.json`). Per spec E5, the `Action` carries them.
+
+**Files:**
+- Modify: `lib/WWW/Hetzner/Cloud/Action.pm` — add `result` attr + typed readers.
+- Modify: `lib/WWW/Hetzner/Cloud/Role/HasActions.pm` — a way to build an Action with its sidecar (`_wrap_action` extension or a sibling helper).
+- Modify: `lib/WWW/Hetzner/Cloud/API/Servers.pm` — the 5 methods pass the sidecar.
+- Modify: `lib/WWW/Hetzner/Cloud/Server.pm` — the mirrored 5 methods still delegate (should need no change beyond confirming they return the controller's Action).
+- Modify: CLI commands that display the sidecar — `CLI/Cmd/Server/Cmd/Rescue.pm` (and `ResetPassword`/`Rebuild`/`CreateImage` if they exist) to read `$action->root_password` / `$action->result`.
+- Test: `t/cloud_servers.t` (or `t/cloud_actions.t`) — assert the sidecar survives.
+
+**Interfaces:**
+- Produces: `$action->result` → hashref (default `{}`) of sidecar fields; `$action->root_password`, `$action->image`, `$action->wss_url`, `$action->password` → readers over `result`, `undef` when absent.
+- The 5 methods (`enable_rescue`, `rebuild`, `reset_password`, `request_console`, `create_image`) return an `Action` whose `result` holds their sidecar.
+
+- [ ] **Step 1: Failing test.** For `reset_password` (fixture with `{action, root_password}`):
+
+```perl
+my $action = $cloud->servers->reset_password($id);
+isa_ok($action, 'WWW::Hetzner::Cloud::Action');
+is($action->root_password, 'the-generated-pw', 'root_password preserved on the Action');
+is($action->result->{root_password}, 'the-generated-pw', 'result carries sidecar');
+```
+Extend the relevant server-action fixtures (`servers_action.json` or per-method fixtures) so `{action, root_password}` / `{action, image}` are present.
+
+- [ ] **Step 2: Run, verify fail.**
+
+- [ ] **Step 3: Implement.** Add to `Action.pm`:
+```perl
+has result => ( is => 'ro', default => sub { {} } );
+sub root_password { $_[0]->result->{root_password} }
+sub image        { $_[0]->result->{image} }
+sub wss_url      { $_[0]->result->{wss_url} }
+sub password     { $_[0]->result->{password} }
+```
+In `HasActions`, add a helper that builds an Action from the full response, e.g.:
+```perl
+sub _wrap_action_result {
+    my ($self, $result) = @_;
+    my %sidecar = %$result;
+    my $action = delete $sidecar{action};
+    return undef unless defined $action;
+    WWW::Hetzner::Cloud::Action->new(client => $self->client, %$action, result => \%sidecar);
+}
+```
+In `Servers.pm`, the 5 methods use `_wrap_action_result($result)` instead of `_wrap_action($result->{action})`.
+
+- [ ] **Step 4: Wire the CLI display commands** to read `$action->root_password` / `$action->result` (Rescue at minimum — this closes karr #6). Confirm `--output json` for those commands emits the sidecar again.
+
+- [ ] **Step 5: Run tests, verify pass; `prove -lr t/`.**
+
+- [ ] **Step 6: Commit** — `"Preserve action sidecar data on Action::result (spec E5, karr #6)"`.
+
+---
+
 ## Task 8: POD + `Changes`
 
 **Recommended agent:** `www-hetzner-doc-writer` (POD), `www-hetzner-worker` may write the `Changes` line.
