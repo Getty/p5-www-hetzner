@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl firewall create --name <name>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -24,6 +25,7 @@ sub execute {
     my $fw = $cloud->firewalls->create(
         name => $self->name,
     );
+    $self->handle_action($fw->actions);
     print "Firewall created with ID ", $fw->id, "\n";
 }
 

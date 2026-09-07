@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::Certificate;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Cloud::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -183,8 +184,7 @@ sub retry {
     croak "Cannot retry certificate without ID" unless $self->id;
     croak "Only managed certificates can be retried" unless $self->is_managed;
 
-    $self->_client->post("/certificates/" . $self->id . "/actions/retry", {});
-    return $self;
+    return $self->_client->certificates->retry($self->id);
 }
 
 =method retry

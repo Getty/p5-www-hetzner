@@ -1,6 +1,24 @@
 Revision history for WWW-Hetzner
 
 {{$NEXT}}
+    - BREAKING: Mutating Cloud methods now return a WWW::Hetzner::Cloud::Action
+      object instead of a raw decoded-JSON action hashref (66 methods across
+      the API controllers and their entity-object mirrors)
+      - New: WWW::Hetzner::Cloud::Action entity with status predicates
+        (is_running/is_success/is_error), error_message, refresh, and a
+        blocking wait(interval => 1, timeout => 120)
+      - New: $cloud->actions controller (WWW::Hetzner::Cloud::API::Actions)
+        to look up an action by id independent of the resource that created it
+      - Created entities carry the creating action as ->action and any
+        ->next_actions (WWW::Hetzner::Cloud::Role::HasAction); Firewall's
+        create returns a plural ->actions instead
+      - Server's enable_rescue, rebuild, reset_password and request_console
+        preserve their sidecar response data (root_password, password,
+        wss_url) on the returned Action via ->result and typed readers
+      - CLI: mutating hcloud.pl commands wait for their action to reach a
+        terminal state by default; pass --no-wait to opt out
+      - New: WWW::Hetzner::Role::HTTP sleeper attribute, an injectable sleep
+        function used while polling actions
 
 0.100     2026-02-12 17:13:58Z
     - Pluggable HTTP transport via WWW::Hetzner::Role::IO

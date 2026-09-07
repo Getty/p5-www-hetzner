@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::LoadBalancer;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Cloud::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -237,8 +238,7 @@ sub add_target {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "type required" unless $opts{type};
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/add_target", \%opts);
-    return $self;
+    return $self->_client->load_balancers->add_target($self->id, %opts);
 }
 
 =method add_target
@@ -254,8 +254,7 @@ sub remove_target {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "type required" unless $opts{type};
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/remove_target", \%opts);
-    return $self;
+    return $self->_client->load_balancers->remove_target($self->id, %opts);
 }
 
 =method remove_target
@@ -273,8 +272,7 @@ sub add_service {
     croak "listen_port required" unless $opts{listen_port};
     croak "destination_port required" unless $opts{destination_port};
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/add_service", \%opts);
-    return $self;
+    return $self->_client->load_balancers->add_service($self->id, %opts);
 }
 
 =method add_service
@@ -294,10 +292,7 @@ sub delete_service {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "listen_port required" unless $listen_port;
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/delete_service", {
-        listen_port => $listen_port,
-    });
-    return $self;
+    return $self->_client->load_balancers->delete_service($self->id, $listen_port);
 }
 
 =method delete_service
@@ -313,11 +308,7 @@ sub attach_to_network {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "network required" unless $network_id;
 
-    my $body = { network => $network_id };
-    $body->{ip} = $opts{ip} if $opts{ip};
-
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/attach_to_network", $body);
-    return $self;
+    return $self->_client->load_balancers->attach_to_network($self->id, $network_id, %opts);
 }
 
 =method attach_to_network
@@ -334,10 +325,7 @@ sub detach_from_network {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "network required" unless $network_id;
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/detach_from_network", {
-        network => $network_id,
-    });
-    return $self;
+    return $self->_client->load_balancers->detach_from_network($self->id, $network_id);
 }
 
 =method detach_from_network

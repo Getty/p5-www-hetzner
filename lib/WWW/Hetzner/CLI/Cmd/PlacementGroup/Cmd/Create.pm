@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl placement-group create --name <name>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -25,6 +26,7 @@ sub execute {
         name => $self->name,
         type => 'spread',
     );
+    $self->handle_action($pg->action);
     print "Placement group created with ID ", $pg->id, "\n";
 }
 

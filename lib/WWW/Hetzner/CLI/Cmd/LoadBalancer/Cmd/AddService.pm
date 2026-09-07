@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl load-balancer add-service <id> --protocol <proto> --listen-port <port> --destination-port <port>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option protocol => (
     is       => 'ro',
@@ -38,12 +39,13 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Adding ", $self->protocol, " service to load balancer $id...\n";
-    $cloud->load_balancers->add_service($id,
+    my $action = $cloud->load_balancers->add_service($id,
         protocol         => $self->protocol,
         listen_port      => $self->listen_port,
         destination_port => $self->destination_port,
     );
-    print "Service added.\n";
+    $self->handle_action($action);
+    print $self->no_wait ? "Service add requested.\n" : "Service added.\n";
 }
 
 1;

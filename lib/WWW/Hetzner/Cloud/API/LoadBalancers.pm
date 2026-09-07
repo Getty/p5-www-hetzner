@@ -51,11 +51,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::LoadBalancer->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -137,7 +140,11 @@ sub create {
     $body->{targets}     = $params{targets}     if $params{targets};
 
     my $result = $self->client->post('/load_balancers', $body);
-    return $self->_wrap($result->{load_balancer});
+    return $self->_wrap(
+        $result->{load_balancer},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 =method update
@@ -191,7 +198,9 @@ sub add_target {
     croak "Load Balancer ID required" unless $id;
     croak "type required" unless $opts{type};
 
-    return $self->client->post("/load_balancers/$id/actions/add_target", \%opts);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/add_target", \%opts)->{action}
+    );
 }
 
 =method remove_target
@@ -210,7 +219,9 @@ sub remove_target {
     croak "Load Balancer ID required" unless $id;
     croak "type required" unless $opts{type};
 
-    return $self->client->post("/load_balancers/$id/actions/remove_target", \%opts);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/remove_target", \%opts)->{action}
+    );
 }
 
 =method add_service
@@ -229,7 +240,9 @@ sub add_service {
     my ($self, $id, %opts) = @_;
     croak "Load Balancer ID required" unless $id;
 
-    return $self->client->post("/load_balancers/$id/actions/add_service", \%opts);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/add_service", \%opts)->{action}
+    );
 }
 
 =method delete_service
@@ -245,9 +258,11 @@ sub delete_service {
     croak "Load Balancer ID required" unless $id;
     croak "listen_port required" unless $listen_port;
 
-    return $self->client->post("/load_balancers/$id/actions/delete_service", {
-        listen_port => $listen_port,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/delete_service", {
+            listen_port => $listen_port,
+        })->{action}
+    );
 }
 
 =method attach_to_network
@@ -266,7 +281,9 @@ sub attach_to_network {
     my $body = { network => $network_id };
     $body->{ip} = $opts{ip} if $opts{ip};
 
-    return $self->client->post("/load_balancers/$id/actions/attach_to_network", $body);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/attach_to_network", $body)->{action}
+    );
 }
 
 =method detach_from_network
@@ -282,9 +299,11 @@ sub detach_from_network {
     croak "Load Balancer ID required" unless $id;
     croak "network required" unless $network_id;
 
-    return $self->client->post("/load_balancers/$id/actions/detach_from_network", {
-        network => $network_id,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/detach_from_network", {
+            network => $network_id,
+        })->{action}
+    );
 }
 
 =seealso

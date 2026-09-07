@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl network add-route <id> --destination <cidr> --gateway <ip>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option destination => (
     is       => 'ro',
@@ -29,11 +30,12 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Adding route ", $self->destination, " via ", $self->gateway, " to network $id...\n";
-    $cloud->networks->add_route($id,
+    my $action = $cloud->networks->add_route($id,
         destination => $self->destination,
         gateway     => $self->gateway,
     );
-    print "Route added.\n";
+    $self->handle_action($action);
+    print $self->no_wait ? "Route add requested.\n" : "Route added.\n";
 }
 
 1;

@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::Zone;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Cloud::Role::HasAction';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::API::RRSets;
 use namespace::clean;

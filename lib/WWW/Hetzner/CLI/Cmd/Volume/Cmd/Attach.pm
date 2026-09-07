@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl volume attach <volume-id> --server <server-id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option server => (
     is       => 'ro',
@@ -28,8 +29,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Attaching volume $id to server ", $self->server, "...\n";
-    $cloud->volumes->attach($id, $self->server, automount => $self->automount);
-    print "Volume attached.\n";
+    my $action = $cloud->volumes->attach($id, $self->server, automount => $self->automount);
+    $self->handle_action($action);
+    print $self->no_wait ? "Volume attach requested.\n" : "Volume attached.\n";
 }
 
 1;

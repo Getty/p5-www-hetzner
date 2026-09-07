@@ -46,11 +46,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::PlacementGroup->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -117,7 +120,10 @@ sub create {
     $body->{labels} = $params{labels} if $params{labels};
 
     my $result = $self->client->post('/placement_groups', $body);
-    return $self->_wrap($result->{placement_group});
+    return $self->_wrap(
+        $result->{placement_group},
+        action => $self->_wrap_action($result->{action}),
+    );
 }
 
 =method update

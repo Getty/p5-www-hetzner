@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl volume resize <id> --size <gb>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option size => (
     is       => 'ro',
@@ -22,8 +23,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Resizing volume $id to ", $self->size, " GB...\n";
-    $cloud->volumes->resize($id, $self->size);
-    print "Volume resized.\n";
+    my $action = $cloud->volumes->resize($id, $self->size);
+    $self->handle_action($action);
+    print $self->no_wait ? "Volume resize requested.\n" : "Volume resized.\n";
 }
 
 1;

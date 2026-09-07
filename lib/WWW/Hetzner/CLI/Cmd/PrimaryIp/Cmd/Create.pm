@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl primary-ip create --name <name> --type <ipv4|ipv6> --datacenter <dc>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -48,6 +49,7 @@ sub execute {
         datacenter    => $self->datacenter,
         ($self->auto_delete ? (auto_delete => 1) : ()),
     );
+    $self->handle_action($pip->action);
     print "Primary IP created with ID ", $pip->id, " (", $pip->ip, ")\n";
 }
 

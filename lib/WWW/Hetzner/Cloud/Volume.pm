@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::Volume;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Cloud::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -187,11 +188,7 @@ sub attach {
     croak "Cannot attach volume without ID" unless $self->id;
     croak "Server ID required" unless $server_id;
 
-    my $body = { server => $server_id };
-    $body->{automount} = $opts{automount} ? \1 : \0 if exists $opts{automount};
-
-    $self->_client->post("/volumes/" . $self->id . "/actions/attach", $body);
-    return $self;
+    return $self->_client->volumes->attach($self->id, $server_id, %opts);
 }
 
 =method attach
@@ -207,8 +204,7 @@ sub detach {
     my ($self) = @_;
     croak "Cannot detach volume without ID" unless $self->id;
 
-    $self->_client->post("/volumes/" . $self->id . "/actions/detach", {});
-    return $self;
+    return $self->_client->volumes->detach($self->id);
 }
 
 =method detach
@@ -224,8 +220,7 @@ sub resize {
     croak "Cannot resize volume without ID" unless $self->id;
     croak "Size required" unless $size;
 
-    $self->_client->post("/volumes/" . $self->id . "/actions/resize", { size => $size });
-    return $self;
+    return $self->_client->volumes->resize($self->id, $size);
 }
 
 =method resize

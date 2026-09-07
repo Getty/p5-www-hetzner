@@ -68,6 +68,21 @@ Defaults to L<WWW::Hetzner::LWPIO>.
 
 =cut
 
+has sleeper => (
+    is      => 'rw',
+    default => sub { sub { sleep $_[0] } },
+);
+
+=attr sleeper
+
+Injectable sleep function, C<sub ($seconds) { ... }>, called with the poll
+interval. Defaults to C<sleep>. Declared C<rw> so a test can swap in a
+non-blocking counting closure after construction, without rebuilding the
+client. Used by L<WWW::Hetzner::Cloud::Action/wait> between polls, via the
+client the action holds a reference to.
+
+=cut
+
 sub get {
     my ($self, $path, %params) = @_;
     return $self->_request('GET', $path, %params);
@@ -232,7 +247,7 @@ sub _request {
 =head1 SEE ALSO
 
 L<WWW::Hetzner::Cloud>, L<WWW::Hetzner::Role::IO>, L<WWW::Hetzner::LWPIO>,
-L<Log::Any>
+L<WWW::Hetzner::Cloud::Action>, L<Log::Any>
 
 =cut
 

@@ -103,6 +103,8 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =over 4
 
+=item * L<WWW::Hetzner::Cloud::API::Actions> - Async job (Action) lookup
+
 =item * L<WWW::Hetzner::Cloud::API::Servers> - Server management
 
 =item * L<WWW::Hetzner::Cloud::API::SSHKeys> - SSH key management
@@ -140,6 +142,8 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 =head2 Entity Classes (Models)
 
 =over 4
+
+=item * L<WWW::Hetzner::Cloud::Action> - Async job object returned by mutating calls
 
 =item * L<WWW::Hetzner::Cloud::Server> - Server object
 

@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::Server;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Cloud::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -219,8 +220,7 @@ sub power_on {
     my ($self) = @_;
     croak "Cannot power on server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/poweron", {});
-    return $self;
+    return $self->_client->servers->power_on($self->id);
 }
 
 =method power_on
@@ -235,8 +235,7 @@ sub power_off {
     my ($self) = @_;
     croak "Cannot power off server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/poweroff", {});
-    return $self;
+    return $self->_client->servers->power_off($self->id);
 }
 
 =method power_off
@@ -251,8 +250,7 @@ sub reboot {
     my ($self) = @_;
     croak "Cannot reboot server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/reboot", {});
-    return $self;
+    return $self->_client->servers->reboot($self->id);
 }
 
 =method reboot
@@ -267,8 +265,7 @@ sub shutdown {
     my ($self) = @_;
     croak "Cannot shutdown server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/shutdown", {});
-    return $self;
+    return $self->_client->servers->shutdown($self->id);
 }
 
 =method shutdown
@@ -284,8 +281,7 @@ sub rebuild {
     croak "Cannot rebuild server without ID" unless $self->id;
     croak "Image required" unless $image;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/rebuild", { image => $image });
-    return $self;
+    return $self->_client->servers->rebuild($self->id, $image);
 }
 
 =method rebuild

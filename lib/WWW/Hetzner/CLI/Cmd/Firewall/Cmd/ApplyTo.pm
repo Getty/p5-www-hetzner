@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl firewall apply-to <firewall-id> --server <server-id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option server => (
     is       => 'ro',
@@ -22,10 +23,11 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Applying firewall $id to server ", $self->server, "...\n";
-    $cloud->firewalls->apply_to_resources($id,
+    my $actions = $cloud->firewalls->apply_to_resources($id,
         { type => 'server', server => { id => $self->server } },
     );
-    print "Firewall applied.\n";
+    $self->handle_action($actions);
+    print $self->no_wait ? "Firewall apply requested.\n" : "Firewall applied.\n";
 }
 
 1;

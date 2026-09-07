@@ -92,6 +92,16 @@ Creation timestamp (read-only).
 
 =cut
 
+has actions => ( is => 'ro', default => sub { [] } );
+
+=attr actions
+
+Arrayref of L<WWW::Hetzner::Cloud::Action> objects returned by C<create>.
+Empty arrayref when the API did not emit any (read-only). Not maintained
+afterwards.
+
+=cut
+
 # Actions
 sub update {
     my ($self) = @_;
@@ -133,11 +143,9 @@ sub set_rules {
     my ($self, @rules) = @_;
     croak "Cannot modify firewall without ID" unless $self->id;
 
-    $self->_client->post("/firewalls/" . $self->id . "/actions/set_rules", {
-        rules => \@rules,
-    });
+    my $actions = $self->_client->firewalls->set_rules($self->id, \@rules);
     $self->rules(\@rules);
-    return $self;
+    return $actions;
 }
 
 =method set_rules
@@ -155,10 +163,7 @@ sub apply_to_resources {
     my ($self, @resources) = @_;
     croak "Cannot modify firewall without ID" unless $self->id;
 
-    $self->_client->post("/firewalls/" . $self->id . "/actions/apply_to_resources", {
-        apply_to => \@resources,
-    });
-    return $self;
+    return $self->_client->firewalls->apply_to_resources($self->id, @resources);
 }
 
 =method apply_to_resources
@@ -173,10 +178,7 @@ sub remove_from_resources {
     my ($self, @resources) = @_;
     croak "Cannot modify firewall without ID" unless $self->id;
 
-    $self->_client->post("/firewalls/" . $self->id . "/actions/remove_from_resources", {
-        remove_from => \@resources,
-    });
-    return $self;
+    return $self->_client->firewalls->remove_from_resources($self->id, @resources);
 }
 
 =method remove_from_resources

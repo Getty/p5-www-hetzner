@@ -55,11 +55,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::Firewall->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -127,7 +130,10 @@ sub create {
     $body->{apply_to} = $params{apply_to} if $params{apply_to};
 
     my $result = $self->client->post('/firewalls', $body);
-    return $self->_wrap($result->{firewall});
+    return $self->_wrap(
+        $result->{firewall},
+        actions => $self->_wrap_actions($result->{actions}),
+    );
 }
 
 =method update
@@ -178,9 +184,11 @@ sub set_rules {
     croak "Firewall ID required" unless $id;
     croak "Rules arrayref required" unless ref $rules eq 'ARRAY';
 
-    return $self->client->post("/firewalls/$id/actions/set_rules", {
-        rules => $rules,
-    });
+    return $self->_wrap_actions(
+        $self->client->post("/firewalls/$id/actions/set_rules", {
+            rules => $rules,
+        })->{actions}
+    );
 }
 
 =method apply_to_resources
@@ -197,9 +205,11 @@ sub apply_to_resources {
     my ($self, $id, @resources) = @_;
     croak "Firewall ID required" unless $id;
 
-    return $self->client->post("/firewalls/$id/actions/apply_to_resources", {
-        apply_to => \@resources,
-    });
+    return $self->_wrap_actions(
+        $self->client->post("/firewalls/$id/actions/apply_to_resources", {
+            apply_to => \@resources,
+        })->{actions}
+    );
 }
 
 =method remove_from_resources
@@ -216,9 +226,11 @@ sub remove_from_resources {
     my ($self, $id, @resources) = @_;
     croak "Firewall ID required" unless $id;
 
-    return $self->client->post("/firewalls/$id/actions/remove_from_resources", {
-        remove_from => \@resources,
-    });
+    return $self->_wrap_actions(
+        $self->client->post("/firewalls/$id/actions/remove_from_resources", {
+            remove_from => \@resources,
+        })->{actions}
+    );
 }
 
 =seealso

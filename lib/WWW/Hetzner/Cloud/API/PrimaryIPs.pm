@@ -45,11 +45,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::PrimaryIP->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -126,7 +129,11 @@ sub create {
     $body->{labels}      = $params{labels}      if $params{labels};
 
     my $result = $self->client->post('/primary_ips', $body);
-    return $self->_wrap($result->{primary_ip});
+    return $self->_wrap(
+        $result->{primary_ip},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 =method update
@@ -183,10 +190,12 @@ sub assign {
     croak "Assignee ID required" unless $assignee_id;
     $assignee_type //= 'server';
 
-    return $self->client->post("/primary_ips/$id/actions/assign", {
-        assignee_id   => $assignee_id,
-        assignee_type => $assignee_type,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/primary_ips/$id/actions/assign", {
+            assignee_id   => $assignee_id,
+            assignee_type => $assignee_type,
+        })->{action}
+    );
 }
 
 =method unassign
@@ -201,7 +210,9 @@ sub unassign {
     my ($self, $id) = @_;
     croak "Primary IP ID required" unless $id;
 
-    return $self->client->post("/primary_ips/$id/actions/unassign", {});
+    return $self->_wrap_action(
+        $self->client->post("/primary_ips/$id/actions/unassign", {})->{action}
+    );
 }
 
 =method change_dns_ptr
@@ -218,10 +229,12 @@ sub change_dns_ptr {
     croak "IP required" unless $ip;
     croak "dns_ptr required" unless defined $dns_ptr;
 
-    return $self->client->post("/primary_ips/$id/actions/change_dns_ptr", {
-        ip      => $ip,
-        dns_ptr => $dns_ptr,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/primary_ips/$id/actions/change_dns_ptr", {
+            ip      => $ip,
+            dns_ptr => $dns_ptr,
+        })->{action}
+    );
 }
 
 =seealso

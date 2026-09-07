@@ -8,6 +8,7 @@ use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl server create --name <name> --type <type> --image <image> [options]';
 use JSON::MaybeXS qw(encode_json);
 use Path::Tiny qw(path);
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 # Required options
 option name => (
@@ -200,6 +201,7 @@ sub execute {
     print "Creating server '$params{name}'...\n";
 
     my $server = $cloud->servers->create(%params);
+    $self->handle_action($server->action);
 
     if ($main->output eq 'json') {
         print encode_json($server->data), "\n";

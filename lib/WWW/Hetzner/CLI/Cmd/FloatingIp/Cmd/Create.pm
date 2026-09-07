@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl floating-ip create --type <ipv4|ipv6> --home-location <location>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option type => (
     is       => 'ro',
@@ -47,6 +48,7 @@ sub execute {
         ($self->name        ? (name        => $self->name)        : ()),
         ($self->description ? (description => $self->description) : ()),
     );
+    $self->handle_action($fip->action);
     print "Floating IP created with ID ", $fip->id, " (", $fip->ip, ")\n";
 }
 

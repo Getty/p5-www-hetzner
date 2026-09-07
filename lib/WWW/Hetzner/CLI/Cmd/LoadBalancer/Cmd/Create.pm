@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl load-balancer create --name <name> --type <type> --location <loc>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -40,6 +41,7 @@ sub execute {
         load_balancer_type => $self->type,
         location           => $self->location,
     );
+    $self->handle_action($lb->action);
     print "Load balancer created with ID ", $lb->id, "\n";
 }
 

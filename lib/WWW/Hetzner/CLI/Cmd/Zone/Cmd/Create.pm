@@ -7,6 +7,7 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl zone create --name <domain> [--ttl <seconds>]';
 use JSON::MaybeXS qw(encode_json);
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -33,6 +34,7 @@ sub execute {
     $params{ttl} = $self->ttl if $self->ttl;
 
     my $zone = $cloud->zones->create(%params);
+    $self->handle_action($zone->action);
 
     if ($main->output eq 'json') {
         print encode_json($zone->data), "\n";

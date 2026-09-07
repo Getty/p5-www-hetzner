@@ -7,6 +7,7 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl server rescue <id> [--disable] [--type linux64|linux32]';
 use JSON::MaybeXS qw(encode_json);
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option disable => (
     is      => 'ro',
@@ -37,21 +38,23 @@ sub execute {
 
     if ($self->disable) {
         print "Disabling rescue mode for server $id...\n";
-        $cloud->servers->disable_rescue($id);
-        print "Rescue mode disabled.\n";
+        my $action = $cloud->servers->disable_rescue($id);
+        $self->handle_action($action);
+        print $self->no_wait ? "Rescue-mode-disable requested.\n" : "Rescue mode disabled.\n";
     } else {
         print "Enabling rescue mode for server $id...\n";
-        my $result = $cloud->servers->enable_rescue($id,
+        my $action = $cloud->servers->enable_rescue($id,
             type     => $self->type,
             ssh_keys => $self->ssh_key,
         );
+        $self->handle_action($action);
 
         if ($main->output eq 'json') {
-            print encode_json($result), "\n";
+            print encode_json({ %{ $action->data }, %{ $action->result } }), "\n";
         } else {
-            print "Rescue mode enabled.\n";
-            if ($result->{root_password}) {
-                print "Root password: $result->{root_password}\n";
+            print $self->no_wait ? "Rescue-mode-enable requested.\n" : "Rescue mode enabled.\n";
+            if (defined $action->root_password) {
+                print "Root password: ", $action->root_password, "\n";
             }
             print "Reboot the server to enter rescue mode.\n";
         }
