@@ -64,4 +64,19 @@ ok(!$a->is_success && !$a->is_error, 'not terminal');
     like($@, qr/\b3\b.*create_server|create_server.*\b3\b/, 'timeout names id and command');
 }
 
+# 6. HasActions role: _wrap_action / _wrap_actions, via a throwaway consumer
+{
+    package My::WrapTest;
+    use Moo;
+    has client => (is => 'ro');
+    with 'WWW::Hetzner::Cloud::Role::HasActions';
+}
+{
+    my $w = My::WrapTest->new(client => $cloud);
+    is($w->_wrap_action(undef), undef, 'undef action -> undef');
+    isa_ok($w->_wrap_action({ id => 5, status => 'running' }), 'WWW::Hetzner::Cloud::Action');
+    is(scalar @{ $w->_wrap_actions([{id=>1,status=>'running'},{id=>2,status=>'success'}]) }, 2, 'plural');
+    is_deeply($w->_wrap_actions(undef), [], 'undef list -> empty arrayref');
+}
+
 done_testing;
