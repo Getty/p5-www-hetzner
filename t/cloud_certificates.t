@@ -62,6 +62,18 @@ subtest 'create certificate' => sub {
     is($cert->id, 1200, 'new certificate id');
 };
 
+subtest 'retry certificate' => sub {
+    my $fixture = load_fixture('certificates_action');
+
+    my $cloud = mock_cloud(
+        'POST /certificates/1100/actions/retry' => $fixture,
+    );
+
+    my $result = $cloud->certificates->retry(1100);
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'issue_certificate', 'action command');
+};
+
 subtest 'delete certificate' => sub {
     my $cloud = mock_cloud(
         'DELETE /certificates/1100' => {},

@@ -46,6 +46,8 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
     my ($self, $data) = @_;
     return WWW::Hetzner::Cloud::Certificate->new(
@@ -185,7 +187,9 @@ sub retry {
     my ($self, $id) = @_;
     croak "Certificate ID required" unless $id;
 
-    return $self->client->post("/certificates/$id/actions/retry", {});
+    return $self->_wrap_action(
+        $self->client->post("/certificates/$id/actions/retry", {})->{action}
+    );
 }
 
 =seealso
