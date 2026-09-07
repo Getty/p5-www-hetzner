@@ -102,11 +102,10 @@ bei Zeitüberschreitung mit Action-Id und Kommando.
 Die `Action` erhält ihren Poll-Pfad vom erzeugenden Controller als Attribut
 `poll_path`. `refresh` hängt `/$id` daran.
 
-Das ist bewusst so gebaut, weil **ungeklärt ist, ob Hetzner den globalen
-Endpunkt `/actions/{id}` zugunsten der ressourcenspezifischen
-(`/servers/actions/{id}`) abgekündigt hat**. Siehe Abschnitt „Vor der
-Implementierung zu klären". Mit `poll_path` ist die Antwort eine Zeile pro
-Controller statt eines Umbaus.
+Default ist der globale Pfad `/actions` (geklärt: nicht abgekündigt, siehe „Vor
+der Implementierung geklärt"). `poll_path` bleibt als Attribut trotzdem
+erhalten: es macht die Ressourcen-Variante `/{resource}/actions/{id}` zu einer
+Zeile pro Controller statt eines Umbaus, falls sie je gebraucht wird.
 
 ### Neue Rollen
 
@@ -117,13 +116,24 @@ von den 8 Controllern, die Actions erzeugen. Additiv; die bestehenden
 **`WWW::Hetzner::Cloud::Role::HasAction`** — liefert Entities die Attribute
 `action` und `next_actions`.
 
-Konsumiert von genau **sechs** Entities, nämlich denen, deren
-`create`-Antwort laut Fixture eine Action enthält: `Certificate`, `FloatingIP`,
-`LoadBalancer`, `PrimaryIP`, `Server`, `Volume`.
+Konsumiert von **acht** Entities, deren `create`-Antwort laut offizieller
+`cloud.spec.json` ein singular `action` enthält: `Certificate`, `FloatingIP`,
+`LoadBalancer`, `PrimaryIP`, `Server`, `Volume`, `PlacementGroup`, `Zone`.
 
-Nicht konsumiert von `Firewall`, `Network`, `PlacementGroup`, `RRSet`, `Zone` —
-deren `create`-Fixtures enthalten keine Action. Für `Firewall` ist das vor der
-Implementierung gegenzuprüfen (siehe unten).
+Die frühere Zählung „genau sechs" stammte aus den vorhandenen Fixtures, nicht
+aus dem echten Vertrag: die `create`-Fixtures von `PlacementGroup` und `Zone`
+sind veraltet und enthalten die Action nicht, die die echte API liefert. Bei
+`PlacementGroup` ist `action` nullable (nur ein *managed* Placement-Group löst
+eine aus) — `HasAction` muss den `undef`-Fall tragen. Siehe „Vor der
+Implementierung geklärt".
+
+`Firewall` ist der Sonderfall: `create` liefert **`actions` im Plural** (eine
+Liste), nicht ein einzelnes `action`. `Firewall` konsumiert daher **nicht**
+`HasAction`, sondern bekommt ein eigenes Attribut `actions` (Arrayref von
+`Action`-Objekten). Der Wrap-Helfer in `HasActions` deckt beide Formen ab.
+
+Nicht konsumiert von `Network`, `RRSet`, `SSHKey` — deren `create`-Antwort
+enthält laut Spec keine Action.
 
 `action` ist der Zustand zum Zeitpunkt der Erzeugung. Nach `->refresh` ist es
 `undef`. Das steht so in der POD.
@@ -147,7 +157,9 @@ setzen können und `mock_cloud` nicht umgebaut werden muss.
 |---|---|---|
 | `Cloud/API/*.pm` | Aktionsmethoden geben `Action` statt Hashref | 38 Methoden, 8 Dateien |
 | `Cloud/*.pm` (Entities) | gespiegelte Aktionsmethoden ebenso | 28 Methoden, 8 Dateien |
-| `Cloud/*.pm` (Entities) | `HasAction` konsumieren | 6 Dateien |
+| `Cloud/*.pm` (Entities) | `HasAction` konsumieren (singular `action`) | 8 Dateien |
+| `Cloud/Firewall.pm` | `actions`-Attribut (Plural-Liste) | 1 Datei |
+| `t/fixtures/*_create.json` | veraltete Fixtures an die echte API angleichen | placement_groups, zones, volumes |
 | `Cloud.pm` | `actions`-Attribut für den neuen Controller | 1 |
 | `CLI/Cmd/**` | `WaitsForAction` konsumieren | mutierende Subcommands |
 | `Role/HTTP.pm` | `sleeper`-Attribut | 1 |
@@ -173,6 +185,9 @@ Neu `t/cloud_actions.t`, gegen die Mock-Fixture-Harness, ohne Netz:
 4. `wait` Fehlerpfad: croakt mit der Meldung aus `action.error.message`
 5. `wait` Timeout: croakt mit Action-Id und Kommando
 6. Poll-Anzahl über den injizierten Sleeper, **ohne eine echte Sekunde**
+7. `Firewall`-`create` liefert `actions` (Plural) als Arrayref von `Action`
+8. `PlacementGroup`-`create` mit nullable `action`: `undef`-Fall trägt sauber
+9. `Volume`-`create` trägt `next_actions` aus der angeglichenen Fixture
 
 Neue Fixtures `actions_get.json` und `actions_list.json` in den Zuständen
 `running`, `success` und `error`. Aktions-Fixtures für Ressourcen existieren
@@ -192,13 +207,30 @@ Folge wechselnder Antworten für denselben Pfad abbilden lässt.
   dort ein Ticket anlegen — niemals ein stiller Cross-Repo-Edit.
 - Kein Release. Das entscheidet der Maintainer gesondert.
 
-## Vor der Implementierung zu klären
+## Vor der Implementierung geklärt
 
-Zwei Punkte, die gegen die aktuelle Hetzner-API-Dokumentation zu prüfen sind und
-die hier bewusst nicht geraten werden:
+Beide Punkte am 2026-09-07 gegen die offizielle `cloud.spec.json`
+(`https://docs.hetzner.cloud/cloud.spec.json`) geprüft, nicht geraten:
 
-1. **Poll-Endpunkt.** Ist der globale `/actions/{id}` noch aktuell, oder gilt
-   nur noch `/{resource}/actions/{id}`? Bestimmt die `poll_path`-Werte.
-2. **Firewall-`create`.** Die Fixture enthält keine Action, die echte API
-   antwortet nach meiner Erinnerung aber mit `actions` im Plural. Falls ja,
-   bekommt `Firewall` eine eigene Behandlung statt `HasAction`.
+1. **Poll-Endpunkt.** Der globale `GET /actions/{id}` ist **nicht abgekündigt**
+   (`deprecated: false`), ebenso `GET /{resource}/actions/{id}`. Abgekündigt ist
+   nur die alte verschachtelte Form `/{resource}/{id}/actions/{action_id}`. →
+   `poll_path` bekommt als Default den globalen Pfad `/actions`; `refresh` hängt
+   `/$id` an. Der Controller kann den Wert überschreiben, falls je nötig, aber
+   der globale Pfad ist sicher.
+2. **Welche `create` liefert eine Action** (Fixture vs. echte API):
+
+   | Ressource | Fixture | echte API |
+   |---|---|---|
+   | Server, FloatingIP, LoadBalancer, PrimaryIP, Certificate | `action` | `action` |
+   | Volume | `action` | `action` + `next_actions` |
+   | Firewall | `actions` | `actions` (Plural-Liste) |
+   | PlacementGroup | — | `action` (nullable) |
+   | Zone | — | `action` |
+   | Network, RRSet, SSHKey | — | — |
+
+   Konsequenz (vom Maintainer bestätigt, 2026-09-07): auf die echte API
+   korrigieren. `HasAction` auf acht Entities, `Firewall` mit Plural-`actions`,
+   und die veralteten Fixtures `placement_groups_create.json`,
+   `zones_create.json` sowie das fehlende `next_actions` in
+   `volumes_create.json` an die echte API angleichen.
