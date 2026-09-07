@@ -111,7 +111,8 @@ subtest 'assign primary IP' => sub {
     );
 
     my $result = $cloud->primary_ips->assign(700, 456, 'server');
-    is($result->{action}{command}, 'assign_primary_ip', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'assign_primary_ip', 'action command');
 };
 
 subtest 'unassign primary IP' => sub {
@@ -123,7 +124,8 @@ subtest 'unassign primary IP' => sub {
     );
 
     my $result = $cloud->primary_ips->unassign(700);
-    is($result->{action}{command}, 'unassign_primary_ip', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    is($result->command, 'unassign_primary_ip', 'action command');
 };
 
 subtest 'primary IP entity methods' => sub {
