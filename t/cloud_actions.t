@@ -11,6 +11,20 @@ is($a->command, 'poweron', 'command');
 ok($a->is_running, 'is_running');
 ok(!$a->is_success && !$a->is_error, 'not terminal');
 
+# 2. list() wraps every action from the fixture (regression guard for _wrap_list
+#    reading the wrong top-level key, or the fixture going unused)
+{
+    my $c = mock_cloud('GET /actions' => sub { load_fixture('actions_list') });
+    my $list = $c->actions->list(status => 'running');
+    is(ref $list, 'ARRAY', 'list returns an arrayref');
+    is(scalar @$list, 3, 'three actions from the fixture');
+    isa_ok($_, 'WWW::Hetzner::Cloud::Action') for @$list;
+    my ($errored) = grep { $_->is_error } @$list;
+    ok($errored, 'one action in the list is_error');
+    is($errored->error_message, 'server does not exist',
+        'error_message carries the fixture message through _wrap_list');
+}
+
 # 3. wait success path: running -> running -> success, counting polls via sleeper
 {
     my @states = ('running', 'running', 'success');
