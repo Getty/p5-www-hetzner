@@ -83,7 +83,7 @@ verloren gingen:
 |---|---|
 | `enable_rescue`, `rebuild`, `reset_password` | `root_password` |
 | `request_console` | `password`, `wss_url` |
-| `create_image` | `image` |
+| `create_image` | `image` (Endpunkt in dieser Distribution noch nicht implementiert — bekommt `result` automatisch, sobald der Controller-Method dazukommt) |
 
 Festlegung (Maintainer, 2026-09-07): Diese Methoden geben weiterhin eine
 `Action` zurück, die die Sidecar-Felder trägt. Die `Action` bekommt ein
