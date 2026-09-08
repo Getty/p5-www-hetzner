@@ -1,0 +1,35 @@
+---
+claimed_at: 2026-09-08T18:10:23Z
+claimed_by: ticket-abschluss
+class: standard
+completed: 2026-09-08T18:10:23Z
+created: 2026-09-08T04:00:38Z
+id: 13
+priority: medium
+started: 2026-09-08T17:34:05Z
+status: done
+tags:
+- api
+- bug
+- cross-repo
+title: _build_request kodiert Query-Parameter nicht
+updated: 2026-09-08T18:10:23Z
+---
+
+Aufgedeckt bei der Arbeit an karr #3. Role::HTTP::_build_request baut Query-Strings
+als "$k=$v" zusammen: keine URI-Kodierung und keine Mehrfachwerte.
+
+Folgen:
+  - ein --name mit Leerzeichen oder & erzeugt eine kaputte URL
+  - label_selector=key%3Dvalue laesst sich nicht ausdruecken
+  - sort=a&sort=b (Mehrfachwert) laesst sich nicht ausdruecken
+
+Faellt heute kaum auf, weil die gaengigen ISO- und Ressourcennamen harmlos sind.
+
+ACHTUNG Cross-Repo: derselbe geteilte Seam wie karr #11. p5-net-async-hetzner
+borgt sich _build_request aus WWW::Hetzner::Cloud -- eine Formaenderung braucht
+ein korrespondierendes Ticket auf dessen Board.
+
+Schnittstellen-Folgeticket angelegt: p5-net-async-hetzner #5 (URI-Kodierung/Mehrfachwerte und Async-Raw-Request-Regressionen). Keine dortigen Codeänderungen.
+
+URI-kodierte Query-Schlüssel/Werte einschließlich Unicode und Sonderzeichen, Arrayrefs als wiederholte Parameter; undef weiterhin ausgelassen. RAW-Request-Regressionen RED->GREEN. Request-/Response-Signaturen und IO-Seam erhalten. Unabhängiges Review sauber; 31 Dateien/265 Tests im gemeinsamen Verifikationslauf PASS. Async-Folgeticket #5. Kein Release.
