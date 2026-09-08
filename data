@@ -1,0 +1,32 @@
+---
+claimed_at: 2026-09-08T04:08:20Z
+claimed_by: json-output
+class: standard
+completed: 2026-09-08T04:08:20Z
+created: 2026-09-08T03:59:52Z
+id: 9
+priority: high
+started: 2026-09-08T04:02:09Z
+status: done
+tags:
+- cli
+- bug
+title: CLI --output json stirbt bei 8 Listen-Kommandos
+updated: 2026-09-08T04:08:20Z
+---
+
+Aufgedeckt bei der Arbeit an karr #3. Acht Top-Level-CLI-Kommandos reichen ein Arrayref blessed Entities direkt an encode_json und sterben deshalb bei --output json:
+
+  CLI/Cmd/Server.pm:89, Image.pm:29, Datacenter.pm:19, Sshkey.pm:20,
+  Location.pm:19, Servertype.pm:19, Zone.pm:55, Record.pm:57
+
+Belegt (netzfrei, am Serialisierer):
+  encode_json([bless {}, "WWW::Hetzner::Cloud::ServerType"])
+  -> encountered object ..., but neither allow_blessed, convert_blessed
+     nor allow_tags settings are enabled
+
+Im Repo stehen zwei Konventionen nebeneinander: die kaputte oben und die
+korrekte encode_json([ map { $_->data } @$list ]), die die Cmd/*/List.pm
+Unterkommandos und die neuen Kommandos aus karr #3 bereits benutzen. Fix
+sind acht Einzeiler auf die korrekte Form. Testabdeckung dafuer gehoert
+sinnvollerweise mit karr #8 zusammen.
