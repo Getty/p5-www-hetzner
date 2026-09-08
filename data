@@ -1,0 +1,22 @@
+---
+claimed_at: 2026-09-08T20:02:06Z
+claimed_by: getty-claude
+class: standard
+completed: 2026-09-08T20:02:06Z
+created: 2026-09-07T20:42:50Z
+id: 8
+priority: low
+started: 2026-09-08T17:37:00Z
+status: done
+tags:
+- cli
+- tests
+title: CLI execute()-Testabdeckung (repo-weite Luecke)
+updated: 2026-09-08T20:02:06Z
+---
+
+Aufgedeckt im Review von karr #2. Kein CLI::Cmd::*::execute() wird von der Testsuite abgedeckt -- Ausnahme jetzt Rescue/Rebuild via t/cli_server_rescue.t (aus karr #2 Task 7b). Muster steht damit: Command-Objekt bauen, execute($args,$chain) gegen mock_cloud treiben, STDOUT/--output json pruefen. Sinnvoll, die uebrigen mutierenden Subcommands (poweron/off, reboot, attach/detach, ...) nach demselben Muster abzudecken, damit die WaitsForAction-Verdrahtung und Ausgaben regressionsgesichert sind.
+
+Abdeckungsinventar 2026-09-08: 102 bisherige execute-Klassen (88 Cloud, 14 Robot); vorher 20, nun 82 weitere mit realen Mock-Ausführungspfaden ergänzt. RED zeigt außer #14 echten AddRule-Vertragsfehler: Firewall CLI übergibt set_rules keine Arrayref. Wird mit Regression korrigiert. Non-Action-Cloud-Deletes bleiben laut API HTTP 204; nur Server/Zone/RRSet liefern Action. Neue Storage-CLI wird zusätzlich vollständig getestet.
+
+Bestehende Cloud-/Robot-CLI jetzt vollständig geprüft: 12 Dateien/132 Tests PASS, unabhängiges Review bestätigt alle 102 execute-Klassen tatsächlich ausgeführt und Request-/Output-/Wait-Assertions. Firewall AddRule korrigiert. Ticket bleibt bis zur zusätzlichen Storage-CLI-Abdeckung offen.
