@@ -1,0 +1,43 @@
+---
+claimed_at: 2026-09-08T17:39:08Z
+claimed_by: ticket-abschluss
+class: standard
+completed: 2026-09-08T17:39:08Z
+created: 2026-09-08T04:00:13Z
+id: 10
+priority: high
+started: 2026-09-08T04:11:26Z
+status: done
+tags:
+- refactor
+- actions
+- storage
+title: Action aus dem Cloud-Namensraum ziehen (Spec E4)
+updated: 2026-09-08T17:39:08Z
+---
+
+Freigegeben vom Maintainer am 2026-09-08, Grundlage ist Entscheidung E4 in docs/superpowers/specs/2026-09-08-storage-boxes-design.md.
+
+  WWW::Hetzner::Cloud::Action             -> WWW::Hetzner::Action
+  WWW::Hetzner::Cloud::Role::HasAction    -> WWW::Hetzner::Role::HasAction
+  WWW::Hetzner::Cloud::Role::HasActions   -> WWW::Hetzner::Role::HasActions
+
+Cloud::API::Actions bleibt, wo es ist: der Controller ist mit Pfad /actions
+echt Cloud-spezifisch. Storage bekommt spaeter sein eigenes
+Storage::API::Actions mit Pfad /storage_boxes/actions.
+
+Ohne Rueckwaerts-Alias. Die Klasse steht in Changes unter {{$NEXT}}, letzter
+Tag ist 0.100 -- sie wurde nie ausgeliefert, es gibt also nichts, wozu
+rueckwaerts-kompatibel zu sein waere. Nach dem naechsten Release kostet
+dieselbe Korrektur eine Kompatibilitaetsschicht auf Dauer.
+
+Cloud-spezifisch ist an der Klasse nichts: sie verlangt vom Client nur get($path)
+und sleeper, beide aus Role::HTTP, und der einzige API-abhaengige Wert poll_path
+ist bereits ein ueberschreibbares Attribut. Beruehrt rund 20 Dateien unter
+lib/WWW/Hetzner/Cloud/**, dazu CLI/Role/WaitsForAction.pm und die Tests. Der
+Changes-Eintrag unter {{$NEXT}} wird auf die neuen Namen korrigiert.
+
+Vorgelagert zu karr #5 (Storage): solange das nicht gelaufen ist, ist Storage
+blockiert.
+
+Action-Namespace vollständig geprüft; gemeinsame POD neutralisiert. Unabhängiges Review: Spec und Codequalität ohne Findings. prove -lr t/ Baseline 38 Dateien/365 Tests PASS (Liveintegration skipped); gezielte Action-/CLI-Regressionen erneut 4 Dateien/50 Tests PASS; git diff --check sauber. Bestehende staged/unstaged Änderungen erhalten, kein Code-Commit/Release.
