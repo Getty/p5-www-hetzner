@@ -1,0 +1,18 @@
+---
+claimed_at: 2026-09-08T04:10:28Z
+claimed_by: delete-actions
+class: standard
+completed: 2026-09-08T04:10:28Z
+created: 2026-09-07T20:42:38Z
+id: 7
+priority: low
+started: 2026-09-08T04:02:05Z
+status: done
+tags:
+- cloud
+- actions
+title: delete-Methoden verwerfen die Loesch-Action (Cloud)
+updated: 2026-09-08T04:10:28Z
+---
+
+Aufgedeckt im Abschluss-Review von karr #2. Die delete-Methoden aller Cloud-Controller (Servers.pm:230, LoadBalancers.pm:182, FloatingIPs.pm:171, PrimaryIPs.pm:176, u.a.) geben den rohen Hashref zurueck. Fuer mehrere Ressourcen (v.a. server delete) liefert die echte API ein {action}, das damit verworfen wird -- CLI delete kann nicht darauf warten. Nicht im Umfang von karr #2 (die 66 Methoden waren power/rebuild/attach-artig + Entity-Spiegelungen, nicht delete). Falls Loesch-Actions gewollt: delete durch _wrap_action leiten und die CLI delete-Kommandos mit WaitsForAction verdrahten.
