@@ -1,0 +1,38 @@
+---
+claimed_at: 2026-09-08T18:10:13Z
+claimed_by: ticket-abschluss
+class: standard
+completed: 2026-09-08T18:10:13Z
+created: 2026-09-08T04:00:17Z
+id: 11
+priority: high
+started: 2026-09-08T17:34:05Z
+status: done
+tags:
+- robot
+- bug
+- cross-repo
+title: Robot POSTs gehen als JSON statt form-encoded raus
+updated: 2026-09-08T18:10:13Z
+---
+
+Aufgedeckt bei der Arbeit an karr #4. Die Robot-Webservice-Doku schreibt
+application/x-www-form-urlencoded vor, aber Role::HTTP::_build_request setzt
+fuer jeden Client hart Content-Type: application/json und encode_json($body).
+
+Betrifft nicht nur die neuen boot-Kommandos, sondern jeden bestehenden Robot-POST:
+reset, key create, IP update, server rename. Der neue Code folgt bewusst dem
+Geschwister-Muster statt zu divergieren -- gefixt wird das an einer Stelle.
+
+Das ist der wahrscheinlichste Grund, warum ein echtes boot rescue --enable gegen
+die Live-API scheitern wuerde. Gegen den Mock faellt es nicht auf, weil der
+Harness den Body nicht gegen die Robot-Doku prueft.
+
+ACHTUNG Cross-Repo: _build_request ist der geteilte Seam, den auch
+p5-net-async-hetzner benutzt. Eine Formaenderung dort braucht ein
+korrespondierendes Ticket auf dem Board von p5-net-async-hetzner --
+niemals eine stille Cross-Repo-Aenderung.
+
+Schnittstellen-Folgeticket angelegt: p5-net-async-hetzner #4 (Robot-Form-Encoding und Async-Raw-Request-Regressionen). Keine dortigen Codeänderungen.
+
+Robot-Form-Encoding umgesetzt, JSON/Bearer für Cloud unverändert. RED->GREEN durch rohe Request-/Header-/Body-Tests, authorized_key[] und ip[] gegen offizielle Robot-Doku. Mock dekodiert Content-Type-gerecht. Unabhängiges Review funktional sauber; POD-Befund behoben/nachgeprüft. Gemeinsamer Verifikationslauf HTTP/Robot/IO/Pagination/Cloud: 31 Dateien/265 Tests PASS. Async-Folgeticket #4. Kein Release.
