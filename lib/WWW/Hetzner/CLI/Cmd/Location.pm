@@ -16,7 +16,7 @@ sub execute {
     my $locations = $cloud->locations->list;
 
     if ($main->output eq 'json') {
-        print encode_json($locations), "\n";
+        print encode_json([ map { $_->data } @$locations ]), "\n";
         return;
     }
 

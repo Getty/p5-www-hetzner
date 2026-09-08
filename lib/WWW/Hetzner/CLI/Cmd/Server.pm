@@ -86,7 +86,7 @@ sub _list {
     my $servers = $cloud->servers->list(%params);
 
     if ($main->output eq 'json') {
-        print encode_json($servers), "\n";
+        print encode_json([ map { $_->data } @$servers ]), "\n";
         return;
     }
 

@@ -16,7 +16,7 @@ sub execute {
     my $types = $cloud->server_types->list;
 
     if ($main->output eq 'json') {
-        print encode_json($types), "\n";
+        print encode_json([ map { $_->data } @$types ]), "\n";
         return;
     }
 

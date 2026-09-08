@@ -54,7 +54,7 @@ sub _list {
     my $records = $rrsets->list(%params);
 
     if ($main->output eq 'json') {
-        print encode_json($records), "\n";
+        print encode_json([ map { $_->data } @$records ]), "\n";
         return;
     }
 

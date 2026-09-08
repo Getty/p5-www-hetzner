@@ -17,7 +17,7 @@ sub execute {
     my $keys = $cloud->ssh_keys->list;
 
     if ($main->output eq 'json') {
-        print encode_json($keys), "\n";
+        print encode_json([ map { $_->data } @$keys ]), "\n";
         return;
     }
 

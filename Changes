@@ -37,6 +37,9 @@ Revision history for WWW-Hetzner
       - boot returns raw hashrefs and has no entity: it is per-server state
         like API::Reset, not a collection with identity
       - CLI: hrobot.pl boot (with rescue/linux/vnc/windows), rdns, failover
+    - Fix: --output json died on eight top-level CLI list commands
+      (server, image, datacenter, sshkey, location, servertype, zone,
+      record), which passed blessed entities straight to encode_json
 
 0.100     2026-02-12 17:13:58Z
     - Pluggable HTTP transport via WWW::Hetzner::Role::IO

@@ -52,7 +52,7 @@ sub _list {
     my $zones = $cloud->zones->list(%params);
 
     if ($main->output eq 'json') {
-        print encode_json($zones), "\n";
+        print encode_json([ map { $_->data } @$zones ]), "\n";
         return;
     }
 

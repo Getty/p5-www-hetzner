@@ -26,7 +26,7 @@ sub execute {
     my $images = $cloud->images->list(%params);
 
     if ($main->output eq 'json') {
-        print encode_json($images), "\n";
+        print encode_json([ map { $_->data } @$images ]), "\n";
         return;
     }
 
