@@ -1,0 +1,31 @@
+---
+claimed_at: 2026-09-08T20:02:11Z
+claimed_by: getty-claude
+class: standard
+completed: 2026-09-08T20:02:11Z
+created: 2026-09-08T04:00:34Z
+id: 12
+priority: medium
+started: 2026-09-08T17:52:32Z
+status: done
+tags:
+- api
+- limitation
+title: Kein Controller wertet meta.pagination aus
+updated: 2026-09-08T20:02:11Z
+---
+
+Aufgedeckt bei der Arbeit an karr #3. Jedes list() liefert nur Seite 1. Hetzners
+Default ist 25 pro Seite, Maximum 50. Fuer server_types oder locations faellt das
+nicht auf, fuer ISOs, Images und grosse Server-Bestaende schon: die Liste ist dann
+still unvollstaendig, ohne jeden Hinweis.
+
+meta.pagination kommt in der Antwort mit und wird distributionsweit nirgends
+ausgewertet. Aus demselben Grund filtert das neue ISOs->get_by_name serverseitig
+statt list() zu durchsuchen (karr #3) -- ein Workaround an einer Stelle, nicht die
+Loesung.
+
+Beruehrt auch die Storage-Box-Ressourcen (karr #5), wo Subaccounts- und
+Snapshots-Listen laut Spec allerdings nicht paginieren.
+
+Maintainer-Entscheidung 2026-09-08: list() bleibt Seitenabruf, neues list_all() sammelt ab erster bzw. expliziter Startseite alle Folgeseiten. CLI und vollständige lokale Namenssuchen wechseln auf list_all(). Filter/Sortierung erhalten, Fehler auf Folgeseiten und Schleifen nicht verschweigen. Gleicher Mechanismus für paginierte Storage-Listen.
