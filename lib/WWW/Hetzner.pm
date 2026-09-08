@@ -121,6 +121,8 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =item * L<WWW::Hetzner::Cloud::API::LoadBalancers> - Load balancer management
 
+=item * L<WWW::Hetzner::Cloud::API::LoadBalancerTypes> - Load balancer types (read-only)
+
 =item * L<WWW::Hetzner::Cloud::API::Certificates> - TLS certificate management
 
 =item * L<WWW::Hetzner::Cloud::API::PlacementGroups> - Placement group management
@@ -131,11 +133,15 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =item * L<WWW::Hetzner::Cloud::API::Images> - OS images (read-only)
 
+=item * L<WWW::Hetzner::Cloud::API::ISOs> - ISO images (read-only)
+
 =item * L<WWW::Hetzner::Cloud::API::ServerTypes> - Server types (read-only)
 
 =item * L<WWW::Hetzner::Cloud::API::Locations> - Locations (read-only)
 
 =item * L<WWW::Hetzner::Cloud::API::Datacenters> - Datacenters (read-only)
+
+=item * L<WWW::Hetzner::Cloud::API::Pricing> - Current price list (read-only, C<get> only)
 
 =back
 
@@ -161,6 +167,8 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =item * L<WWW::Hetzner::Cloud::LoadBalancer> - Load balancer object
 
+=item * L<WWW::Hetzner::Cloud::LoadBalancerType> - Load balancer type object
+
 =item * L<WWW::Hetzner::Cloud::Certificate> - Certificate object
 
 =item * L<WWW::Hetzner::Cloud::PlacementGroup> - Placement group object
@@ -171,11 +179,25 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =item * L<WWW::Hetzner::Cloud::Image> - Image object
 
+=item * L<WWW::Hetzner::Cloud::ISO> - ISO object
+
 =item * L<WWW::Hetzner::Cloud::ServerType> - Server type object
 
 =item * L<WWW::Hetzner::Cloud::Location> - Location object
 
 =item * L<WWW::Hetzner::Cloud::Datacenter> - Datacenter object
+
+=item * L<WWW::Hetzner::Cloud::Pricing> - Price list object
+
+=back
+
+=head2 Roles
+
+=over 4
+
+=item * L<WWW::Hetzner::Cloud::Role::HasActions> - Controller role wrapping raw action hashes as L<WWW::Hetzner::Cloud::Action> objects
+
+=item * L<WWW::Hetzner::Cloud::Role::HasAction> - Entity role exposing the Action a create call returned
 
 =back
 
@@ -498,9 +520,20 @@ See L<WWW::Hetzner::Cloud::API::PlacementGroups>, L<WWW::Hetzner::Cloud::Placeme
     $cloud->images->list
     $cloud->images->get($id)
 
+    # ISOs
+    $cloud->isos->list
+    $cloud->isos->list(architecture => 'arm')
+    $cloud->isos->get($id)
+    $cloud->isos->get_by_name('netboot.xyz.iso')
+
     # Server Types
     $cloud->server_types->list
     $cloud->server_types->get($id)
+
+    # Load Balancer Types
+    $cloud->load_balancer_types->list
+    $cloud->load_balancer_types->get($id)
+    $cloud->load_balancer_types->get_by_name('lb11')
 
     # Locations
     $cloud->locations->list
@@ -509,6 +542,12 @@ See L<WWW::Hetzner::Cloud::API::PlacementGroups>, L<WWW::Hetzner::Cloud::Placeme
     # Datacenters
     $cloud->datacenters->list
     $cloud->datacenters->get($id)
+
+    # Pricing - a single object, so no list and no lookup by id
+    $cloud->pricing->get
+
+See L<WWW::Hetzner::Cloud::API::ISOs>, L<WWW::Hetzner::Cloud::API::LoadBalancerTypes>,
+L<WWW::Hetzner::Cloud::API::Pricing>
 
 =head1 ROBOT API (Dedicated Servers)
 
@@ -533,6 +572,14 @@ See L<WWW::Hetzner::Cloud::API::PlacementGroups>, L<WWW::Hetzner::Cloud::Placeme
 
 =item * L<WWW::Hetzner::Robot::API::Reset> - Server reset and WOL
 
+=item * L<WWW::Hetzner::Robot::API::Traffic> - Traffic statistics
+
+=item * L<WWW::Hetzner::Robot::API::Boot> - Boot configuration (rescue system, installations)
+
+=item * L<WWW::Hetzner::Robot::API::RDNS> - Reverse DNS entries
+
+=item * L<WWW::Hetzner::Robot::API::Failover> - Failover IP routing
+
 =back
 
 =head2 Robot Entity Classes
@@ -544,6 +591,10 @@ See L<WWW::Hetzner::Cloud::API::PlacementGroups>, L<WWW::Hetzner::Cloud::Placeme
 =item * L<WWW::Hetzner::Robot::Key> - SSH key object
 
 =item * L<WWW::Hetzner::Robot::IP> - IP address object
+
+=item * L<WWW::Hetzner::Robot::RDNS> - Reverse DNS entry object
+
+=item * L<WWW::Hetzner::Robot::Failover> - Failover IP object
 
 =back
 
@@ -600,6 +651,111 @@ IP objects:
     $robot->reset->hardware($server_number)
     $robot->reset->wol($server_number)            # wake-on-lan
 
+=head2 Robot Traffic
+
+    $robot->traffic->query(
+        type => 'day',                            # day, month, year
+        from => '2024-01-01T00',
+        to   => '2024-01-02T00',
+        ip   => '1.2.3.4',                        # or an arrayref of IPs
+    )
+
+See L<WWW::Hetzner::Robot::API::Traffic>
+
+=head2 Robot Boot Configuration
+
+    $robot->boot->get($server_number)             # status of all four options
+
+    $robot->boot->rescue($server_number)
+    $robot->boot->enable_rescue($server_number, os => 'linux')
+    $robot->boot->disable_rescue($server_number)
+
+    $robot->boot->linux($server_number)
+    $robot->boot->enable_linux($server_number, dist => 'Debian 12 minimal', lang => 'en')
+    $robot->boot->disable_linux($server_number)
+
+    $robot->boot->vnc($server_number)
+    $robot->boot->enable_vnc($server_number, dist => 'centOS-5.0', lang => 'en_US')
+    $robot->boot->disable_vnc($server_number)
+
+    $robot->boot->windows($server_number)
+    $robot->boot->enable_windows($server_number, os => '...', lang => 'en')
+    $robot->boot->disable_windows($server_number)
+
+Boot options are per-server state rather than entities, so these return raw
+hashrefs. The generated root C<password> is only in the response of the
+activating call. Activating an option does not reboot the server - a reset
+does.
+
+See L<WWW::Hetzner::Robot::API::Boot>
+
+=head2 Robot Reverse DNS
+
+    $robot->rdns->list
+    $robot->rdns->get($ip_address)
+    $robot->rdns->create($ip_address, 'mail.example.com')
+    $robot->rdns->update($ip_address, 'www.example.com')
+    $robot->rdns->delete($ip_address)
+
+RDNS objects:
+
+    $entry->ip
+    $entry->ptr
+    $entry->ptr('mail.example.com')               # set, then write it back
+    $entry->update
+    $entry->delete
+
+See L<WWW::Hetzner::Robot::API::RDNS>, L<WWW::Hetzner::Robot::RDNS>
+
+=head2 Robot Failover IPs
+
+    $robot->failover->list
+    $robot->failover->get($failover_ip)
+    $robot->failover->switch($failover_ip, $target_server_ip)
+    $robot->failover->delete($failover_ip)
+
+Failover objects:
+
+    $failover->ip
+    $failover->netmask
+    $failover->server_ip
+    $failover->server_ipv6_net
+    $failover->server_number
+    $failover->active_server_ip
+    $failover->switch($target_server_ip)
+    $failover->delete
+
+C<delete> drops the routing, not the IP itself. Hetzner rate limits switching
+to 50 requests per hour - a failover switch is not a health check.
+
+See L<WWW::Hetzner::Robot::API::Failover>, L<WWW::Hetzner::Robot::Failover>
+
+=head1 HTTP TRANSPORT
+
+Both clients build their requests with L<WWW::Hetzner::Role::HTTP> and hand
+them to a pluggable IO backend, so the same request and response objects
+serve the synchronous client, the asynchronous L<Net::Async::Hetzner> and the
+test harness.
+
+    my $cloud = WWW::Hetzner::Cloud->new(
+        token => $ENV{HETZNER_API_TOKEN},
+        io    => My::CustomIO->new,
+    );
+
+=over 4
+
+=item * L<WWW::Hetzner::Role::HTTP> - Builds requests, parses responses, holds the C<io> attribute
+
+=item * L<WWW::Hetzner::Role::IO> - Interface role a backend consumes; requires C<call($req)>
+
+=item * L<WWW::Hetzner::LWPIO> - Default synchronous backend (L<LWP::UserAgent>)
+
+=item * L<WWW::Hetzner::HTTPRequest> - Transport independent request object
+
+=item * L<WWW::Hetzner::HTTPResponse> - Transport independent response object
+
+=back
+
 =head1 LOGGING
 
 Uses L<Log::Any> for flexible logging. See L<WWW::Hetzner::Cloud/LOGGING>.
@@ -616,8 +772,13 @@ Uses L<Log::Any> for flexible logging. See L<WWW::Hetzner::Cloud/LOGGING>.
     hcloud.pl server create --name test --type cx22 --image debian-12
     hcloud.pl zone list
     hcloud.pl ssh-key list
+    hcloud.pl iso
+    hcloud.pl load-balancer-type
+    hcloud.pl pricing
 
-See L<WWW::Hetzner::CLI>.
+L<WWW::Hetzner::CLI> lists every command. Subcommands whose call returns an
+Action wait for it to finish unless C<--no-wait> is given, see
+L<WWW::Hetzner::CLI::Role::WaitsForAction>.
 
 =head2 hrobot.pl - Robot CLI
 
@@ -628,8 +789,12 @@ CLI for dedicated server management:
     hrobot.pl key list
     hrobot.pl reset 123456 --type sw
     hrobot.pl wol 123456
+    hrobot.pl boot 123456
+    hrobot.pl boot rescue 123456 --enable --os linux
+    hrobot.pl rdns 203.0.113.50 --ptr mail.example.com
+    hrobot.pl failover 203.0.113.60 --to 198.51.100.10
 
-See L<WWW::Hetzner::Robot::CLI>.
+L<WWW::Hetzner::Robot::CLI> lists every command.
 
 =head1 SEE ALSO
 

@@ -112,6 +112,23 @@ $robot->reset->software(123456);  # CTRL+ALT+DEL
 $robot->reset->hardware(123456);  # Power cycle
 $robot->reset->wol(123456);       # Wake-on-LAN
 
+# Boot configuration (rescue system, Linux/VNC/Windows installation)
+my $boot = $robot->boot->get(123456);
+my $rescue = $robot->boot->enable_rescue(123456, os => 'linux');
+print $rescue->{password}, "\n";  # only in the activating response
+$robot->boot->enable_linux(123456, dist => 'Debian 12 minimal', lang => 'en');
+$robot->boot->disable_rescue(123456);
+
+# Reverse DNS
+my $entries = $robot->rdns->list;
+$robot->rdns->update('203.0.113.50', 'mail.example.com');
+$robot->rdns->delete('203.0.113.50');
+
+# Failover IPs
+my $failovers = $robot->failover->list;
+$robot->failover->switch('203.0.113.60', '198.51.100.10');
+$robot->failover->delete('203.0.113.60');  # drops the routing, not the IP
+
 # Traffic statistics
 my $traffic = $robot->traffic->query(
     ip   => '1.2.3.4',
@@ -162,6 +179,7 @@ hcloud.pl primary-ip list
 # Load Balancers
 hcloud.pl load-balancer list
 hcloud.pl load-balancer create --name lb --type lb11 --location fsn1
+hcloud.pl load-balancer-type
 
 # Placement Groups
 hcloud.pl placement-group list
@@ -177,9 +195,12 @@ hcloud.pl record list --zone example.com
 # Info
 hcloud.pl servertype list
 hcloud.pl image list
+hcloud.pl iso
+hcloud.pl iso --architecture arm
 hcloud.pl location list
 hcloud.pl datacenter list
 hcloud.pl sshkey list
+hcloud.pl pricing
 
 # JSON output
 hcloud.pl -o json server list
@@ -197,6 +218,16 @@ hrobot.pl key list
 hrobot.pl reset 123456 --type sw
 hrobot.pl wol 123456
 hrobot.pl traffic query --ip 1.2.3.4 --from 2024-01-01
+
+hrobot.pl boot 123456
+hrobot.pl boot rescue 123456 --enable --os linux
+hrobot.pl boot linux 123456 --enable --dist 'Debian 12 minimal' --lang en
+
+hrobot.pl rdns
+hrobot.pl rdns 203.0.113.50 --ptr mail.example.com
+
+hrobot.pl failover
+hrobot.pl failover 203.0.113.60 --to 198.51.100.10
 ```
 
 ## Cloud API Resources
@@ -210,6 +241,7 @@ hrobot.pl traffic query --ip 1.2.3.4 --from 2024-01-01
 | Floating IPs | list, get, create, delete, assign, unassign |
 | Primary IPs | list, get, create, delete, assign, unassign |
 | Load Balancers | list, get, create, delete, add_target, add_service |
+| Load Balancer Types | list, get, get_by_name |
 | Certificates | list, get, create, delete |
 | Placement Groups | list, get, create, update, delete |
 | SSH Keys | list, get, get_by_name, create, update, delete, ensure |
@@ -217,8 +249,10 @@ hrobot.pl traffic query --ip 1.2.3.4 --from 2024-01-01
 | DNS Records | add_a, add_aaaa, add_cname, add_mx, add_txt |
 | Server Types | list, get, get_by_name |
 | Images | list, get, get_by_name |
+| ISOs | list, get, get_by_name |
 | Locations | list, get, get_by_name |
 | Datacenters | list, get, get_by_name |
+| Pricing | get |
 
 ## Async Support
 
@@ -295,7 +329,7 @@ perl -MLWP::ConsoleLogger::Everywhere your_script.pl
 | API | Base URL | Purpose |
 |-----|----------|---------|
 | Cloud API | api.hetzner.cloud | Cloud Servers, Volumes, Networks, DNS, Load Balancers |
-| Robot API | robot-ws.your-server.de | Dedicated Servers, IPs, Reset |
+| Robot API | robot-ws.your-server.de | Dedicated Servers, IPs, Reset, Boot Configuration, Reverse DNS, Failover IPs |
 
 **Note:** The old standalone DNS API (dns.hetzner.com) no longer exists. DNS is now part of the Cloud API.
 
