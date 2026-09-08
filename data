@@ -1,0 +1,39 @@
+---
+claimed_at: 2026-09-08T19:35:56Z
+claimed_by: getty-claude
+class: standard
+completed: 2026-09-08T19:35:56Z
+created: 2026-09-08T04:10:50Z
+id: 15
+priority: medium
+started: 2026-09-08T19:30:41Z
+status: done
+tags:
+- doku
+- cli
+title: 64 CLI-Unterkommandos sind aus der Doku nicht erreichbar
+updated: 2026-09-08T19:35:56Z
+---
+
+Aufgedeckt beim Doku-Anschluss nach karr #3 und #4.
+
+Diese Distribution hat rund 140 Module; navigierbar bleibt sie nur, weil jedes von
+WWW::Hetzner aus per L<> erreichbar ist. Fuer 64 Blatt-Unterkommandos gilt das nicht.
+
+Ursache ist ein einziges fehlendes Muster: CLI::Cmd::Server ist das einzige
+Eltern-Kommando, das seine Kinder verlinkt (11 von 11). Die uebrigen 13 verlinken keins:
+
+  CLI/Cmd/Certificate.pm     4 Kinder, 0 Links     CLI/Cmd/Record.pm         4, 0
+  CLI/Cmd/Firewall.pm        7, 0                  CLI/Cmd/Sshkey.pm         4, 0
+  CLI/Cmd/FloatingIp.pm      6, 0                  CLI/Cmd/Volume.pm         7, 0
+  CLI/Cmd/LoadBalancer.pm    6, 0                  CLI/Cmd/Zone.pm           4, 0
+  CLI/Cmd/Network.pm         6, 0                  Robot/CLI/Cmd/Boot.pm     4, 0
+  CLI/Cmd/PlacementGroup.pm  4, 0                  Robot/CLI/Cmd/Server.pm   2, 0
+  CLI/Cmd/PrimaryIp.pm       6, 0
+
+Darunter die vier neuen Robot::CLI::Cmd::Boot::Cmd::{Rescue,Linux,Vnc,Windows} aus
+karr #4.
+
+Rein mechanisch: die =head1 SUBCOMMANDS-Liste aus CLI::Cmd::Server in die 13 anderen
+Eltern replizieren. Konnte beim Doku-Ticket nicht mitgemacht werden, weil dort
+gleichzeitig karr #7 und #9 in denselben Dateien gearbeitet haben.
