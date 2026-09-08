@@ -34,6 +34,12 @@ This is a Perl implementation to manage dedicated servers via the Robot API.
 
 =item * L<traffic|WWW::Hetzner::Robot::CLI::Cmd::Traffic> - Query traffic statistics
 
+=item * L<boot|WWW::Hetzner::Robot::CLI::Cmd::Boot> - Boot configuration (rescue system, installations)
+
+=item * L<rdns|WWW::Hetzner::Robot::CLI::Cmd::Rdns> - Manage reverse DNS entries
+
+=item * L<failover|WWW::Hetzner::Robot::CLI::Cmd::Failover> - Manage failover IP routing
+
 =back
 
 =cut
@@ -113,10 +119,15 @@ sub execute {
     print "  reset     Reset a server\n";
     print "  wol       Wake-on-LAN\n";
     print "  traffic   Query traffic statistics\n";
+    print "  boot      Boot configuration (rescue, linux, vnc, windows)\n";
+    print "  rdns      Manage reverse DNS entries\n";
+    print "  failover  Manage failover IP routing\n";
     print "\nExamples:\n";
     print "  hrobot.pl server list\n";
     print "  hrobot.pl -u user -p pass server list\n";
     print "  hrobot.pl --output json server describe 123456\n";
+    print "  hrobot.pl boot rescue 123456 --enable --os linux\n";
+    print "  hrobot.pl failover 203.0.113.60 --to 198.51.100.10\n";
     print "\nEnvironment variables:\n";
     print "  HETZNER_ROBOT_USER      Default for --user\n";
     print "  HETZNER_ROBOT_PASSWORD  Default for --password\n";

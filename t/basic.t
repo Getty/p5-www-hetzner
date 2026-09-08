@@ -66,11 +66,16 @@ use_ok('WWW::Hetzner::Robot::API::Keys');
 use_ok('WWW::Hetzner::Robot::API::IPs');
 use_ok('WWW::Hetzner::Robot::API::Reset');
 use_ok('WWW::Hetzner::Robot::API::Traffic');
+use_ok('WWW::Hetzner::Robot::API::Boot');
+use_ok('WWW::Hetzner::Robot::API::RDNS');
+use_ok('WWW::Hetzner::Robot::API::Failover');
 
 # Robot entities
 use_ok('WWW::Hetzner::Robot::Server');
 use_ok('WWW::Hetzner::Robot::Key');
 use_ok('WWW::Hetzner::Robot::IP');
+use_ok('WWW::Hetzner::Robot::RDNS');
+use_ok('WWW::Hetzner::Robot::Failover');
 
 # Test Cloud instantiation
 my $cloud = WWW::Hetzner::Cloud->new(token => 'test-token');

@@ -27,6 +27,16 @@ Revision history for WWW-Hetzner
         not a list), so it offers get only
       - New entities WWW::Hetzner::Cloud::ISO, ::LoadBalancerType, ::Pricing
       - CLI: hcloud.pl iso, load-balancer-type and pricing
+    - New Robot resources: boot, rdns and failover
+      - New: $robot->boot for the boot configuration of a dedicated server
+        (rescue system, Linux install, VNC, Windows), with enable_*/disable_*
+        methods named after Cloud::API::Servers rather than Hetzner's own
+        activate/deactivate wording
+      - New: $robot->rdns and $robot->failover, both listable per-IP
+        resources with entities WWW::Hetzner::Robot::RDNS and ::Failover
+      - boot returns raw hashrefs and has no entity: it is per-server state
+        like API::Reset, not a collection with identity
+      - CLI: hrobot.pl boot (with rescue/linux/vnc/windows), rdns, failover
 
 0.100     2026-02-12 17:13:58Z
     - Pluggable HTTP transport via WWW::Hetzner::Role::IO

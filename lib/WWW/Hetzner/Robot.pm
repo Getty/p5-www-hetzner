@@ -8,6 +8,9 @@ use WWW::Hetzner::Robot::API::Keys;
 use WWW::Hetzner::Robot::API::IPs;
 use WWW::Hetzner::Robot::API::Reset;
 use WWW::Hetzner::Robot::API::Traffic;
+use WWW::Hetzner::Robot::API::Boot;
+use WWW::Hetzner::Robot::API::RDNS;
+use WWW::Hetzner::Robot::API::Failover;
 use namespace::clean;
 
 our $VERSION = '0.101';
@@ -28,6 +31,11 @@ our $VERSION = '0.101';
     my $server = $robot->servers->get(123456);
     print $server->name, "\n";
     print $server->product, "\n";
+
+    # Boot the rescue system (arm, then reset into it)
+    my $rescue = $robot->boot->enable_rescue(123456, os => 'linux');
+    print $rescue->{password}, "\n";
+    $robot->reset->execute(123456, 'hw');
 
     # Reset server
     $robot->reset->execute(123456, 'sw');  # software reset
@@ -60,6 +68,12 @@ Uses HTTP Basic Auth (user/password) instead of Bearer tokens.
 =item * reset - Server reset (software/hardware)
 
 =item * traffic - Traffic statistics
+
+=item * boot - Boot configuration (rescue system, Linux/VNC/Windows installation)
+
+=item * rdns - Reverse DNS entries
+
+=item * failover - Failover IP routing
 
 =back
 
@@ -190,6 +204,40 @@ has traffic => (
 =attr traffic
 
 Returns a L<WWW::Hetzner::Robot::API::Traffic> instance for traffic statistics.
+
+=cut
+
+has boot => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Boot->new(client => shift) },
+);
+
+=attr boot
+
+Returns a L<WWW::Hetzner::Robot::API::Boot> instance for boot configuration
+(rescue system, Linux, VNC and Windows installation).
+
+=cut
+
+has rdns => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::RDNS->new(client => shift) },
+);
+
+=attr rdns
+
+Returns a L<WWW::Hetzner::Robot::API::RDNS> instance for reverse DNS entries.
+
+=cut
+
+has failover => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Failover->new(client => shift) },
+);
+
+=attr failover
+
+Returns a L<WWW::Hetzner::Robot::API::Failover> instance for failover IP routing.
 
 =cut
 

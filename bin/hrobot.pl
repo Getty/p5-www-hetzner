@@ -24,6 +24,10 @@ hrobot.pl - Hetzner Robot CLI (Perl implementation)
     # Show server details
     hrobot.pl server describe 123456
 
+    # Boot the rescue system, then reset into it
+    hrobot.pl boot rescue 123456 --enable --os linux
+    hrobot.pl reset 123456 --type hw
+
     # Reset server
     hrobot.pl reset 123456
     hrobot.pl reset 123456 --type hw
@@ -85,6 +89,38 @@ Reset a server.
 Wake-on-LAN.
 
     hrobot.pl wol ID
+
+=head2 boot
+
+Boot configuration: rescue system and unattended installations. Activating an
+option only arms it - the server has to be reset to boot into it. The response
+of an activating call carries the generated password.
+
+    hrobot.pl boot ID                      # Status of all boot options
+    hrobot.pl boot rescue ID               # Rescue system status
+    hrobot.pl boot rescue ID --enable --os linux
+    hrobot.pl boot rescue ID --disable
+    hrobot.pl boot linux ID --enable --dist 'Debian 12 minimal' --lang en
+    hrobot.pl boot vnc ID --enable --dist centOS-5.0 --lang en_US
+    hrobot.pl boot windows ID --enable --os 'Windows Server 2022 Standard Edition' --lang en
+
+=head2 rdns
+
+Manage reverse DNS entries.
+
+    hrobot.pl rdns                                     # List all entries
+    hrobot.pl rdns 203.0.113.50                        # Show one entry
+    hrobot.pl rdns 203.0.113.50 --ptr mail.example.com # Set the PTR record
+    hrobot.pl rdns 203.0.113.50 --delete               # Delete the entry
+
+=head2 failover
+
+Manage failover IP routing.
+
+    hrobot.pl failover                                 # List all failover IPs
+    hrobot.pl failover 203.0.113.60                    # Show one failover IP
+    hrobot.pl failover 203.0.113.60 --to 198.51.100.10 # Route to another server
+    hrobot.pl failover 203.0.113.60 --delete           # Delete the routing
 
 =head1 ENVIRONMENT
 
