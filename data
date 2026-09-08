@@ -1,0 +1,51 @@
+---
+claimed_at: 2026-09-08T18:19:51Z
+claimed_by: ticket-abschluss
+class: standard
+completed: 2026-09-08T18:19:51Z
+created: 2026-09-08T04:08:37Z
+id: 14
+priority: high
+started: 2026-09-08T17:37:00Z
+status: done
+tags:
+- cli
+- bug
+title: CLI-Textausgabe liest Hash statt Accessor, zeigt dauerhaft Striche
+updated: 2026-09-08T18:19:51Z
+---
+
+Aufgedeckt bei der Arbeit an karr #9, zweiter Bug in denselben Dateien -- diesmal
+im Text-Zweig, nicht im JSON-Zweig, und deshalb dort NICHT mitgefixt (chirurgischer
+Schnitt).
+
+Die Text-Zweige greifen direkt in den Hash des Entities ($s->{id}) statt den Accessor
+zu benutzen. Das geht ueberall dort gut, wo der Moo-Attributname zufaellig gleich dem
+API-Key ist -- und bricht genau dort, wo ein Attribut per init_arg umbenannt wurde:
+
+  Cloud/Server.pm:107-109   server_type_data / datacenter_data / image_data
+                            (init_arg server_type / datacenter / image)
+  Cloud/Datacenter.pm:57    location_data (init_arg location)
+
+Betroffene Ausgabestellen:
+  CLI/Cmd/Server.pm:109-110   $s->{server_type}{name}, $s->{datacenter}{name}
+  CLI/Cmd/Datacenter.pm:31    $d->{location}{name}
+
+Beide lesen immer undef. Reproduziert gegen mock_cloud mit den vorhandenen Fixtures:
+
+  ID       NAME            STATUS    IPV4            TYPE   DATACENTER
+  123456   omnicorp-cop    running   203.0.113.10    -      -
+
+  ID   NAME        DESCRIPTION          LOCATION
+  1    fsn1-dc14   Falkenstein 1 DC14   -
+
+Fix ist je ein Accessor: $s->server_type, $s->datacenter, $d->location existieren
+bereits und liefern genau den Namen, den diese Zeilen wollen.
+
+Cmd/Volume.pm und Cmd/Volume/Cmd/List.pm zeigen den richtigen Stil (durchgaengig
+Accessoren), obwohl Cloud::Volume dieselbe location_data-Umbenennung hat. Das Ticket
+darf sich deshalb sinnvoll auf "Text-Zweige benutzen Accessoren statt Hash-Zugriff"
+ueber alle Listen-Kommandos verbreitern. Regressionstest gehoert dazu -- die
+Testabdeckung fuer Text-Ausgabe fehlt genauso wie die aus karr #8.
+
+Alle acht Default-Tabellen auf Entity-Accessoren umgestellt; Server-Typ/Datacenter und Datacenter-Location werden korrekt angezeigt. JSON unverändert. Textregression RED->GREEN. Unabhängiges Review Spec/Qualität ohne Findings. Gesamte bestehende Cloud-/Robot-CLI-Prüfung: 12 Dateien/132 Tests PASS, 102 echte execute-Klassen abgedeckt. Kein Release.
