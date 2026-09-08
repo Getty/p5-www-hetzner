@@ -7,6 +7,7 @@ use WWW::Hetzner::Cloud::API::Actions;
 use WWW::Hetzner::Cloud::API::Servers;
 use WWW::Hetzner::Cloud::API::ServerTypes;
 use WWW::Hetzner::Cloud::API::Images;
+use WWW::Hetzner::Cloud::API::ISOs;
 use WWW::Hetzner::Cloud::API::SSHKeys;
 use WWW::Hetzner::Cloud::API::Locations;
 use WWW::Hetzner::Cloud::API::Datacenters;
@@ -17,8 +18,10 @@ use WWW::Hetzner::Cloud::API::Firewalls;
 use WWW::Hetzner::Cloud::API::FloatingIPs;
 use WWW::Hetzner::Cloud::API::PrimaryIPs;
 use WWW::Hetzner::Cloud::API::LoadBalancers;
+use WWW::Hetzner::Cloud::API::LoadBalancerTypes;
 use WWW::Hetzner::Cloud::API::Certificates;
 use WWW::Hetzner::Cloud::API::PlacementGroups;
+use WWW::Hetzner::Cloud::API::Pricing;
 use namespace::clean;
 
 our $VERSION = '0.101';
@@ -71,6 +74,8 @@ servers, DNS zones, networks, volumes, and other resources.
 
 =item * images - OS images
 
+=item * isos - ISO images that can be attached to a server
+
 =item * ssh_keys - SSH keys
 
 =item * placement_groups - Placement groups for server distribution
@@ -90,6 +95,8 @@ servers, DNS zones, networks, volumes, and other resources.
 =item * primary_ips - Primary IPs for servers
 
 =item * load_balancers - Load balancers with targets and services
+
+=item * load_balancer_types - Available load balancer types
 
 =back
 
@@ -124,6 +131,8 @@ servers, DNS zones, networks, volumes, and other resources.
 =item * locations - Locations (fsn1, nbg1, hel1, ash, hil, sin)
 
 =item * datacenters - Datacenters
+
+=item * pricing - Current price list (a single object, not a list)
 
 =back
 
@@ -216,6 +225,17 @@ has images => (
 =attr images
 
 Returns a L<WWW::Hetzner::Cloud::API::Images> instance for listing OS images.
+
+=cut
+
+has isos => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::ISOs->new(client => shift) },
+);
+
+=attr isos
+
+Returns a L<WWW::Hetzner::Cloud::API::ISOs> instance for listing ISO images.
 
 =cut
 
@@ -329,6 +349,18 @@ Returns a L<WWW::Hetzner::Cloud::API::LoadBalancers> instance for managing load 
 
 =cut
 
+has load_balancer_types => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::LoadBalancerTypes->new(client => shift) },
+);
+
+=attr load_balancer_types
+
+Returns a L<WWW::Hetzner::Cloud::API::LoadBalancerTypes> instance for listing
+load balancer types.
+
+=cut
+
 has certificates => (
     is      => 'lazy',
     builder => sub { WWW::Hetzner::Cloud::API::Certificates->new(client => shift) },
@@ -348,6 +380,19 @@ has placement_groups => (
 =attr placement_groups
 
 Returns a L<WWW::Hetzner::Cloud::API::PlacementGroups> instance for managing placement groups.
+
+=cut
+
+has pricing => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Pricing->new(client => shift) },
+);
+
+=attr pricing
+
+Returns a L<WWW::Hetzner::Cloud::API::Pricing> instance for reading the
+current price list. Pricing is a single object rather than a collection, so
+that controller only has C<get>.
 
 =cut
 

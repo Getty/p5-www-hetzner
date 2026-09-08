@@ -12,6 +12,7 @@ my %cmd_aliases = (
     'floating-ip'     => 'floatingip',
     'primary-ip'      => 'primaryip',
     'load-balancer'   => 'loadbalancer',
+    'load-balancer-type' => 'loadbalancertype',
     'placement-group' => 'placementgroup',
     'add-subnet'      => 'addsubnet',
     'add-route'       => 'addroute',
@@ -204,6 +205,19 @@ List images. Use C<--type> to filter by type (system, snapshot, backup).
 =head2 servertype
 
 List available server types.
+
+=head2 iso
+
+List ISOs. Use C<--architecture> to filter by architecture (x86, arm) and
+C<--name> to look up a single ISO by its exact name.
+
+=head2 load-balancer-type
+
+List available load balancer types.
+
+=head2 pricing
+
+Show the current price list.
 
 =head2 location
 

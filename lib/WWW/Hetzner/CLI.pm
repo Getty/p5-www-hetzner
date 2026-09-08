@@ -35,6 +35,8 @@ options, and output should match the original tool as closely as possible.
 
 =item * L<image|WWW::Hetzner::CLI::Cmd::Image> - List images
 
+=item * L<iso|WWW::Hetzner::CLI::Cmd::Iso> - List ISOs
+
 =item * L<sshkey|WWW::Hetzner::CLI::Cmd::Sshkey> - Manage SSH keys
 
 =item * L<placement-group|WWW::Hetzner::CLI::Cmd::PlacementGroup> - Manage placement groups
@@ -54,6 +56,8 @@ options, and output should match the original tool as closely as possible.
 =item * L<primary-ip|WWW::Hetzner::CLI::Cmd::PrimaryIp> - Manage primary IPs
 
 =item * L<load-balancer|WWW::Hetzner::CLI::Cmd::LoadBalancer> - Manage load balancers
+
+=item * L<load-balancer-type|WWW::Hetzner::CLI::Cmd::LoadBalancerType> - List load balancer types
 
 =back
 
@@ -90,6 +94,8 @@ options, and output should match the original tool as closely as possible.
 =item * L<location|WWW::Hetzner::CLI::Cmd::Location> - List locations
 
 =item * L<datacenter|WWW::Hetzner::CLI::Cmd::Datacenter> - List datacenters
+
+=item * L<pricing|WWW::Hetzner::CLI::Cmd::Pricing> - Show the current price list
 
 =back
 
@@ -150,6 +156,7 @@ sub execute {
     print "  server           Manage cloud servers\n";
     print "  servertype       List server types\n";
     print "  image            List images\n";
+    print "  iso              List ISOs\n";
     print "  sshkey           Manage SSH keys\n";
     print "  placement-group  Manage placement groups\n";
     print "\nNetworking:\n";
@@ -158,6 +165,7 @@ sub execute {
     print "  floating-ip      Manage floating IPs\n";
     print "  primary-ip       Manage primary IPs\n";
     print "  load-balancer    Manage load balancers\n";
+    print "  load-balancer-type  List load balancer types\n";
     print "\nStorage:\n";
     print "  volume           Manage volumes\n";
     print "\nDNS:\n";
@@ -168,6 +176,7 @@ sub execute {
     print "\nInfo:\n";
     print "  location         List locations\n";
     print "  datacenter       List datacenters\n";
+    print "  pricing          Show the current price list\n";
     print "\nExamples:\n";
     print "  hcloud.pl server list\n";
     print "  hcloud.pl -t mytoken server list\n";

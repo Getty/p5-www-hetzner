@@ -19,6 +19,14 @@ Revision history for WWW-Hetzner
         terminal state by default; pass --no-wait to opt out
       - New: WWW::Hetzner::Role::HTTP sleeper attribute, an injectable sleep
         function used while polling actions
+    - New read-only Cloud resources: ISOs, Load Balancer Types and Pricing
+      - New: $cloud->isos with list, get and get_by_name (the latter filters
+        server-side via GET /isos?name=, as the ISO list is long)
+      - New: $cloud->load_balancer_types, the counterpart to server_types
+      - New: $cloud->pricing, a singleton (GET /pricing returns one object,
+        not a list), so it offers get only
+      - New entities WWW::Hetzner::Cloud::ISO, ::LoadBalancerType, ::Pricing
+      - CLI: hcloud.pl iso, load-balancer-type and pricing
 
 0.100     2026-02-12 17:13:58Z
     - Pluggable HTTP transport via WWW::Hetzner::Role::IO
