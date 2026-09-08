@@ -169,9 +169,11 @@ sub update {
 
 =method delete
 
-    $cloud->zones->delete($id);
+    my $action = $cloud->zones->delete($id);
 
-Deletes a zone and all its RRSets.
+Deletes a zone and all its RRSets. Returns the L<WWW::Hetzner::Cloud::Action>
+tracking the deletion; call C<< $action->wait >> to block until the zone is
+gone.
 
 =cut
 
@@ -179,7 +181,8 @@ sub delete {
     my ($self, $id) = @_;
     croak "Zone ID required" unless $id;
 
-    return $self->client->delete("/zones/$id");
+    my $result = $self->client->delete("/zones/$id");
+    return $self->_wrap_action($result->{action});
 }
 
 =method export

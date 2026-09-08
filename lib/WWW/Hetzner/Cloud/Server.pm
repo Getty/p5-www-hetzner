@@ -204,15 +204,15 @@ sub delete {
     my ($self) = @_;
     croak "Cannot delete server without ID" unless $self->id;
 
-    $self->_client->delete("/servers/" . $self->id);
-    return 1;
+    return $self->_client->servers->delete($self->id);
 }
 
 =method delete
 
-    $server->delete;
+    my $action = $server->delete;
 
-Deletes the server.
+Deletes the server. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+deletion; call C<< $action->wait >> to block until the server is gone.
 
 =cut
 

@@ -111,16 +111,16 @@ sub delete {
     croak "Cannot delete RRSet without name" unless $self->name;
     croak "Cannot delete RRSet without type" unless $self->type;
 
-    my $path = "/zones/" . $self->zone_id . "/rrsets/" . $self->name . "/" . $self->type;
-    $self->_client->delete($path);
-    return 1;
+    return $self->_client->zones->rrsets($self->zone_id)
+        ->delete($self->name, $self->type);
 }
 
 =method delete
 
-    $record->delete;
+    my $action = $record->delete;
 
-Deletes the RRSet.
+Deletes the RRSet. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+deletion; call C<< $action->wait >> to block until the RRSet is gone.
 
 =cut
 

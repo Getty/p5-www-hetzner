@@ -6,6 +6,7 @@ our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl zone delete <zone-id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -15,9 +16,10 @@ sub execute {
 
     my $id = $args->[0] or die "Usage: zone delete <zone-id>\n";
 
-    $cloud->zones->delete($id);
+    my $action = $cloud->zones->delete($id);
+    $self->handle_action($action);
 
-    print "Zone $id deleted.\n";
+    print $self->no_wait ? "Zone $id delete requested.\n" : "Zone $id deleted.\n";
 }
 
 1;

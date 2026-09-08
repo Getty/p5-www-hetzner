@@ -92,12 +92,35 @@ subtest 'create server' => sub {
 };
 
 subtest 'delete server' => sub {
+    # karr #7: DELETE /servers/{id} answers 200 {action}; the action used to be
+    # dropped, so the caller could not wait for the deletion to finish.
+    my $fixture = load_fixture('servers_action');
+    $fixture->{action}{command} = 'delete_server';
+
     my $cloud = mock_cloud(
-        'DELETE /servers/123456' => {},
+        'DELETE /servers/123456' => $fixture,
     );
 
-    my $result = $cloud->servers->delete(123456);
-    ok(1, 'delete succeeded');
+    my $action = $cloud->servers->delete(123456);
+    isa_ok($action, 'WWW::Hetzner::Cloud::Action', 'delete returns an Action');
+    is($action->id, 13343, 'delete action id');
+    is($action->command, 'delete_server', 'delete action command');
+    ok($action->is_running, 'delete action is still running');
+};
+
+subtest 'delete server via entity mirror' => sub {
+    my $fixture = load_fixture('servers_action');
+    $fixture->{action}{command} = 'delete_server';
+
+    my $cloud = mock_cloud(
+        'GET /servers/123456'    => sub { load_fixture('servers_get') },
+        'DELETE /servers/123456' => $fixture,
+    );
+
+    my $server = $cloud->servers->get(123456);
+    my $action = $server->delete;
+    isa_ok($action, 'WWW::Hetzner::Cloud::Action', '$server->delete returns an Action');
+    is($action->command, 'delete_server', 'entity mirror carries the action command');
 };
 
 subtest 'create server requires params' => sub {

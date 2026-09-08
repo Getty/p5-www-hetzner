@@ -69,6 +69,8 @@ has zone_id => (
     required => 1,
 );
 
+with 'WWW::Hetzner::Cloud::Role::HasActions';
+
 sub _wrap {
     my ($self, $data) = @_;
     return WWW::Hetzner::Cloud::RRSet->new(
@@ -183,9 +185,10 @@ sub update {
 
 =method delete
 
-    $rrsets->delete('www', 'A');
+    my $action = $rrsets->delete('www', 'A');
 
-Deletes an RRSet.
+Deletes an RRSet. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+deletion; call C<< $action->wait >> to block until the RRSet is gone.
 
 =cut
 
@@ -195,7 +198,8 @@ sub delete {
     croak "Record type required" unless $type;
 
     my $path = $self->_base_path . "/$name/$type";
-    return $self->client->delete($path);
+    my $result = $self->client->delete($path);
+    return $self->_wrap_action($result->{action});
 }
 
 =method add_a

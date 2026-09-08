@@ -217,9 +217,10 @@ sub create {
 
 =method delete
 
-    $cloud->servers->delete($id);
+    my $action = $cloud->servers->delete($id);
 
-Deletes a server.
+Deletes a server. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+deletion; call C<< $action->wait >> to block until the server is gone.
 
 =cut
 
@@ -227,7 +228,8 @@ sub delete {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->delete("/servers/$id");
+    my $result = $self->client->delete("/servers/$id");
+    return $self->_wrap_action($result->{action});
 }
 
 =method power_on

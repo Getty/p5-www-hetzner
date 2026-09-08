@@ -40,6 +40,14 @@ Revision history for WWW-Hetzner
     - Fix: --output json died on eight top-level CLI list commands
       (server, image, datacenter, sshkey, location, servertype, zone,
       record), which passed blessed entities straight to encode_json
+    - BREAKING: server, zone and rrset delete now return an Action
+      - Verified against cloud.spec.json: only DELETE /servers/{id},
+        /zones/{id} and /zones/{id}/rrsets/{name}/{type} answer with an
+        action; the other ten DELETE endpoints answer 204 and are unchanged
+      - The three controller methods returned the raw {action => {...}}
+        hashref, the three entity mirrors returned a literal 1
+      - CLI: hcloud.pl server/zone/record delete now wait for the deletion
+        action to reach a terminal state; pass --no-wait to opt out
 
 0.100     2026-02-12 17:13:58Z
     - Pluggable HTTP transport via WWW::Hetzner::Role::IO

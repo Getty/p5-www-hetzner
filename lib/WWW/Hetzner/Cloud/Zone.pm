@@ -145,15 +145,16 @@ sub delete {
     my ($self) = @_;
     croak "Cannot delete zone without ID" unless $self->id;
 
-    $self->_client->delete("/zones/" . $self->id);
-    return 1;
+    return $self->_client->zones->delete($self->id);
 }
 
 =method delete
 
-    $zone->delete;
+    my $action = $zone->delete;
 
-Deletes the zone and all its records.
+Deletes the zone and all its records. Returns the
+L<WWW::Hetzner::Cloud::Action> tracking the deletion; call
+C<< $action->wait >> to block until the zone is gone.
 
 =cut
 
