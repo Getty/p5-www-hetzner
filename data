@@ -1,0 +1,25 @@
+---
+claimed_at: 2026-09-09T05:42:58Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:42:58Z
+created: 2026-09-09T04:35:26Z
+id: 19
+priority: high
+started: 2026-09-09T05:42:58Z
+status: done
+tags:
+- release
+- cleanup
+title: Remove orphaned WWW::Hetzner::Cloud::Action / Cloud::Role::HasAction(s) --
+  dead code shipping a duplicate Action class
+updated: 2026-09-09T05:42:58Z
+---
+
+lib/WWW/Hetzner/Cloud/Action.pm, lib/WWW/Hetzner/Cloud/Role/HasAction.pm and lib/WWW/Hetzner/Cloud/Role/HasActions.pm are committed (34627ca / 11bb248 / c61fe5d) but nothing in lib/, bin/ or t/ consumes them any more. Every Cloud controller/entity now does `with "WWW::Hetzner::Role::HasAction"` / `"WWW::Hetzner::Role::HasActions"` and wraps into the new WWW::Hetzner::Action (currently staged, not yet committed) -- confirmed via grep across the whole tree, zero remaining references to the old trio outside themselves.
+
+dzil build still gathers and ships all three old files side by side with the new WWW::Hetzner::Action / WWW::Hetzner::Role::HasAction(s), so CPAN would index two unrelated "Action" implementations at once. The Changes {{$NEXT}} note ("Action and its two roles sit directly under WWW::Hetzner, not under ::Cloud") already documents this as a completed move -- the old files were simply never deleted.
+
+Fix: git rm lib/WWW/Hetzner/Cloud/Action.pm lib/WWW/Hetzner/Cloud/Role/HasAction.pm lib/WWW/Hetzner/Cloud/Role/HasActions.pm (and the now-empty lib/WWW/Hetzner/Cloud/Role/ dir if nothing else lives there), then re-run the test suite.
+
+2026-09-09 05:42 git rm of Cloud/Action.pm, Cloud/Role/HasAction.pm and Cloud/Role/HasActions.pm -- zero external consumers (grep over lib bin t), now-empty Cloud/Role dir removed too. Commit 2fc33b5. Full suite green (522 prove, 737 dzil).
