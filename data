@@ -1,0 +1,23 @@
+---
+claimed_at: 2026-09-09T05:41:37Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:41:37Z
+created: 2026-09-09T04:36:14Z
+id: 23
+priority: low
+started: 2026-09-09T05:41:37Z
+status: done
+tags:
+- cpanfile
+- cleanup
+title: 'cpanfile: Data::Record declared as a runtime requires but unused anywhere
+  in the codebase'
+updated: 2026-09-09T05:41:37Z
+---
+
+grep -rn "Data::Record" across lib/, bin/, t/ and cpanfile finds only the cpanfile declaration itself (`requires "Data::Record";`) -- no use/require anywhere in shipped code or tests. Pre-existing (not part of the current diff).
+
+Either it is dead weight from an earlier draft and should be dropped, or it is meant for a not-yet-written feature and should carry a comment saying so. Low priority / does not block the build, but "nothing declared is dead" is one of the release-checklist criteria.
+
+2026-09-09 05:41 cpanfile: dropped 'requires Data::Record' -- grep across lib/ bin/ t/ found zero use/require, dead declaration. Commit 4e696de. dzil test green (737 tests).
