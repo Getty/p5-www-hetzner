@@ -1,0 +1,27 @@
+---
+claimed_at: 2026-09-09T05:43:12Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:43:12Z
+created: 2026-09-09T04:35:39Z
+id: 20
+priority: high
+started: 2026-09-09T05:43:12Z
+status: done
+tags:
+- release
+- changes
+title: Changes {{$NEXT}} does not mention Storage Boxes / Pagination
+updated: 2026-09-09T05:43:12Z
+---
+
+The unreleased section of Changes covers the Action/HasAction rework, ISO/LoadBalancerType/Pricing, Robot boot/rdns/failover, CLI JSON fix and the server/zone/rrset delete-Action change -- but has no entry at all for:
+
+- WWW::Hetzner::Storage (the second top-level client, alongside Cloud and Robot) and its resources: StorageBox, Snapshot, Subaccount, StorageBoxType, plus the 5 API controllers and 33 CLI subcommands under hcloud.pl storage-box
+- WWW::Hetzner::Role::Pagination and the list_all() rollout across all 19 Cloud API controllers (list_all collects every page, list keeps its single-page contract)
+
+The one bullet that does mention Storage in passing ("Fix: Robot request bodies ... Cloud and Storage keep JSON encoding") presupposes Storage already exists, which reads oddly with no prior "New: Storage support" bullet above it.
+
+Needed: a New: block introducing WWW::Hetzner::Storage and its resources/CLI (mirroring the existing ISO/LoadBalancerType/Pricing and Robot boot/rdns/failover blocks already in Changes), plus a bullet for the generic Pagination role and list_all. Do this once the files are committed (see the companion uncommitted-work ticket).
+
+2026-09-09 05:43 Verified the Changes NEXT section already carries a New: block for WWW::Hetzner::Storage and its resources/CLI plus a Pagination/list_all bullet, matching the ISO and Robot blocks. Landed with the feature in fe7399c.
