@@ -1,0 +1,23 @@
+---
+claimed_at: 2026-09-09T05:43:26Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:43:26Z
+created: 2026-09-09T04:35:50Z
+id: 21
+priority: medium
+started: 2026-09-09T05:43:26Z
+status: done
+tags:
+- docs
+title: 'README.md: German prose leaked into the new Storage API section'
+updated: 2026-09-09T05:43:26Z
+---
+
+The "## Storage API (Storage Boxes)" section added to README.md (currently uncommitted) has one paragraph written in German, sitting in an otherwise all-English document:
+
+"Boxen, Typen und Actions unterstützen list_all; Subaccounts und Snapshots sind laut API nicht paginiert. Create liefert ein Entity mit ->action, Update ein Entity ohne neue Action, Delete und Action-Endpunkte liefern WWW::Hetzner::Action. Die Bibliothek wartet nur bei explizitem ->wait; die CLI wartet standardmäßig und bietet --no-wait. Storage-Actions werden über /storage_boxes/actions/{id} abgefragt. Passwort-Resets nehmen das neue Passwort als Eingabe entgegen, ohne eines zurückzuliefern."
+
+This is presumably a note that leaked in while drafting and needs translating to English before this becomes the front page on CPAN/GitHub.
+
+2026-09-09 05:43 Verified the README Storage API section is English only -- the German paragraph named in the ticket is already translated; non-ASCII and German-word greps are both clean. Landed with the feature in fe7399c.
