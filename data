@@ -1,0 +1,24 @@
+---
+claimed_at: 2026-09-09T05:43:54Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:43:54Z
+created: 2026-09-09T04:36:26Z
+id: 24
+priority: low
+started: 2026-09-09T05:43:54Z
+status: done
+tags:
+- podweaver
+- cleanup
+title: bin/hcloud.pl and bin/hrobot.pl ship without our $VERSION
+updated: 2026-09-09T05:43:54Z
+---
+
+Per the getty-perl-release-author-getty convention, every file under lib/ and bin/ should carry its own our $VERSION line for RewriteVersion::Transitional/BumpVersionAfterRelease to manage. All lib/ files have one (confirmed: grep -rLE "our \\$VERSION" lib/ is empty). bin/hcloud.pl and bin/hrobot.pl do not.
+
+PodWeaver still emits a "=head1 VERSION" POD section for both from the dist version, but the actual $VERSION package variable is absent -- confirmed empty (only the POD heading, no code line) in a dzil build of the current tree. Pre-existing, not introduced by the current diff; not a build blocker, just incomplete versioning metadata for these two executables.
+
+Fix: add `our $VERSION = ...;` near the top of each script (matching whatever the module files currently carry, 0.101) so RewriteVersion picks them up on future releases too.
+
+2026-09-09 05:43 Added our $VERSION set to 0.101 at line 9 of bin/hcloud.pl and bin/hrobot.pl, mirroring every lib file for RewriteVersion. Landed with the feature in fe7399c.
