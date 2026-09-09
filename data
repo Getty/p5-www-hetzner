@@ -1,0 +1,28 @@
+---
+claimed_at: 2026-09-09T05:43:40Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:43:40Z
+created: 2026-09-09T04:36:04Z
+id: 22
+priority: medium
+started: 2026-09-09T05:43:40Z
+status: done
+tags:
+- docs
+- podweaver
+title: bin/hcloud.pl and bin/hrobot.pl carry a hand-written duplicate =head1 NAME
+  (PodWeaver already generates one)
+updated: 2026-09-09T05:43:40Z
+---
+
+Both scripts have a hand-written =head1 NAME / =head1 SYNOPSIS block right after __END__, and ALSO get a PodWeaver-generated NAME (from # PODNAME + # ABSTRACT) inserted at the very top of the POD, ahead of VERSION. Confirmed in the built tarball:
+
+bin/hcloud.pl -- =head1 NAME appears at line 116 (generated, followed by VERSION/SYNOPSIS) and again at line 169 (hand-written, right before OPTIONS), both saying "hcloud.pl - Hetzner Cloud CLI (Perl implementation)".
+bin/hrobot.pl -- same pattern, lines 19 and 54.
+
+podchecker does not flag this (duplicate headings are not a syntax error) but metacpan/POD-to-HTML renders two NAME entries in the table of contents. Pre-existing, not introduced by the current diff.
+
+Fix: delete the second, hand-written "=head1 NAME\n\n<script> - ..." block in each file (the SYNOPSIS/DESCRIPTION/OPTIONS content below/around it stays; only the duplicate NAME heading needs to go).
+
+2026-09-09 05:43 Verified both bin scripts already have the duplicate hand-written =head1 NAME block removed (zero =head1 NAME remaining in each; PodWeaver still generates the top one). Landed with the feature in fe7399c.
