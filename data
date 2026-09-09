@@ -1,0 +1,24 @@
+---
+claimed_at: 2026-09-09T05:42:44Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:42:44Z
+created: 2026-09-09T04:35:14Z
+id: 18
+priority: high
+started: 2026-09-09T05:42:44Z
+status: done
+tags:
+- release
+- cpanfile
+title: 'cpanfile: Path::Tiny is a runtime dependency, declared test-only'
+updated: 2026-09-09T05:42:44Z
+---
+
+lib/WWW/Hetzner/CLI/Cmd/Sshkey/Cmd/Create.pm:10 and lib/WWW/Hetzner/CLI/Cmd/Server/Cmd/Create.pm:10 both `use Path::Tiny qw(path);` -- these are shipped lib/ modules, not test code. cpanfile only lists it under `on test => sub { requires "Path::Tiny"; ... }`.
+
+Confirmed in the built META.json: Path::Tiny appears solely under test_requires, not runtime requires. A CPAN install without test deps (e.g. cpanm --notest) will not pull it in, and `hcloud.pl sshkey create` / `hcloud.pl server create` will die on load with a missing-module error.
+
+Fix: add `requires "Path::Tiny";` to the top-level runtime block in cpanfile (the on-test declaration can stay or be dropped, does not matter once it is also a runtime requires).
+
+2026-09-09 05:42 Moved Path::Tiny from on-test to the runtime requires block in cpanfile; it is used by shipped CLI Sshkey/Server create modules, so a cpanm --notest install now pulls it in. Commit 4e696de. dzil test green (737 tests).
