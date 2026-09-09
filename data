@@ -1,0 +1,32 @@
+---
+claimed_at: 2026-09-09T05:42:30Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-09T05:42:30Z
+created: 2026-09-09T04:35:02Z
+id: 17
+priority: high
+started: 2026-09-09T05:42:30Z
+status: done
+tags:
+- release
+- build
+title: '0.101 blocker: Storage Box / Pagination work is entirely uncommitted, dzil
+  build ships without it'
+updated: 2026-09-09T05:42:30Z
+---
+
+dzil build only gathers files known to git (Git::GatherDir). Verified by building HEAD-plus-worktree and diffing against the tarball contents: the whole Storage Box family is untracked (?? in git status) and absent from the built lib/ and t/ trees:
+
+- lib/WWW/Hetzner/Storage.pm, lib/WWW/Hetzner/Storage/{StorageBox,Snapshot,Subaccount,StorageBoxType}.pm, lib/WWW/Hetzner/Storage/API/{StorageBoxes,Snapshots,Subaccounts,StorageBoxTypes,Actions}.pm
+- lib/WWW/Hetzner/Role/Pagination.pm
+- All 33 files under lib/WWW/Hetzner/CLI/Cmd/StorageBox/**
+- about 19 new/changed t/*.t files (storage_*.t, cli_storage_*.t, cli_cloud_*.t, pagination.t, http_encoding.t) and 16 fixtures under t/fixtures/storage_*.json
+
+Additionally the list_all/Pagination rollout across the 19 existing Cloud API controllers (e.g. lib/WWW/Hetzner/Cloud/API/Servers.pm) is a working-tree-only modification -- git log shows no commit touching Servers.pm since 7b8f60e, so this is uncommitted too.
+
+Cutting 0.101 from HEAD right now would ship essentially 0.100 content under a 0.101 version string; the Storage Boxes work that is the actual point of this cycle (karr #1) would not reach CPAN.
+
+Needed: git add (and commit) the Storage/Pagination/StorageBox-CLI files and their tests/fixtures. Re-run dzil build afterward and diff the tarball MANIFEST against git ls-files to confirm everything landed.
+
+2026-09-09 05:42 Committed the whole uncommitted Storage/Pagination/Action cycle so dzil build (Git::GatherDir) gathers it. Verified: built MANIFEST lists all 72 Storage/Pagination/StorageBox files plus fixtures; zero tracked lib/t/bin files missing from MANIFEST; old Cloud::Action trio absent. dzil test green (59 files, 737 tests). Commit fe7399c.
