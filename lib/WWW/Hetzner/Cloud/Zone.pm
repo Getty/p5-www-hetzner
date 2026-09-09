@@ -4,7 +4,7 @@ package WWW::Hetzner::Cloud::Zone;
 our $VERSION = '0.101';
 
 use Moo;
-with 'WWW::Hetzner::Cloud::Role::HasAction';
+with 'WWW::Hetzner::Role::HasAction';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::API::RRSets;
 use namespace::clean;
@@ -153,7 +153,7 @@ sub delete {
     my $action = $zone->delete;
 
 Deletes the zone and all its records. Returns the
-L<WWW::Hetzner::Cloud::Action> tracking the deletion; call
+L<WWW::Hetzner::Action> tracking the deletion; call
 C<< $action->wait >> to block until the zone is gone.
 
 =cut

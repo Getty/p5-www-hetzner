@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $lbs = $cloud->load_balancers->list;
+    my $lbs = $cloud->load_balancers->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$lbs ]), "\n";

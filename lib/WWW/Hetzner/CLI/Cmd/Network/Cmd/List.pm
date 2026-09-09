@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $networks = $cloud->networks->list;
+    my $networks = $cloud->networks->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$networks ]), "\n";

@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::API::LoadBalancers;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::LoadBalancer;
 use namespace::clean;
@@ -51,7 +52,7 @@ has client => (
     weak_ref => 1,
 );
 
-with 'WWW::Hetzner::Cloud::Role::HasActions';
+with 'WWW::Hetzner::Role::HasActions';
 
 sub _wrap {
     my ($self, $data, %extra) = @_;
@@ -76,12 +77,30 @@ Returns arrayref of L<WWW::Hetzner::Cloud::LoadBalancer> objects.
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/load_balancers', params => \%params);
-    return $self->_wrap_list($result->{load_balancers} // []);
+    return ($self->_wrap_list($result->{load_balancers} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =method get
 

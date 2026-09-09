@@ -63,7 +63,7 @@ sub execute {
     push @rules, $rule;
 
     print "Adding rule to firewall $id...\n";
-    my $actions = $cloud->firewalls->set_rules($id, @rules);
+    my $actions = $cloud->firewalls->set_rules($id, \@rules);
     $self->handle_action($actions);
     print $self->no_wait ? "Rule add requested.\n" : "Rule added.\n";
 }

@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::API::Images;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Image;
 use namespace::clean;
@@ -15,7 +16,7 @@ use namespace::clean;
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all images
-    my $images = $cloud->images->list;
+    my $images = $cloud->images->list_all;
 
     # Filter by type
     my $snapshots = $cloud->images->list(type => 'snapshot');
@@ -70,12 +71,30 @@ Returns an arrayref of L<WWW::Hetzner::Cloud::Image> objects. Optional parameter
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/images', params => \%params);
-    return $self->_wrap_list($result->{images} // []);
+    return ($self->_wrap_list($result->{images} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =method get
 
@@ -105,7 +124,7 @@ sub get_by_name {
     my ($self, $name) = @_;
     croak "Name required" unless $name;
 
-    my $images = $self->list;
+    my $images = $self->list_all(name => $name);
     for my $image (@$images) {
         return $image if $image->name eq $name;
     }

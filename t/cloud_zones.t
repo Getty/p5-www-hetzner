@@ -74,7 +74,7 @@ subtest 'create zone' => sub {
     is($zone->{id}, 'zone789012', 'new zone id');
     is($zone->{name}, 'newdomain.com', 'new zone name');
     is($zone->{status}, 'pending', 'new zone status');
-    isa_ok($zone->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    isa_ok($zone->action, 'WWW::Hetzner::Action', 'create action is an Action');
     is($zone->action->command, 'create_zone', 'action command');
 };
 
@@ -103,7 +103,7 @@ subtest 'delete zone' => sub {
     );
 
     my $action = $cloud->zones->delete('zone123456');
-    isa_ok($action, 'WWW::Hetzner::Cloud::Action', 'delete returns an Action');
+    isa_ok($action, 'WWW::Hetzner::Action', 'delete returns an Action');
     is($action->id, 9101, 'delete action id');
     is($action->command, 'delete_zone', 'delete action command');
 };
@@ -116,7 +116,7 @@ subtest 'delete zone via entity mirror' => sub {
 
     my $zone = $cloud->zones->get('zone123456');
     my $action = $zone->delete;
-    isa_ok($action, 'WWW::Hetzner::Cloud::Action', '$zone->delete returns an Action');
+    isa_ok($action, 'WWW::Hetzner::Action', '$zone->delete returns an Action');
     is($action->command, 'delete_zone', 'entity mirror carries the action command');
 };
 

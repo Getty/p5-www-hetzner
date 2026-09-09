@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::API::Locations;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Location;
 use namespace::clean;
@@ -15,7 +16,7 @@ use namespace::clean;
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all locations
-    my $locations = $cloud->locations->list;
+    my $locations = $cloud->locations->list_all;
 
     # Get by name
     my $fsn1 = $cloud->locations->get_by_name('fsn1');
@@ -59,12 +60,30 @@ Returns an arrayref of L<WWW::Hetzner::Cloud::Location> objects.
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/locations', params => \%params);
-    return $self->_wrap_list($result->{locations} // []);
+    return ($self->_wrap_list($result->{locations} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =method get
 
@@ -94,7 +113,7 @@ sub get_by_name {
     my ($self, $name) = @_;
     croak "Name required" unless $name;
 
-    my $locations = $self->list;
+    my $locations = $self->list_all;
     for my $loc (@$locations) {
         return $loc if $loc->name eq $name;
     }

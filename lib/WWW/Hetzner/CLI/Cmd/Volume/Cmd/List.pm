@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $volumes = $cloud->volumes->list;
+    my $volumes = $cloud->volumes->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([map { $_->data } @$volumes]), "\n";

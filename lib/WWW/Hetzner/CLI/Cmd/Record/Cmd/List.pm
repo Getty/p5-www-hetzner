@@ -41,7 +41,7 @@ sub execute {
     $params{name} = $self->name if $self->name;
 
     my $rrsets = $cloud->zones->rrsets($self->zone);
-    my $records = $rrsets->list(%params);
+    my $records = $rrsets->list_all(%params);
 
     if ($main->output eq 'json') {
         print encode_json([map { $_->data } @$records]), "\n";

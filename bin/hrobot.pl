@@ -6,15 +6,13 @@ use strict;
 use warnings;
 use lib 'lib';
 
+our $VERSION = '0.101';
+
 use WWW::Hetzner::Robot::CLI;
 
 WWW::Hetzner::Robot::CLI->new_with_cmd;
 
 __END__
-
-=head1 NAME
-
-hrobot.pl - Hetzner Robot CLI (Perl implementation)
 
 =head1 SYNOPSIS
 
@@ -89,6 +87,14 @@ Reset a server.
 Wake-on-LAN.
 
     hrobot.pl wol ID
+
+=head2 traffic
+
+Query traffic statistics.
+
+    hrobot.pl traffic --ip 1.2.3.4 --type day --from 2024-01-01T00 --to 2024-01-02T00
+    hrobot.pl traffic --ip 1.2.3.4 --type month --from 2024-01-01 --to 2024-02-01
+    hrobot.pl traffic --ip 1.2.3.4 --type year --from 2024-01 --to 2024-12
 
 =head2 boot
 

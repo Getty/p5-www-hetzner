@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $fips = $cloud->floating_ips->list;
+    my $fips = $cloud->floating_ips->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$fips ]), "\n";

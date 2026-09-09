@@ -50,7 +50,7 @@ sub execute {
     $params{architecture} = $self->architecture if $self->architecture;
     $params{name}         = $self->name         if $self->name;
 
-    my $isos = $cloud->isos->list(%params);
+    my $isos = $cloud->isos->list_all(%params);
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$isos ]), "\n";

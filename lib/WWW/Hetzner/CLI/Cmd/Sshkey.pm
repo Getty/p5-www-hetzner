@@ -8,13 +8,29 @@ use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl sshkey <command> [options]';
 use JSON::MaybeXS qw(encode_json);
 
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::List> - List SSH keys
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::Describe> - Describe an SSH key
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::Create> - Create an SSH key
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::Delete> - Delete an SSH key
+
+=back
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
     # Default to list
     my $main = $chain->[0];
     my $cloud = $main->cloud;
-    my $keys = $cloud->ssh_keys->list;
+    my $keys = $cloud->ssh_keys->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$keys ]), "\n";
@@ -31,9 +47,9 @@ sub execute {
 
     for my $k (@$keys) {
         printf "%-10s %-30s %s\n",
-            $k->{id},
-            $k->{name},
-            $k->{fingerprint} // '-';
+            $k->id,
+            $k->name,
+            $k->fingerprint // '-';
     }
 }
 

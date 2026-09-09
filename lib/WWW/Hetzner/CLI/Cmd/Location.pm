@@ -13,7 +13,7 @@ sub execute {
 
     my $main = $chain->[0];
     my $cloud = $main->cloud;
-    my $locations = $cloud->locations->list;
+    my $locations = $cloud->locations->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$locations ]), "\n";
@@ -25,10 +25,10 @@ sub execute {
 
     for my $l (@$locations) {
         printf "%-10s %-30s %-10s %s\n",
-            $l->{id},
-            $l->{name},
-            $l->{country},
-            $l->{city};
+            $l->id,
+            $l->name,
+            $l->country,
+            $l->city;
     }
 }
 

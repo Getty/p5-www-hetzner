@@ -13,7 +13,7 @@ sub execute {
 
     my $main = $chain->[0];
     my $cloud = $main->cloud;
-    my $types = $cloud->server_types->list;
+    my $types = $cloud->server_types->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$types ]), "\n";
@@ -26,12 +26,12 @@ sub execute {
 
     for my $t (@$types) {
         printf "%-10s %-12s %-8s %-10s %-10s %s\n",
-            $t->{id},
-            $t->{name},
-            $t->{cores},
-            $t->{memory} . ' GB',
-            $t->{disk} . ' GB',
-            $t->{deprecated} ? 'yes' : '-';
+            $t->id,
+            $t->name,
+            $t->cores,
+            $t->memory . ' GB',
+            $t->disk . ' GB',
+            $t->deprecated ? 'yes' : '-';
     }
 }
 

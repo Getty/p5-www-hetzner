@@ -106,7 +106,7 @@ subtest 'delete rrset' => sub {
 
     my $rrsets = $cloud->zones->rrsets('zone123456');
     my $action = $rrsets->delete('www', 'A');
-    isa_ok($action, 'WWW::Hetzner::Cloud::Action', 'delete returns an Action');
+    isa_ok($action, 'WWW::Hetzner::Action', 'delete returns an Action');
     is($action->id, 9102, 'delete action id');
     is($action->command, 'delete_rrset', 'delete action command');
 };
@@ -119,7 +119,7 @@ subtest 'delete rrset via entity mirror' => sub {
 
     my $record = $cloud->zones->rrsets('zone123456')->get('www', 'A');
     my $action = $record->delete;
-    isa_ok($action, 'WWW::Hetzner::Cloud::Action', '$record->delete returns an Action');
+    isa_ok($action, 'WWW::Hetzner::Action', '$record->delete returns an Action');
     is($action->command, 'delete_rrset', 'entity mirror carries the action command');
 };
 

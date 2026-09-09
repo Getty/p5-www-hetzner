@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $pips = $cloud->primary_ips->list;
+    my $pips = $cloud->primary_ips->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$pips ]), "\n";

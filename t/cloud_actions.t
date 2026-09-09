@@ -6,7 +6,7 @@ use Test::WWW::Hetzner::Mock;
 # 1. attributes + predicates from fixture
 my $cloud = mock_cloud('GET /actions/13343' => sub { load_fixture('actions_get') });
 my $a = $cloud->actions->get(13343);
-isa_ok($a, 'WWW::Hetzner::Cloud::Action');
+isa_ok($a, 'WWW::Hetzner::Action');
 is($a->command, 'poweron', 'command');
 ok($a->is_running, 'is_running');
 ok(!$a->is_success && !$a->is_error, 'not terminal');
@@ -18,7 +18,7 @@ ok(!$a->is_success && !$a->is_error, 'not terminal');
     my $list = $c->actions->list(status => 'running');
     is(ref $list, 'ARRAY', 'list returns an arrayref');
     is(scalar @$list, 3, 'three actions from the fixture');
-    isa_ok($_, 'WWW::Hetzner::Cloud::Action') for @$list;
+    isa_ok($_, 'WWW::Hetzner::Action') for @$list;
     my ($errored) = grep { $_->is_error } @$list;
     ok($errored, 'one action in the list is_error');
     is($errored->error_message, 'server does not exist',
@@ -69,13 +69,13 @@ ok(!$a->is_success && !$a->is_error, 'not terminal');
     package My::WrapTest;
     use Moo;
     has client => (is => 'ro');
-    with 'WWW::Hetzner::Cloud::Role::HasActions';
+    with 'WWW::Hetzner::Role::HasActions';
 }
 {
     my $w = My::WrapTest->new(client => $cloud);
     is($w->_wrap_action(undef), undef, 'undef action -> undef');
     my $plain = $w->_wrap_action({ id => 5, status => 'running' });
-    isa_ok($plain, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($plain, 'WWW::Hetzner::Action');
     is($plain->root_password, undef, '_wrap_action: no sidecar -> root_password undef');
     is_deeply($plain->result, {}, '_wrap_action: result defaults to {}');
     is(scalar @{ $w->_wrap_actions([{id=>1,status=>'running'},{id=>2,status=>'success'}]) }, 2, 'plural');
@@ -91,7 +91,7 @@ ok(!$a->is_success && !$a->is_error, 'not terminal');
         action        => { id => 9, command => 'reset_password', status => 'running' },
         root_password => 'pw123',
     });
-    isa_ok($wrapped, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($wrapped, 'WWW::Hetzner::Action');
     is($wrapped->id, 9, 'action fields still set');
     is($wrapped->root_password, 'pw123', 'sidecar preserved via _wrap_action_result');
     is_deeply($wrapped->result, { root_password => 'pw123' },

@@ -3,7 +3,7 @@
 [![CPAN Version](https://img.shields.io/cpan/v/WWW-Hetzner.svg)](https://metacpan.org/pod/WWW::Hetzner)
 [![License](https://img.shields.io/cpan/l/WWW-Hetzner.svg)](https://metacpan.org/pod/WWW::Hetzner)
 
-Perl client for Hetzner APIs (Cloud and Robot).
+Perl client for Hetzner APIs (Cloud, Storage and Robot).
 
 ## Installation
 
@@ -85,6 +85,57 @@ my $key = $cloud->ssh_keys->create(
 );
 ```
 
+## Pagination
+
+Paginated controllers provide `list_all()` for complete results. `list()` keeps
+its single-page behavior; `page` selects that page, and `per_page` controls its
+size. With `list_all()`, an explicit `page` selects the starting page. Filters
+and sorting are preserved on subsequent requests, and failures are reported
+rather than returning an apparently successful partial list. CLI lists use
+complete results by default.
+
+```perl
+my $servers = $cloud->servers->list_all(label_selector => 'env=production');
+my $page = $cloud->servers->list(page => 2, per_page => 50);
+```
+
+## Storage API (Storage Boxes)
+
+Storage uses its own client and `https://api.hetzner.com/v1`, with the same
+`HETZNER_API_TOKEN` default as Cloud. Explicit tokens and `base_url` remain
+configurable on each client.
+
+```perl
+use WWW::Hetzner::Storage;
+
+my $storage = WWW::Hetzner::Storage->new(
+    token => $ENV{HETZNER_API_TOKEN},
+);
+my $boxes = $storage->storage_boxes->list_all;
+my $box = $storage->storage_boxes->get(12345);
+my $subaccounts = $box->subaccounts->list;
+my $snapshots = $box->snapshots->list;
+my $actions = $box->actions->list_all;
+```
+
+Boxes, Types, and Actions support `list_all`; Subaccounts and Snapshots are
+not paginated per the API. Create returns an entity with `->action`, Update
+returns an entity without a new action, and Delete and action endpoints
+return `WWW::Hetzner::Action`. The library only waits on an explicit `->wait`;
+the CLI waits by default and offers `--no-wait`. Storage actions are polled
+via `/storage_boxes/actions/{id}`. Password resets take the new password as
+input, without returning one.
+
+| Resource | API Methods |
+|----------|-------------|
+| Storage Boxes | list, list_all, get, get_by_name, create, update, delete, folders; protection, type, password, access settings, snapshot plan and rollback actions |
+| Storage Box Types | list, list_all, get, get_by_name |
+| Actions | list, list_all, get; global or bound to a box through `$box->actions` |
+| Subaccounts | list, get, create, update, delete; home directory, password and access settings actions |
+| Snapshots | list, get, create, update, delete |
+
+S3/Object Storage and asynchronous Storage clients are not included.
+
 ## Robot API (Dedicated Servers)
 
 ```perl
@@ -139,7 +190,7 @@ my $traffic = $robot->traffic->query(
 
 ## CLI Tools
 
-### hcloud.pl (Cloud)
+### hcloud.pl (Cloud and Storage)
 
 ```bash
 export HETZNER_API_TOKEN=your-token
@@ -201,6 +252,12 @@ hcloud.pl location list
 hcloud.pl datacenter list
 hcloud.pl sshkey list
 hcloud.pl pricing
+
+# Storage Boxes
+hcloud.pl storage-box list
+hcloud.pl storage-box describe 12345
+hcloud.pl storage-box subaccount list 12345
+hcloud.pl storage-box snapshot list 12345
 
 # JSON output
 hcloud.pl -o json server list
@@ -329,6 +386,7 @@ perl -MLWP::ConsoleLogger::Everywhere your_script.pl
 | API | Base URL | Purpose |
 |-----|----------|---------|
 | Cloud API | api.hetzner.cloud | Cloud Servers, Volumes, Networks, DNS, Load Balancers |
+| Storage API | api.hetzner.com | Storage Boxes, Types, Actions, Subaccounts, Snapshots |
 | Robot API | robot-ws.your-server.de | Dedicated Servers, IPs, Reset, Boot Configuration, Reverse DNS, Failover IPs |
 
 **Note:** The old standalone DNS API (dns.hetzner.com) no longer exists. DNS is now part of the Cloud API.

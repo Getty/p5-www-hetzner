@@ -4,7 +4,7 @@ package WWW::Hetzner::Cloud::Server;
 our $VERSION = '0.101';
 
 use Moo;
-with 'WWW::Hetzner::Cloud::Role::HasAction';
+with 'WWW::Hetzner::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -211,7 +211,7 @@ sub delete {
 
     my $action = $server->delete;
 
-Deletes the server. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+Deletes the server. Returns the L<WWW::Hetzner::Action> tracking the
 deletion; call C<< $action->wait >> to block until the server is gone.
 
 =cut

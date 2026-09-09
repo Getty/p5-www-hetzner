@@ -18,6 +18,22 @@ use JSON::MaybeXS qw(encode_json);
 
 =cut
 
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::Record::Cmd::List> - List DNS records
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::Record::Cmd::Describe> - Describe a DNS record
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::Record::Cmd::Create> - Create a DNS record
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::Record::Cmd::Delete> - Delete a DNS record
+
+=back
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
@@ -51,7 +67,7 @@ sub _list {
     $params{type} = $self->type if $self->type;
 
     my $rrsets = $cloud->zones->rrsets($self->zone);
-    my $records = $rrsets->list(%params);
+    my $records = $rrsets->list_all(%params);
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$records ]), "\n";
@@ -68,11 +84,11 @@ sub _list {
     print "-" x 80, "\n";
 
     for my $r (@$records) {
-        my $values = join(', ', map { $_->{value} } @{$r->{records} // []});
+        my $values = join(', ', map { $_->{value} } @{$r->records // []});
         printf "%-25s %-8s %-8s %s\n",
-            $r->{name},
-            $r->{type},
-            $r->{ttl} // '-',
+            $r->name,
+            $r->type,
+            $r->ttl // '-',
             $values;
     }
 }

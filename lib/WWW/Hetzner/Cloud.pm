@@ -60,7 +60,7 @@ servers, DNS zones, networks, volumes, and other resources.
 
 =over 4
 
-=item * actions - Async job objects (L<WWW::Hetzner::Cloud::Action>) returned by every mutating call below; poll status or block with C<< ->wait >>
+=item * actions - Async job objects (L<WWW::Hetzner::Action>) returned by every mutating call below; poll status or block with C<< ->wait >>
 
 =back
 
@@ -199,7 +199,7 @@ has actions => (
 =attr actions
 
 Returns a L<WWW::Hetzner::Cloud::API::Actions> instance for reading Cloud
-actions. Actions (L<WWW::Hetzner::Cloud::Action> objects) are the async job
+actions. Actions (L<WWW::Hetzner::Action> objects) are the async job
 objects that mutating calls across every resource in this class return --
 this accessor is how one is looked up or polled directly by id, independent
 of the resource that created it.
@@ -470,7 +470,7 @@ API issues without adding any code.
 
 =head1 SEE ALSO
 
-L<WWW::Hetzner>, L<WWW::Hetzner::Role::HTTP>, L<WWW::Hetzner::Cloud::Action>,
+L<WWW::Hetzner>, L<WWW::Hetzner::Role::HTTP>, L<WWW::Hetzner::Action>,
 L<WWW::Hetzner::Cloud::API::Actions>
 
 =cut

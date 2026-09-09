@@ -13,7 +13,7 @@ sub execute {
 
     my $main = $chain->[0];
     my $cloud = $main->cloud;
-    my $datacenters = $cloud->datacenters->list;
+    my $datacenters = $cloud->datacenters->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$datacenters ]), "\n";
@@ -25,10 +25,10 @@ sub execute {
 
     for my $d (@$datacenters) {
         printf "%-10s %-15s %-30s %s\n",
-            $d->{id},
-            $d->{name},
-            $d->{description},
-            $d->{location}{name} // '-';
+            $d->id,
+            $d->name,
+            $d->description,
+            $d->location // '-';
     }
 }
 

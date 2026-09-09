@@ -25,7 +25,7 @@ use Scalar::Util qw(blessed);
 =head1 DESCRIPTION
 
 Shared behaviour for CLI subcommands whose controller call returns a
-L<WWW::Hetzner::Cloud::Action> (or an arrayref of them, as Firewall's plural
+L<WWW::Hetzner::Action> (or an arrayref of them, as Firewall's plural
 methods do): wait for it to reach a terminal state before the command
 reports success, unless the user opted out with C<--no-wait>.
 
@@ -67,7 +67,7 @@ sub no_wait { return $_[0]->wait ? 0 : 1 }
 
 =method handle_action
 
-    $self->handle_action($action);   # a single WWW::Hetzner::Cloud::Action
+    $self->handle_action($action);   # a single WWW::Hetzner::Action
     $self->handle_action($actions);  # an arrayref of them (Firewall plural methods)
 
 Waits for C<$action> to reach a terminal state, unless C<--no-wait> was
@@ -102,7 +102,7 @@ sub handle_action {
 
 =over 4
 
-=item * L<WWW::Hetzner::Cloud::Action> - Action entity class, provides C<wait>
+=item * L<WWW::Hetzner::Action> - Action entity class, provides C<wait>
 
 =item * L<WWW::Hetzner::CLI::Cmd::Server::Cmd::Poweron> - reference consumer
 

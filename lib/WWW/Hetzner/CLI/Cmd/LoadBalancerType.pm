@@ -21,7 +21,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $types = $cloud->load_balancer_types->list;
+    my $types = $cloud->load_balancer_types->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$types ]), "\n";

@@ -13,7 +13,7 @@ sub execute {
 
     my $main = $chain->[0];
     my $cloud = $main->cloud;
-    my $keys = $cloud->ssh_keys->list;
+    my $keys = $cloud->ssh_keys->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([map { $_->data } @$keys]), "\n";

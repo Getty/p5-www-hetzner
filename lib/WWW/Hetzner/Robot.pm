@@ -3,6 +3,7 @@ package WWW::Hetzner::Robot;
 # ABSTRACT: Perl client for Hetzner Robot API (Dedicated Servers)
 
 use Moo;
+use URI::Escape ();
 use WWW::Hetzner::Robot::API::Servers;
 use WWW::Hetzner::Robot::API::Keys;
 use WWW::Hetzner::Robot::API::IPs;
@@ -149,6 +150,34 @@ sub _set_auth {
 
 Override for Basic Auth instead of Bearer token authentication.
 
+=cut
+
+sub _content_type { 'application/x-www-form-urlencoded' }
+
+sub _encode_body {
+    my ($self, $body) = @_;
+    my @pairs;
+
+    for my $key (keys %$body) {
+        my $value = $body->{$key};
+        my $is_array = ref $value eq 'ARRAY';
+        my $form_key = $is_array && $key !~ /\[\]\z/ ? "$key\[\]" : $key;
+        my @values = $is_array ? @$value : ($value);
+
+        for my $value (@values) {
+            next unless defined $value;
+            push @pairs, URI::Escape::uri_escape_utf8($form_key) . '=' .
+                URI::Escape::uri_escape_utf8($value);
+        }
+    }
+
+    return join '&', @pairs;
+}
+
+=method _encode_body
+
+Encode Robot request bodies as C<application/x-www-form-urlencoded>. Arrayref
+values become repeated C<name[]> fields without duplicating an existing C<[]> suffix.
 =cut
 
 # Resource accessors

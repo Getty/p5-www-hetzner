@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::API::ISOs;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::ISO;
 use namespace::clean;
@@ -70,12 +71,30 @@ number of available public ISOs -- filter, or page through the result.
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/isos', params => \%params);
-    return $self->_wrap_list($result->{isos} // []);
+    return ($self->_wrap_list($result->{isos} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =method get
 
@@ -108,7 +127,7 @@ sub get_by_name {
     my ($self, $name) = @_;
     croak "Name required" unless $name;
 
-    my $isos = $self->list(name => $name);
+    my $isos = $self->list_all(name => $name);
     for my $iso (@$isos) {
         return $iso if $iso->name eq $name;
     }

@@ -71,7 +71,7 @@ subtest 'create primary IP' => sub {
     is($pip->id, 800, 'new primary IP id');
     is($pip->ip, '203.0.113.80', 'new IP address');
     ok(!$pip->is_assigned, 'not assigned');
-    isa_ok($pip->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    isa_ok($pip->action, 'WWW::Hetzner::Action', 'create action is an Action');
     is($pip->action->command, 'create_primary_ip', 'action command');
 };
 
@@ -113,7 +113,7 @@ subtest 'assign primary IP' => sub {
     );
 
     my $result = $cloud->primary_ips->assign(700, 456, 'server');
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'assign_primary_ip', 'action command');
 };
 
@@ -126,7 +126,7 @@ subtest 'unassign primary IP' => sub {
     );
 
     my $result = $cloud->primary_ips->unassign(700);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'unassign_primary_ip', 'action command');
 };
 
@@ -148,9 +148,9 @@ subtest 'primary IP entity methods' => sub {
     is($data->{ip}, '203.0.113.70', 'data ip');
     is($data->{type}, 'ipv4', 'data type');
 
-    isa_ok($pip->assign(456), 'WWW::Hetzner::Cloud::Action', 'entity assign returns Action');
-    isa_ok($pip->unassign, 'WWW::Hetzner::Cloud::Action', 'entity unassign returns Action');
-    isa_ok($pip->change_dns_ptr('203.0.113.70', 'new.example.com'), 'WWW::Hetzner::Cloud::Action', 'entity change_dns_ptr returns Action');
+    isa_ok($pip->assign(456), 'WWW::Hetzner::Action', 'entity assign returns Action');
+    isa_ok($pip->unassign, 'WWW::Hetzner::Action', 'entity unassign returns Action');
+    isa_ok($pip->change_dns_ptr('203.0.113.70', 'new.example.com'), 'WWW::Hetzner::Action', 'entity change_dns_ptr returns Action');
 };
 
 done_testing;

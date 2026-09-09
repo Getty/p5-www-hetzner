@@ -6,6 +6,8 @@ use strict;
 use warnings;
 use lib 'lib';
 
+our $VERSION = '0.101';
+
 # Map hyphenated commands to MooX::Cmd package names
 # (Perl packages can't have hyphens, so we translate)
 my %cmd_aliases = (
@@ -14,6 +16,18 @@ my %cmd_aliases = (
     'load-balancer'   => 'loadbalancer',
     'load-balancer-type' => 'loadbalancertype',
     'placement-group' => 'placementgroup',
+    'storage-box'     => 'storagebox',
+    'change-type'     => 'changetype',
+    'reset-password'  => 'resetpassword',
+    'enable-protection' => 'enableprotection',
+    'disable-protection' => 'disableprotection',
+    'enable-snapshot-plan' => 'enablesnapshotplan',
+    'disable-snapshot-plan' => 'disablesnapshotplan',
+    'rollback-snapshot' => 'rollbacksnapshot',
+    'update-access-settings' => 'updateaccesssettings',
+    'add-label'       => 'addlabel',
+    'remove-label'    => 'removelabel',
+    'change-home-directory' => 'changehomedirectory',
     'add-subnet'      => 'addsubnet',
     'add-route'       => 'addroute',
     'add-rule'        => 'addrule',
@@ -63,6 +77,17 @@ my %custom_help = (
         print "  add-target     Add a target to load balancer\n";
         print "  add-service    Add a service to load balancer\n";
     },
+    storagebox => sub {
+        print "Usage: hcloud.pl storage-box <subcommand>\n\n";
+        print "Subcommands:\n";
+        print "  list, describe, create, update, delete\n";
+        print "  change-type, reset-password\n";
+        print "  enable-protection, disable-protection\n";
+        print "  enable-snapshot-plan, disable-snapshot-plan, rollback-snapshot\n";
+        print "  update-access-settings, folders, add-label, remove-label\n";
+        print "  snapshot       Manage Storage Box snapshots\n";
+        print "  subaccount     Manage Storage Box subaccounts\n";
+    },
 );
 
 # Check if help was requested for a command with custom help
@@ -85,10 +110,6 @@ use WWW::Hetzner::CLI;
 WWW::Hetzner::CLI->new_with_cmd;
 
 __END__
-
-=head1 NAME
-
-hcloud.pl - Hetzner Cloud CLI (Perl implementation)
 
 =head1 SYNOPSIS
 
@@ -211,9 +232,53 @@ List available server types.
 List ISOs. Use C<--architecture> to filter by architecture (x86, arm) and
 C<--name> to look up a single ISO by its exact name.
 
+=head2 placement-group
+
+Manage placement groups.
+
+=head2 network
+
+Manage private networks.
+
+=head2 firewall
+
+Manage firewalls.
+
+=head2 floating-ip
+
+Manage floating IPs.
+
+=head2 primary-ip
+
+Manage primary IPs.
+
+=head2 load-balancer
+
+Manage load balancers.
+
 =head2 load-balancer-type
 
 List available load balancer types.
+
+=head2 volume
+
+Manage volumes.
+
+=head2 storage-box
+
+Manage Storage Boxes.
+
+=head2 zone
+
+Manage DNS zones.
+
+=head2 record
+
+Manage DNS records.
+
+=head2 certificate
+
+Manage TLS certificates.
 
 =head2 pricing
 

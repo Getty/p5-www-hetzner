@@ -10,7 +10,7 @@ use WWW::Hetzner::CLI::Cmd::Server::Cmd::Rebuild;
 
 # Regression guard for karr #6: enable_rescue/rebuild's root_password sidecar
 # was silently dropped and --output json died encoding a blessed Action, once
-# those methods started returning WWW::Hetzner::Cloud::Action instead of a
+# those methods started returning WWW::Hetzner::Action instead of a
 # raw {action=>..., root_password=>...} hash (Task 4). Exercises the real
 # Cmd::execute($args, $chain) path against a mock_cloud, not the controller
 # directly, so it fails the same way the CLI bug did.

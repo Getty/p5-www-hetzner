@@ -4,6 +4,7 @@ package WWW::Hetzner;
 
 use Moo;
 use WWW::Hetzner::Cloud;
+use WWW::Hetzner::Storage;
 use WWW::Hetzner::Robot;
 use namespace::clean;
 
@@ -50,7 +51,7 @@ WWW::Hetzner provides a unified interface to Hetzner's various APIs:
 
 =item * B<Robot API> (L<WWW::Hetzner::Robot>) - robot-ws.your-server.de (Dedicated servers)
 
-=item * B<Hetzner API> - api.hetzner.com (Storage Boxes, not yet implemented)
+=item * B<Hetzner API> (L<WWW::Hetzner::Storage>) - api.hetzner.com (Storage Boxes)
 
 =back
 
@@ -81,11 +82,16 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =cut
 
-# TODO: Storage API not yet implemented
-# has storage => (
-#     is      => 'lazy',
-#     builder => sub { WWW::Hetzner::Storage->new },
-# );
+has storage => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Storage->new },
+);
+
+=attr storage
+
+Returns a L<WWW::Hetzner::Storage> instance for the Storage Box API.
+
+=cut
 
 =head1 CLOUD API CLASSES
 
@@ -149,7 +155,7 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =over 4
 
-=item * L<WWW::Hetzner::Cloud::Action> - Async job object returned by mutating calls
+=item * L<WWW::Hetzner::Action> - Async job object returned by mutating calls
 
 =item * L<WWW::Hetzner::Cloud::Server> - Server object
 
@@ -195,9 +201,9 @@ Returns a L<WWW::Hetzner::Robot> instance for the Robot API.
 
 =over 4
 
-=item * L<WWW::Hetzner::Cloud::Role::HasActions> - Controller role wrapping raw action hashes as L<WWW::Hetzner::Cloud::Action> objects
+=item * L<WWW::Hetzner::Role::HasActions> - Controller role wrapping raw action hashes as L<WWW::Hetzner::Action> objects
 
-=item * L<WWW::Hetzner::Cloud::Role::HasAction> - Entity role exposing the Action a create call returned
+=item * L<WWW::Hetzner::Role::HasAction> - Entity role exposing the Action a create call returned
 
 =back
 
@@ -548,6 +554,58 @@ See L<WWW::Hetzner::Cloud::API::PlacementGroups>, L<WWW::Hetzner::Cloud::Placeme
 
 See L<WWW::Hetzner::Cloud::API::ISOs>, L<WWW::Hetzner::Cloud::API::LoadBalancerTypes>,
 L<WWW::Hetzner::Cloud::API::Pricing>
+
+=head1 STORAGE BOX API
+
+    my $storage = WWW::Hetzner->new->storage;
+
+    my $boxes = $storage->storage_boxes->list;       # one API page
+    my $all   = $storage->storage_boxes->list_all;   # every page
+    my $box   = $storage->storage_boxes->get($id);
+
+    my $created = $storage->storage_boxes->create(
+        name             => 'my-box',
+        location         => 'fsn1',
+        storage_box_type => 'bx20',
+        password         => 'secret',
+    );
+    my $action = $created->action;
+
+C<list> preserves the Storage API's single-page response. C<list_all>, from
+L<WWW::Hetzner::Role::Pagination>, follows pagination metadata without changing
+the supplied filters. It is available on Storage Boxes, Storage Box Types, and
+both global and Storage-Box-bound action controllers; subaccount and snapshot
+lists are not paginated by the API.
+
+Storage Box objects expose C<subaccounts>, C<snapshots>, and C<actions>
+controllers bound to their own ID. Storage actions always refresh through the
+global C</storage_boxes/actions/{id}> endpoint.
+
+=over 4
+
+=item * L<WWW::Hetzner::Storage> - Storage Box client
+
+=item * L<WWW::Hetzner::Storage::API::StorageBoxes> - Storage Box controller
+
+=item * L<WWW::Hetzner::Storage::API::StorageBoxTypes> - Storage Box Type controller
+
+=item * L<WWW::Hetzner::Storage::API::Actions> - Storage action controller
+
+=item * L<WWW::Hetzner::Storage::API::Subaccounts> - Nested subaccount controller
+
+=item * L<WWW::Hetzner::Storage::API::Snapshots> - Nested snapshot controller
+
+=item * L<WWW::Hetzner::Storage::StorageBox> - Storage Box entity
+
+=item * L<WWW::Hetzner::Storage::StorageBoxType> - Storage Box Type entity
+
+=item * L<WWW::Hetzner::Storage::Subaccount> - Subaccount entity
+
+=item * L<WWW::Hetzner::Storage::Snapshot> - Snapshot entity
+
+=item * L<WWW::Hetzner::Role::Pagination> - Shared paginated-list helper
+
+=back
 
 =head1 ROBOT API (Dedicated Servers)
 

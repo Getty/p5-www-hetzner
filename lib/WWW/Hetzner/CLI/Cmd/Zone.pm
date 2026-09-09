@@ -18,6 +18,22 @@ use JSON::MaybeXS qw(encode_json);
 
 =cut
 
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::Zone::Cmd::List> - List DNS zones
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::Zone::Cmd::Describe> - Describe a DNS zone
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::Zone::Cmd::Create> - Create a DNS zone
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::Zone::Cmd::Delete> - Delete a DNS zone
+
+=back
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
@@ -49,7 +65,7 @@ sub _list {
     $params{label_selector} = $self->selector if $self->selector;
     $params{name} = $self->name if $self->name;
 
-    my $zones = $cloud->zones->list(%params);
+    my $zones = $cloud->zones->list_all(%params);
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$zones ]), "\n";
@@ -66,12 +82,13 @@ sub _list {
     print "-" x 80, "\n";
 
     for my $z (@$zones) {
-        my $labels = join(', ', map { "$_=$z->{labels}{$_}" } keys %{$z->{labels} // {}});
+        my $labels_data = $z->labels;
+        my $labels = join(', ', map { "$_=$labels_data->{$_}" } keys %{$labels_data // {}});
         printf "%-15s %-30s %-10s %-8s %s\n",
-            $z->{id},
-            $z->{name},
-            $z->{status} // '-',
-            $z->{ttl} // '-',
+            $z->id,
+            $z->name,
+            $z->status // '-',
+            $z->ttl // '-',
             $labels || '-';
     }
 }

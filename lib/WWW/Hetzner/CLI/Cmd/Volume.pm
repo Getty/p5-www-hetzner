@@ -8,6 +8,28 @@ use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl volume <command> [options]';
 use JSON::MaybeXS qw(encode_json);
 
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::Volume::Cmd::List> - List volumes
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::Volume::Cmd::Describe> - Describe a volume
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::Volume::Cmd::Create> - Create a volume
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::Volume::Cmd::Delete> - Delete a volume
+
+=item * L<attach|WWW::Hetzner::CLI::Cmd::Volume::Cmd::Attach> - Attach a volume to a server
+
+=item * L<detach|WWW::Hetzner::CLI::Cmd::Volume::Cmd::Detach> - Detach a volume from a server
+
+=item * L<resize|WWW::Hetzner::CLI::Cmd::Volume::Cmd::Resize> - Resize a volume
+
+=back
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
@@ -21,7 +43,7 @@ sub _list {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $volumes = $cloud->volumes->list;
+    my $volumes = $cloud->volumes->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([map { $_->data } @$volumes]), "\n";

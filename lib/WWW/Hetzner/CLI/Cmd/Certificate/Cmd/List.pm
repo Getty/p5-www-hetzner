@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $certs = $cloud->certificates->list;
+    my $certs = $cloud->certificates->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$certs ]), "\n";

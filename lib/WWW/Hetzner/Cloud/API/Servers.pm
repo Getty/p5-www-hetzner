@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::API::Servers;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Server;
 use namespace::clean;
@@ -15,7 +16,7 @@ use namespace::clean;
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all servers
-    my $servers = $cloud->servers->list;
+    my $servers = $cloud->servers->list_all;
 
     # Create a server
     my $server = $cloud->servers->create(
@@ -61,7 +62,7 @@ has client => (
     weak_ref => 1,
 );
 
-with 'WWW::Hetzner::Cloud::Role::HasActions';
+with 'WWW::Hetzner::Role::HasActions';
 
 sub _wrap {
     my ($self, $data, %extra) = @_;
@@ -87,12 +88,30 @@ Optional parameters: label_selector, name, status, sort.
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/servers', params => \%params);
-    return $self->_wrap_list($result->{servers} // []);
+    return ($self->_wrap_list($result->{servers} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =method list_by_label
 
@@ -219,7 +238,7 @@ sub create {
 
     my $action = $cloud->servers->delete($id);
 
-Deletes a server. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+Deletes a server. Returns the L<WWW::Hetzner::Action> tracking the
 deletion; call C<< $action->wait >> to block until the server is gone.
 
 =cut
@@ -522,8 +541,8 @@ sub update {
 
 Polls until server reaches the specified status. Default timeout is 120 seconds.
 This polls the server's own status, not an action -- to wait on the
-L<WWW::Hetzner::Cloud::Action> returned by C<create> or one of the power/rebuild
-methods above instead, call L<WWW::Hetzner::Cloud::Action/wait> on that action.
+L<WWW::Hetzner::Action> returned by C<create> or one of the power/rebuild
+methods above instead, call L<WWW::Hetzner::Action/wait> on that action.
 
 =cut
 
@@ -549,7 +568,7 @@ sub wait_for_status {
 
 =item * L<WWW::Hetzner::Cloud::Server> - Server entity class
 
-=item * L<WWW::Hetzner::Cloud::Action> - Action object returned by the methods above
+=item * L<WWW::Hetzner::Action> - Action object returned by the methods above
 
 =item * L<WWW::Hetzner::CLI::Cmd::Server> - Server CLI commands
 

@@ -20,6 +20,22 @@ use MooX::Options protect_argv => 0, usage_string => 'USAGE: hrobot.pl boot <ser
 
 =cut
 
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<rescue|WWW::Hetzner::Robot::CLI::Cmd::Boot::Cmd::Rescue> - Configure rescue-system boot
+
+=item * L<linux|WWW::Hetzner::Robot::CLI::Cmd::Boot::Cmd::Linux> - Configure Linux installation boot
+
+=item * L<vnc|WWW::Hetzner::Robot::CLI::Cmd::Boot::Cmd::Vnc> - Configure VNC installation boot
+
+=item * L<windows|WWW::Hetzner::Robot::CLI::Cmd::Boot::Cmd::Windows> - Configure Windows installation boot
+
+=back
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
     my $root = $chain->[0];

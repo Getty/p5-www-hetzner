@@ -4,8 +4,9 @@ package WWW::Hetzner::Cloud::API::Actions;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
-use WWW::Hetzner::Cloud::Action;
+use WWW::Hetzner::Action;
 use namespace::clean;
 
 =head1 SYNOPSIS
@@ -15,12 +16,12 @@ use namespace::clean;
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all actions
-    my $actions = $cloud->actions->list;
+    my $actions = $cloud->actions->list_all;
 
     # Fetch a single action
     my $action = $cloud->actions->get($id);
 
-    # Action is a WWW::Hetzner::Cloud::Action object
+    # Action is a WWW::Hetzner::Action object
     print $action->status, "\n";
 
     # Block until it finishes
@@ -30,7 +31,7 @@ use namespace::clean;
 
 This module provides the API for reading Hetzner Cloud actions, the async
 job objects returned by resource-mutating calls. All methods return
-L<WWW::Hetzner::Cloud::Action> objects.
+L<WWW::Hetzner::Action> objects.
 
 =cut
 
@@ -42,7 +43,7 @@ has client => (
 
 sub _wrap {
     my ($self, $data) = @_;
-    return WWW::Hetzner::Cloud::Action->new(
+    return WWW::Hetzner::Action->new(
         client => $self->client,
         %$data,
     );
@@ -57,7 +58,7 @@ sub _wrap_list {
 
     my $action = $cloud->actions->get($id);
 
-Returns a L<WWW::Hetzner::Cloud::Action> object.
+Returns a L<WWW::Hetzner::Action> object.
 
 =cut
 
@@ -74,17 +75,35 @@ sub get {
     my $actions = $cloud->actions->list;
     my $actions = $cloud->actions->list(status => 'running');
 
-Returns an arrayref of L<WWW::Hetzner::Cloud::Action> objects.
+Returns an arrayref of L<WWW::Hetzner::Action> objects.
 Optional parameters: status, sort.
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/actions', params => \%params);
-    return $self->_wrap_list($result->{actions} // []);
+    return ($self->_wrap_list($result->{actions} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =seealso
 
@@ -92,7 +111,7 @@ sub list {
 
 =item * L<WWW::Hetzner::Cloud> - Main Cloud API client
 
-=item * L<WWW::Hetzner::Cloud::Action> - Action entity class
+=item * L<WWW::Hetzner::Action> - Action entity class
 
 =item * L<WWW::Hetzner> - Main umbrella module
 

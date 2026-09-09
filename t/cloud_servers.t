@@ -86,7 +86,7 @@ subtest 'create server' => sub {
     is($server->name, 'test-full-params', 'new server name');
     is($server->status, 'initializing', 'new server status');
     ok(!$server->is_running, 'is_running returns false for initializing');
-    isa_ok($server->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    isa_ok($server->action, 'WWW::Hetzner::Action', 'create action is an Action');
     is($server->action->command, 'create_server', 'action command');
     is(scalar @{ $server->next_actions }, 1, 'next_actions populated');
 };
@@ -102,7 +102,7 @@ subtest 'delete server' => sub {
     );
 
     my $action = $cloud->servers->delete(123456);
-    isa_ok($action, 'WWW::Hetzner::Cloud::Action', 'delete returns an Action');
+    isa_ok($action, 'WWW::Hetzner::Action', 'delete returns an Action');
     is($action->id, 13343, 'delete action id');
     is($action->command, 'delete_server', 'delete action command');
     ok($action->is_running, 'delete action is still running');
@@ -119,7 +119,7 @@ subtest 'delete server via entity mirror' => sub {
 
     my $server = $cloud->servers->get(123456);
     my $action = $server->delete;
-    isa_ok($action, 'WWW::Hetzner::Cloud::Action', '$server->delete returns an Action');
+    isa_ok($action, 'WWW::Hetzner::Action', '$server->delete returns an Action');
     is($action->command, 'delete_server', 'entity mirror carries the action command');
 };
 
@@ -144,7 +144,7 @@ subtest 'power_on' => sub {
     );
 
     my $result = $cloud->servers->power_on(123456);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'poweron', 'action command');
 };
 
@@ -157,7 +157,7 @@ subtest 'power_off' => sub {
     );
 
     my $result = $cloud->servers->power_off(123456);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'poweroff', 'action command');
 };
 
@@ -170,7 +170,7 @@ subtest 'reboot' => sub {
     );
 
     my $result = $cloud->servers->reboot(123456);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'reboot', 'action command');
 };
 
@@ -183,7 +183,7 @@ subtest 'shutdown' => sub {
     );
 
     my $result = $cloud->servers->shutdown(123456);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'shutdown', 'action command');
 };
 
@@ -201,7 +201,7 @@ subtest 'rebuild' => sub {
     );
 
     my $result = $cloud->servers->rebuild(123456, 'debian-13');
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'rebuild', 'action command');
     is($result->root_password, 'the-generated-pw', 'root_password preserved on the Action');
     is($result->result->{root_password}, 'the-generated-pw', 'result carries sidecar');
@@ -217,7 +217,7 @@ subtest 'enable_rescue' => sub {
     );
 
     my $result = $cloud->servers->enable_rescue(123456);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'enable_rescue', 'action command');
     is($result->root_password, 'rescue-pw', 'root_password preserved on the Action');
     is($result->result->{root_password}, 'rescue-pw', 'result carries sidecar');
@@ -233,7 +233,7 @@ subtest 'reset_password' => sub {
     );
 
     my $action = $cloud->servers->reset_password(123456);
-    isa_ok($action, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($action, 'WWW::Hetzner::Action');
     is($action->root_password, 'the-generated-pw', 'root_password preserved on the Action');
     is($action->result->{root_password}, 'the-generated-pw', 'result carries sidecar');
 };
@@ -249,7 +249,7 @@ subtest 'request_console' => sub {
     );
 
     my $result = $cloud->servers->request_console(123456);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'request_console', 'action command');
     is($result->password, 'console-pw', 'password preserved on the Action');
     is($result->wss_url, 'wss://console.hetzner.cloud/?token=abc123', 'wss_url preserved on the Action');
@@ -272,7 +272,7 @@ subtest 'change_type' => sub {
     );
 
     my $result = $cloud->servers->change_type(123456, 'cx33');
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'change_type', 'action command');
 };
 
@@ -332,11 +332,11 @@ subtest 'server entity action methods return Action' => sub {
 
     my $server = $cloud->servers->get(123456);
 
-    isa_ok($server->power_on, 'WWW::Hetzner::Cloud::Action', 'entity power_on returns Action');
-    isa_ok($server->power_off, 'WWW::Hetzner::Cloud::Action', 'entity power_off returns Action');
-    isa_ok($server->reboot, 'WWW::Hetzner::Cloud::Action', 'entity reboot returns Action');
-    isa_ok($server->shutdown, 'WWW::Hetzner::Cloud::Action', 'entity shutdown returns Action');
-    isa_ok($server->rebuild('debian-13'), 'WWW::Hetzner::Cloud::Action', 'entity rebuild returns Action');
+    isa_ok($server->power_on, 'WWW::Hetzner::Action', 'entity power_on returns Action');
+    isa_ok($server->power_off, 'WWW::Hetzner::Action', 'entity power_off returns Action');
+    isa_ok($server->reboot, 'WWW::Hetzner::Action', 'entity reboot returns Action');
+    isa_ok($server->shutdown, 'WWW::Hetzner::Action', 'entity shutdown returns Action');
+    isa_ok($server->rebuild('debian-13'), 'WWW::Hetzner::Action', 'entity rebuild returns Action');
 };
 
 subtest 'wait_for_status' => sub {

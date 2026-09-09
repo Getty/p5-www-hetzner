@@ -83,7 +83,7 @@ sub _list {
     $params{label_selector} = $self->selector if $self->selector;
     $params{name} = $self->name if $self->name;
 
-    my $servers = $cloud->servers->list(%params);
+    my $servers = $cloud->servers->list_all(%params);
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$servers ]), "\n";
@@ -102,12 +102,12 @@ sub _list {
 
     for my $s (@$servers) {
         printf "%-10s %-25s %-12s %-16s %-10s %s\n",
-            $s->{id},
-            $s->{name},
-            $s->{status},
-            $s->{public_net}{ipv4}{ip} // '-',
-            $s->{server_type}{name} // '-',
-            $s->{datacenter}{name} // '-';
+            $s->id,
+            $s->name,
+            $s->status,
+            $s->ipv4 // '-',
+            $s->server_type // '-',
+            $s->datacenter // '-';
     }
 }
 

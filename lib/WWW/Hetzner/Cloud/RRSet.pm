@@ -119,7 +119,7 @@ sub delete {
 
     my $action = $record->delete;
 
-Deletes the RRSet. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+Deletes the RRSet. Returns the L<WWW::Hetzner::Action> tracking the
 deletion; call C<< $action->wait >> to block until the RRSet is gone.
 
 =cut

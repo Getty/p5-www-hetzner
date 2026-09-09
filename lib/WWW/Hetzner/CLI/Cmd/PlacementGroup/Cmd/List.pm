@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $pgs = $cloud->placement_groups->list;
+    my $pgs = $cloud->placement_groups->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$pgs ]), "\n";

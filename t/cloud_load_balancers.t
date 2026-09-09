@@ -66,7 +66,7 @@ subtest 'create load balancer' => sub {
 
     isa_ok($lb, 'WWW::Hetzner::Cloud::LoadBalancer');
     is($lb->id, 1000, 'new load balancer id');
-    isa_ok($lb->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    isa_ok($lb->action, 'WWW::Hetzner::Action', 'create action is an Action');
     is($lb->action->command, 'create_load_balancer', 'action command');
 };
 
@@ -108,7 +108,7 @@ subtest 'add target' => sub {
         type   => 'server',
         server => { id => 456 },
     );
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'add_target', 'action command');
 };
 
@@ -130,7 +130,7 @@ subtest 'add service' => sub {
         listen_port      => 443,
         destination_port => 8443,
     );
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'add_service', 'action command');
 };
 
@@ -151,14 +151,14 @@ subtest 'load balancer entity action methods' => sub {
     my $lb = $cloud->load_balancers->get(900);
 
     isa_ok($lb->add_target(type => 'server', server => { id => 456 }),
-        'WWW::Hetzner::Cloud::Action', 'entity add_target returns Action');
+        'WWW::Hetzner::Action', 'entity add_target returns Action');
     isa_ok($lb->remove_target(type => 'server', server => { id => 456 }),
-        'WWW::Hetzner::Cloud::Action', 'entity remove_target returns Action');
+        'WWW::Hetzner::Action', 'entity remove_target returns Action');
     isa_ok($lb->add_service(protocol => 'http', listen_port => 80, destination_port => 8080),
-        'WWW::Hetzner::Cloud::Action', 'entity add_service returns Action');
-    isa_ok($lb->delete_service(80), 'WWW::Hetzner::Cloud::Action', 'entity delete_service returns Action');
-    isa_ok($lb->attach_to_network(123), 'WWW::Hetzner::Cloud::Action', 'entity attach_to_network returns Action');
-    isa_ok($lb->detach_from_network(123), 'WWW::Hetzner::Cloud::Action', 'entity detach_from_network returns Action');
+        'WWW::Hetzner::Action', 'entity add_service returns Action');
+    isa_ok($lb->delete_service(80), 'WWW::Hetzner::Action', 'entity delete_service returns Action');
+    isa_ok($lb->attach_to_network(123), 'WWW::Hetzner::Action', 'entity attach_to_network returns Action');
+    isa_ok($lb->detach_from_network(123), 'WWW::Hetzner::Action', 'entity detach_from_network returns Action');
 };
 
 done_testing;

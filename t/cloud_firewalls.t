@@ -62,7 +62,7 @@ subtest 'create firewall' => sub {
     isa_ok($fw, 'WWW::Hetzner::Cloud::Firewall');
     is($fw->id, 400, 'new firewall id');
     is($fw->name, 'new-firewall', 'new firewall name');
-    isa_ok($fw->actions->[0], 'WWW::Hetzner::Cloud::Action', 'firewall create yields actions list');
+    isa_ok($fw->actions->[0], 'WWW::Hetzner::Action', 'firewall create yields actions list');
     is($fw->actions->[0]->command, 'apply_firewall', 'action command');
 };
 
@@ -98,7 +98,7 @@ subtest 'set rules' => sub {
         { direction => 'in', protocol => 'tcp', port => '443', source_ips => ['0.0.0.0/0'] },
     ]);
     is(ref $result, 'ARRAY', 'returns arrayref of actions');
-    isa_ok($result->[0], 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result->[0], 'WWW::Hetzner::Action');
     is($result->[0]->command, 'set_firewall_rules', 'action command');
 };
 
@@ -118,7 +118,7 @@ subtest 'apply to resources' => sub {
     my $result = $cloud->firewalls->apply_to_resources(300,
         { type => 'server', server => { id => 456 } },
     );
-    isa_ok($result->[0], 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result->[0], 'WWW::Hetzner::Action');
     is($result->[0]->command, 'apply_to_resources', 'action command');
 };
 
@@ -137,7 +137,7 @@ subtest 'remove from resources' => sub {
     my $result = $cloud->firewalls->remove_from_resources(300,
         { type => 'server', server => { id => 456 } },
     );
-    isa_ok($result->[0], 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result->[0], 'WWW::Hetzner::Action');
     is($result->[0]->command, 'remove_from_resources', 'action command');
 };
 
@@ -162,13 +162,13 @@ subtest 'firewall entity methods' => sub {
     my $set_rules_result = $fw->set_rules(
         { direction => 'in', protocol => 'tcp', port => '443', source_ips => ['0.0.0.0/0'] },
     );
-    isa_ok($set_rules_result->[0], 'WWW::Hetzner::Cloud::Action', 'entity set_rules returns Action list');
+    isa_ok($set_rules_result->[0], 'WWW::Hetzner::Action', 'entity set_rules returns Action list');
 
     my $apply_result = $fw->apply_to_resources({ type => 'server', server => { id => 456 } });
-    isa_ok($apply_result->[0], 'WWW::Hetzner::Cloud::Action', 'entity apply_to_resources returns Action list');
+    isa_ok($apply_result->[0], 'WWW::Hetzner::Action', 'entity apply_to_resources returns Action list');
 
     my $remove_result = $fw->remove_from_resources({ type => 'server', server => { id => 456 } });
-    isa_ok($remove_result->[0], 'WWW::Hetzner::Cloud::Action', 'entity remove_from_resources returns Action list');
+    isa_ok($remove_result->[0], 'WWW::Hetzner::Action', 'entity remove_from_resources returns Action list');
 };
 
 done_testing;

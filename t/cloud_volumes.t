@@ -72,7 +72,7 @@ subtest 'create volume' => sub {
     is($volume->id, 777, 'new volume id');
     is($volume->name, 'new-volume', 'new volume name');
     is($volume->status, 'creating', 'new volume status');
-    isa_ok($volume->action, 'WWW::Hetzner::Cloud::Action', 'create action is an Action');
+    isa_ok($volume->action, 'WWW::Hetzner::Action', 'create action is an Action');
     is($volume->action->command, 'create_volume', 'action command');
     is(scalar @{ $volume->next_actions }, 1, 'next_actions populated');
 };
@@ -111,7 +111,7 @@ subtest 'attach volume' => sub {
     );
 
     my $result = $cloud->volumes->attach(555, 12345);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'attach_volume', 'action command');
 };
 
@@ -124,7 +124,7 @@ subtest 'detach volume' => sub {
     );
 
     my $result = $cloud->volumes->detach(555);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'detach_volume', 'action command');
 };
 
@@ -141,7 +141,7 @@ subtest 'resize volume' => sub {
     );
 
     my $result = $cloud->volumes->resize(555, 100);
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'resize_volume', 'action command');
 };
 
@@ -164,9 +164,9 @@ subtest 'volume entity methods' => sub {
     is($data->{name}, 'my-data', 'data name');
     is($data->{size}, 50, 'data size');
 
-    isa_ok($volume->attach(12345), 'WWW::Hetzner::Cloud::Action', 'entity attach returns Action');
-    isa_ok($volume->detach, 'WWW::Hetzner::Cloud::Action', 'entity detach returns Action');
-    isa_ok($volume->resize(100), 'WWW::Hetzner::Cloud::Action', 'entity resize returns Action');
+    isa_ok($volume->attach(12345), 'WWW::Hetzner::Action', 'entity attach returns Action');
+    isa_ok($volume->detach, 'WWW::Hetzner::Action', 'entity detach returns Action');
+    isa_ok($volume->resize(100), 'WWW::Hetzner::Action', 'entity resize returns Action');
 };
 
 done_testing;

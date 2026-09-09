@@ -23,7 +23,7 @@ sub execute {
     my %params;
     $params{type} = $self->type if $self->type;
 
-    my $images = $cloud->images->list(%params);
+    my $images = $cloud->images->list_all(%params);
 
     if ($main->output eq 'json') {
         print encode_json([ map { $_->data } @$images ]), "\n";
@@ -36,11 +36,11 @@ sub execute {
 
     for my $i (@$images) {
         printf "%-10s %-20s %-10s %-15s %s\n",
-            $i->{id},
-            $i->{name} // '-',
-            $i->{type},
-            ($i->{os_flavor} // '') . ' ' . ($i->{os_version} // ''),
-            $i->{status};
+            $i->id,
+            $i->name // '-',
+            $i->type,
+            ($i->os_flavor // '') . ' ' . ($i->os_version // ''),
+            $i->status;
     }
 }
 

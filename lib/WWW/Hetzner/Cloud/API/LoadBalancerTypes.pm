@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::API::LoadBalancerTypes;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::LoadBalancerType;
 use namespace::clean;
@@ -15,7 +16,7 @@ use namespace::clean;
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all load balancer types
-    my $types = $cloud->load_balancer_types->list;
+    my $types = $cloud->load_balancer_types->list_all;
 
     # Get by ID
     my $type = $cloud->load_balancer_types->get(1);
@@ -61,12 +62,30 @@ Returns an arrayref of L<WWW::Hetzner::Cloud::LoadBalancerType> objects.
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/load_balancer_types', params => \%params);
-    return $self->_wrap_list($result->{load_balancer_types} // []);
+    return ($self->_wrap_list($result->{load_balancer_types} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =method get
 
@@ -97,7 +116,7 @@ sub get_by_name {
     my ($self, $name) = @_;
     croak "Name required" unless $name;
 
-    my $types = $self->list;
+    my $types = $self->list_all;
     for my $type (@$types) {
         return $type if $type->name eq $name;
     }

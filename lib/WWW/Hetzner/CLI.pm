@@ -6,6 +6,7 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options;
 use WWW::Hetzner::Cloud;
+use WWW::Hetzner::Storage;
 
 our $VERSION = '0.101';
 
@@ -66,6 +67,8 @@ options, and output should match the original tool as closely as possible.
 =over 4
 
 =item * L<volume|WWW::Hetzner::CLI::Cmd::Volume> - Manage volumes
+
+=item * L<storage-box|WWW::Hetzner::CLI::Cmd::StorageBox> - Manage Storage Boxes
 
 =back
 
@@ -144,6 +147,21 @@ L<WWW::Hetzner::Cloud> instance.
 
 =cut
 
+has storage => (
+    is      => 'lazy',
+    builder => sub {
+        my ($self) = @_;
+        WWW::Hetzner::Storage->new(token => $self->token);
+    },
+);
+
+=attr storage
+
+L<WWW::Hetzner::Storage> instance, configured from the same C<--token>
+option as the Cloud client.
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
@@ -168,6 +186,7 @@ sub execute {
     print "  load-balancer-type  List load balancer types\n";
     print "\nStorage:\n";
     print "  volume           Manage volumes\n";
+    print "  storage-box      Manage Storage Boxes\n";
     print "\nDNS:\n";
     print "  zone             Manage DNS zones\n";
     print "  record           Manage DNS records\n";
@@ -201,6 +220,8 @@ Main entry point. Shows help when no subcommand is given.
 =item * L<WWW::Hetzner> - Main umbrella module
 
 =item * L<WWW::Hetzner::Cloud> - Cloud API client
+
+=item * L<WWW::Hetzner::Storage> - Storage Box API client
 
 =item * L<https://docs.hetzner.cloud/> - Official Hetzner Cloud API documentation
 

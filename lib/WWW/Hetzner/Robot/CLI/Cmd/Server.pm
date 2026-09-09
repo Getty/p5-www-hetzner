@@ -15,6 +15,18 @@ use MooX::Options usage_string => 'USAGE: hrobot.pl server [list|describe] [opti
 
 =cut
 
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::List> - List dedicated servers
+
+=item * L<describe|WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::Describe> - Describe a dedicated server
+
+=back
+
+=cut
+
 sub execute {
     my ($self, $args, $chain) = @_;
     my $root = $chain->[0];

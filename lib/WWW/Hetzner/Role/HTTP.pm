@@ -7,6 +7,7 @@ use WWW::Hetzner::HTTPRequest;
 use WWW::Hetzner::HTTPResponse;
 use WWW::Hetzner::LWPIO;
 use JSON::MaybeXS qw(decode_json encode_json);
+use URI::Escape ();
 use Carp qw(croak);
 use Log::Any qw($log);
 
@@ -25,7 +26,13 @@ our $VERSION = '0.101';
 =head1 DESCRIPTION
 
 This role provides HTTP methods (GET, POST, PUT, DELETE) for Hetzner API
-clients. It handles JSON encoding/decoding, authentication, and error handling.
+clients. It handles client-specific request-body encoding, JSON response
+decoding, authentication, and error handling. Request bodies use JSON by
+default; L<WWW::Hetzner::Robot> uses
+C<application/x-www-form-urlencoded> instead.
+
+A client with a different body format overrides L</_content_type> and
+L</_encode_body>.
 
 HTTP transport is delegated to a pluggable L<WWW::Hetzner::Role::IO> backend
 (default: L<WWW::Hetzner::LWPIO>), making it possible to use async HTTP
@@ -78,7 +85,7 @@ has sleeper => (
 Injectable sleep function, C<sub ($seconds) { ... }>, called with the poll
 interval. Defaults to C<sleep>. Declared C<rw> so a test can swap in a
 non-blocking counting closure after construction, without rebuilding the
-client. Used by L<WWW::Hetzner::Cloud::Action/wait> between polls, via the
+client. Used by L<WWW::Hetzner::Action/wait> between polls, via the
 client the action holds a reference to.
 
 =cut
@@ -105,7 +112,9 @@ sub post {
 
     my $data = $self->post('/path', { key => 'value' });
 
-Perform a POST request with JSON body.
+Perform a POST request whose body is encoded by L</_encode_body> with the
+media type from L</_content_type>. JSON is the default; the Robot client uses
+form encoding.
 
 =cut
 
@@ -118,7 +127,9 @@ sub put {
 
     my $data = $self->put('/path', { key => 'value' });
 
-Perform a PUT request with JSON body.
+Perform a PUT request whose body is encoded by L</_encode_body> with the
+media type from L</_content_type>. JSON is the default; the Robot client uses
+form encoding.
 
 =cut
 
@@ -160,6 +171,30 @@ Sets authentication headers. Override for different auth mechanisms:
 
 =cut
 
+sub _content_type { 'application/json' }
+
+=method _content_type
+
+Content type for request bodies. The default is C<application/json>.
+L<WWW::Hetzner::Robot> overrides this to
+C<application/x-www-form-urlencoded>; clients with a different body format
+must also override L</_encode_body>.
+
+=cut
+
+sub _encode_body {
+    my ($self, $body) = @_;
+    return encode_json($body);
+}
+
+=method _encode_body
+
+Encodes a request body. The default encoder produces JSON. A client that
+overrides L</_content_type> for another body format must override this hook to
+produce matching content; L<WWW::Hetzner::Robot> uses form encoding.
+
+=cut
+
 sub _build_request {
     my ($self, $method, $path, %opts) = @_;
 
@@ -168,10 +203,14 @@ sub _build_request {
     # Add query params for GET
     if ($method eq 'GET' && $opts{params}) {
         my @pairs;
-        for my $k (keys %{$opts{params}}) {
-            my $v = $opts{params}{$k};
-            next unless defined $v;
-            push @pairs, "$k=$v";
+        for my $key (keys %{$opts{params}}) {
+            my $value = $opts{params}{$key};
+            my @values = ref $value eq 'ARRAY' ? @$value : ($value);
+            for my $value (@values) {
+                next unless defined $value;
+                push @pairs, URI::Escape::uri_escape_utf8($key) . '=' .
+                    URI::Escape::uri_escape_utf8($value);
+            }
         }
         $url .= '?' . join('&', @pairs) if @pairs;
     }
@@ -180,7 +219,7 @@ sub _build_request {
 
     my %headers;
     $self->_set_auth(\%headers);
-    $headers{'Content-Type'} = 'application/json';
+    $headers{'Content-Type'} = $self->_content_type;
 
     my %req_args = (
         method  => $method,
@@ -189,7 +228,7 @@ sub _build_request {
     );
 
     if ($opts{body}) {
-        $req_args{content} = encode_json($opts{body});
+        $req_args{content} = $self->_encode_body($opts{body});
         $log->debugf("Body: %s", $req_args{content});
     }
 
@@ -247,7 +286,7 @@ sub _request {
 =head1 SEE ALSO
 
 L<WWW::Hetzner::Cloud>, L<WWW::Hetzner::Role::IO>, L<WWW::Hetzner::LWPIO>,
-L<WWW::Hetzner::Cloud::Action>, L<Log::Any>
+L<WWW::Hetzner::Action>, L<Log::Any>
 
 =cut
 

@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::API::RRSets;
 our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::RRSet;
 use namespace::clean;
@@ -22,7 +23,7 @@ use namespace::clean;
     my $rrsets = $zone->rrsets;
 
     # List all records
-    my $records = $rrsets->list;
+    my $records = $rrsets->list_all;
     my $records = $rrsets->list(type => 'A');
 
     # Get specific record
@@ -69,7 +70,7 @@ has zone_id => (
     required => 1,
 );
 
-with 'WWW::Hetzner::Cloud::Role::HasActions';
+with 'WWW::Hetzner::Role::HasActions';
 
 sub _wrap {
     my ($self, $data) = @_;
@@ -100,12 +101,30 @@ Optional parameters: name, type, sort, page, per_page.
 
 =cut
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get($self->_base_path, params => \%params);
-    return $self->_wrap_list($result->{rrsets} // []);
+    return ($self->_wrap_list($result->{rrsets} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
+=method list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
+=cut
 
 =method get
 
@@ -187,7 +206,7 @@ sub update {
 
     my $action = $rrsets->delete('www', 'A');
 
-Deletes an RRSet. Returns the L<WWW::Hetzner::Cloud::Action> tracking the
+Deletes an RRSet. Returns the L<WWW::Hetzner::Action> tracking the
 deletion; call C<< $action->wait >> to block until the RRSet is gone.
 
 =cut

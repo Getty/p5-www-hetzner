@@ -24,7 +24,7 @@ sub execute {
     my %params;
     $params{label_selector} = $self->selector if $self->selector;
 
-    my $zones = $cloud->zones->list(%params);
+    my $zones = $cloud->zones->list_all(%params);
 
     if ($main->output eq 'json') {
         print encode_json([map { $_->data } @$zones]), "\n";

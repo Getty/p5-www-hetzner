@@ -105,7 +105,7 @@ subtest 'add subnet' => sub {
         network_zone => 'eu-central',
         type         => 'cloud',
     );
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'add_subnet', 'action command');
 };
 
@@ -122,7 +122,7 @@ subtest 'delete subnet' => sub {
     );
 
     my $result = $cloud->networks->delete_subnet(100, '10.0.2.0/24');
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'delete_subnet', 'action command');
 };
 
@@ -143,7 +143,7 @@ subtest 'add route' => sub {
         destination => '10.200.0.0/16',
         gateway     => '10.0.0.1',
     );
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'add_route', 'action command');
 };
 
@@ -164,7 +164,7 @@ subtest 'delete route' => sub {
         destination => '10.200.0.0/16',
         gateway     => '10.0.0.1',
     );
-    isa_ok($result, 'WWW::Hetzner::Cloud::Action');
+    isa_ok($result, 'WWW::Hetzner::Action');
     is($result->command, 'delete_route', 'action command');
 };
 
@@ -188,12 +188,12 @@ subtest 'network entity methods' => sub {
     is($data->{ip_range}, '10.0.0.0/8', 'data ip_range');
 
     isa_ok($network->add_subnet(ip_range => '10.0.2.0/24', network_zone => 'eu-central', type => 'cloud'),
-        'WWW::Hetzner::Cloud::Action', 'entity add_subnet returns Action');
-    isa_ok($network->delete_subnet('10.0.2.0/24'), 'WWW::Hetzner::Cloud::Action', 'entity delete_subnet returns Action');
+        'WWW::Hetzner::Action', 'entity add_subnet returns Action');
+    isa_ok($network->delete_subnet('10.0.2.0/24'), 'WWW::Hetzner::Action', 'entity delete_subnet returns Action');
     isa_ok($network->add_route(destination => '10.200.0.0/16', gateway => '10.0.0.1'),
-        'WWW::Hetzner::Cloud::Action', 'entity add_route returns Action');
+        'WWW::Hetzner::Action', 'entity add_route returns Action');
     isa_ok($network->delete_route(destination => '10.200.0.0/16', gateway => '10.0.0.1'),
-        'WWW::Hetzner::Cloud::Action', 'entity delete_route returns Action');
+        'WWW::Hetzner::Action', 'entity delete_route returns Action');
 };
 
 done_testing;
