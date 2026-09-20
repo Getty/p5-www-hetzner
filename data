@@ -1,0 +1,35 @@
+---
+claimed_at: 2026-09-20T20:59:55Z
+claimed_by: p5-www-hetzner
+class: standard
+completed: 2026-09-20T20:59:55Z
+created: 2026-09-18T03:03:46Z
+id: 26
+priority: medium
+started: 2026-09-20T16:16:29Z
+status: done
+tags:
+- cpanfile
+- release-hygiene
+- audit
+title: 'cpanfile-Analyserunde: Core-Deps raus, Namen kanonisieren, Duplikate + Vollständigkeit
+  prüfen'
+updated: 2026-09-20T20:59:55Z
+---
+
+Umbau von der ursprünglichen Einzelmaßnahme (Log::Any::Test deklarieren) zu einer vollständigen cpanfile-Analyserunde. Die Einzelmaßnahme ist im Working-Tree bereits erledigt: `Log::Any::Test` steht unter `on test` (cpanfile:14).
+
+Ziel: cpanfile sauber und korrekt. Zu prüfen:
+
+1. Keine Core-Module deklarieren, die mit dem Ziel-Perl ohnehin ausgeliefert werden (z. B. Test::More). Pro Kandidat via Module::CoreList gegen die minimale Perl-Version prüfen, nicht raten.
+2. Kanonische Modulnamen: jeder Eintrag muss der real ge-use-te Distributions-/Modulname sein (keine Tippfehler, keine veralteten Aliase).
+3. Keine Duplikate — auch nicht ein Modul gleichzeitig unter runtime und `on test`.
+4. Vollständigkeit (Gegenprobe): jedes in lib/ + bin/ tatsächlich verwendete Modul ist unter `requires` deklariert; jedes nur in t/ verwendete unter `on test`. Deklariert und tatsächlich benutzt müssen deckungsgleich sein.
+5. Runtime- vs. Test-Trennung korrekt (nichts Test-only im runtime-Block und umgekehrt).
+6. Minimalversionen: nur setzen, wo eine konkret benötigte Feature-/Bugfix-Grenze bekannt ist; keine willkürlichen Pins.
+
+Verifikation: `dzil build` + Blick in die generierten Prereqs (bzw. `dzil listdeps`, `cpanm --installdeps --with-develop .` in sauberer Umgebung), `prove -lr t/` grün.
+
+Ausführung ist release-relevant und gehört an www-hetzner-worker (Umsetzung) bzw. www-hetzner-release-checker (Audit), nicht direkt an den Orchestrator.
+
+Analyserunde abgeschlossen (Audit: www-hetzner-release-checker, Fixes: www-hetzner-worker). Ergebnis: cpanfile war bereits weitgehend sauber — kein Core-Removal noetig (Test::More bleibt bewusst), Namen kanonisch, keine Duplikate, Vollstaendigkeit + Runtime/Test-Trennung korrekt. Zwei belegte Aenderungen: (1) `requires "Test::More", "0.94"` (subtest/done_testing in t/), (2) `requires "perl", "5.008001"` — hergeleitet als max der Runtime-Dep-Floors (getrieben von MooX::Options/LWP/URI/HTTP::Message/namespace::clean/Path::Tiny). Verifiziert: dzil build sauber, prove -lr t/ = 522 Tests gruen. Working-Tree uncommitted, wartet auf Commit-Entscheidung des Maintainers.
