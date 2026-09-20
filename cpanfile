@@ -1,3 +1,4 @@
+requires 'perl', '5.008001';
 requires 'Moo';
 requires 'MooX::Cmd';
 requires 'MooX::Options';
@@ -10,5 +11,6 @@ requires 'Log::Any';
 requires 'Path::Tiny';
 
 on test => sub {
-    requires 'Test::More';
+    requires 'Test::More', '0.94';
+    requires 'Log::Any::Test';
 };
