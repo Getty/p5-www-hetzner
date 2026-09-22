@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Subaccount::Cmd::UpdateAccessSettings;
 # ABSTRACT: Update Storage Box subaccount access settings
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

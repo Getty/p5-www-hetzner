@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib 'lib';
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use WWW::Hetzner::Robot::CLI;
 

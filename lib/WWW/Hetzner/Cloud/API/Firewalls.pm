@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Firewalls;
 # ABSTRACT: Hetzner Cloud Firewalls API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';

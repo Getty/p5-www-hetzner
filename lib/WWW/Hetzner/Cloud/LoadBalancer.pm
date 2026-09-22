@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::LoadBalancer;
 # ABSTRACT: Hetzner Cloud Load Balancer object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::HasAction';

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::LoadBalancerTypes;
 # ABSTRACT: Hetzner Cloud Load Balancer Types API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';

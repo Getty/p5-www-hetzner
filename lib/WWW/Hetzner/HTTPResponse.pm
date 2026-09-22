@@ -4,7 +4,7 @@ package WWW::Hetzner::HTTPResponse;
 
 use Moo;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 =head1 SYNOPSIS
 

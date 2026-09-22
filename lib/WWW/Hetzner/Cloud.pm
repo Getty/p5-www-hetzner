@@ -24,7 +24,7 @@ use WWW::Hetzner::Cloud::API::PlacementGroups;
 use WWW::Hetzner::Cloud::API::Pricing;
 use namespace::clean;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 =head1 SYNOPSIS
 

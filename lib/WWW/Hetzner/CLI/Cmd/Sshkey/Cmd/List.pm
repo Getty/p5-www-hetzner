@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::List;
 # ABSTRACT: List SSH keys
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

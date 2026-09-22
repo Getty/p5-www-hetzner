@@ -1,7 +1,7 @@
 package WWW::Hetzner::Storage::API::Subaccounts;
 # ABSTRACT: Hetzner Storage Box Subaccounts API
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use Carp qw(croak);

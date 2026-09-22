@@ -4,7 +4,7 @@ package WWW::Hetzner::Role::IO;
 
 use Moo::Role;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 requires 'call';
 

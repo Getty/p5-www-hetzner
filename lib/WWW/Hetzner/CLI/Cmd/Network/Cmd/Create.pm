@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::Create;
 # ABSTRACT: Create a network
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

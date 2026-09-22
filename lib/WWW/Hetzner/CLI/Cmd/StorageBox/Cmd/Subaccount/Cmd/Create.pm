@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Subaccount::Cmd::Create;
 # ABSTRACT: Create a Storage Box subaccount
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

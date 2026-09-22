@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::AddTarget;
 # ABSTRACT: Add a target to a load balancer
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

@@ -7,7 +7,7 @@ use MooX::Cmd;
 use MooX::Options;
 use WWW::Hetzner::Robot;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 =head1 SYNOPSIS
 

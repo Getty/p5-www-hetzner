@@ -1,7 +1,7 @@
 package WWW::Hetzner::Storage::StorageBoxType;
 # ABSTRACT: Hetzner Storage Box Type object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use namespace::clean;

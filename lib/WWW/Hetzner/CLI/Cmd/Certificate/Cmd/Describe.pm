@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Certificate::Cmd::Describe;
 # ABSTRACT: Describe a certificate
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

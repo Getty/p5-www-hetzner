@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Delete;
 # ABSTRACT: Delete a Storage Box
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

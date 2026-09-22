@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Shutdown;
 # ABSTRACT: Shutdown a server (graceful)
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

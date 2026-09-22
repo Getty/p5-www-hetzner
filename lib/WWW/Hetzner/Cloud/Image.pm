@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Image;
 # ABSTRACT: Hetzner Cloud Image object
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use namespace::clean;

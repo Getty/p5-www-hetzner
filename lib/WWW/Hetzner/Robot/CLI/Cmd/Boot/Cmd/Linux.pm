@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Boot::Cmd::Linux;
 # ABSTRACT: Linux installation boot configuration
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use MooX::Cmd;

@@ -8,7 +8,7 @@ use MooX::Options;
 use WWW::Hetzner::Cloud;
 use WWW::Hetzner::Storage;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 =head1 SYNOPSIS
 

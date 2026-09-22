@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::Failover;
 # ABSTRACT: Hetzner Robot failover IP entity
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Moo;
 use Carp qw(croak);
