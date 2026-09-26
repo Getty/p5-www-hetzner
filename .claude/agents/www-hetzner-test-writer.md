@@ -7,7 +7,7 @@ briefing:
   skills:
     - www-hetzner-core
     - getty-perl-moo
-    - kanban-issues-karr-cli
+    - kanban-issues-karr-ticket
 ---
 
 You are the www-hetzner-test-writer for **WWW::Hetzner**.

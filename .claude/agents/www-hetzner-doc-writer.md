@@ -5,8 +5,8 @@ model: sonnet
 allowed-tools: Read, Edit, Grep, Glob
 briefing:
   skills:
-    - getty-perl-release-author-getty
     - www-hetzner-core
+    - getty-perl-pod
 ---
 
 You are the www-hetzner-doc-writer for **WWW::Hetzner**. The POD conventions above are
