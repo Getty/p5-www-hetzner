@@ -2,7 +2,7 @@
 name: www-hetzner-doc-writer
 description: "Write and maintain WWW::Hetzner POD in the @Author::GETTY house format (inline =attr/=method/=opt, PodWeaver-generated sections left alone). Keeps the 140-module distribution navigable — every module reachable from WWW::Hetzner by L<> links. Specify the module path."
 model: sonnet
-allowed-tools: Read, Edit, Grep, Glob
+disallowedTools: Write, NotebookEdit, Bash
 briefing:
   skills:
     - www-hetzner-core

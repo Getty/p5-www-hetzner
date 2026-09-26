@@ -2,7 +2,6 @@
 name: www-hetzner-release-manager
 description: "Owns www-hetzner's commits and release readiness — cuts commits from the worker's commit-ready tree, writes commit messages and Changes entries, moves karr cards to done. Release audit: WWW::Hetzner before a CPAN release — cpanfile deps declared, Changes current, dist.ini/@Author::GETTY config sound, build and full test suite clean. Workers never commit; this agent does. Never pushes, tags or releases."
 model: sonnet
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - getty-git-commit-style

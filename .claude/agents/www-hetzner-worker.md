@@ -2,7 +2,6 @@
 name: www-hetzner-worker
 description: "Default WWW::Hetzner worker — implement, refactor, debug and test code in this synchronous Hetzner Cloud/Robot API client. Owns everything behavior-relevant: the IO transport seam, the API-controller / entity / CLI-subcommand mesh, request/response logic, error handling. Pre-loaded with all WWW::Hetzner conventions and repo specifics. Leaves a commit-ready tree; never commits — commits belong to www-hetzner-release-manager."
 model: inherit
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - www-hetzner-core
