@@ -1,0 +1,24 @@
+---
+class: standard
+completed: 2026-10-13T19:50:28Z
+created: 2026-10-06T19:49:20Z
+id: 28
+priority: low
+started: 2026-10-13T19:50:28Z
+status: done
+tags:
+- security
+- logging
+- review-2026-10-06
+title: Debug log prints request bodies including passwords
+updated: 2026-10-13T19:50:28Z
+---
+
+`_build_request` logs every request body verbatim at debug level (`lib/WWW/Hetzner/Role/HTTP.pm:230-233`, `$log->debugf("Body: %s", ...)`). Bodies that carry secrets go through it unchanged: Storage Box create / reset_password and subaccount create / reset password (`password`), Cloud server create (`user_data`, often carrying credentials), certificate upload (`private_key`).
+
+WWW::MikroTik solved the same problem with a structural mask for the debug line only (`p5-www-mikrotik/lib/WWW/MikroTik.pm:610-617`).
+
+Done when: the debug line masks top-level keys such as `password`, `private_key`, `user_data` (the request itself unchanged), documented in the Role::HTTP POD and covered in `t/logging.t`.
+
+---
+Fleet review 2026-10-06 · kind: bug · confidence: verified
