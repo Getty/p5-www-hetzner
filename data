@@ -1,0 +1,25 @@
+---
+claimed_at: 2026-10-13T03:00:38Z
+claimed_by: worker-k30
+class: standard
+completed: 2026-10-13T03:00:20Z
+created: 2026-10-13T02:52:01Z
+id: 30
+priority: high
+started: 2026-10-13T02:52:48Z
+status: done
+tags:
+- bug
+- servers
+title: Servers->create sends booleans as JSON numbers
+updated: 2026-10-13T03:00:38Z
+---
+
+Hit live 2026-10-13 from CitiAI core: create(enable_ipv4 => 0, enable_ipv6 => 0) is copied verbatim into public_net -> JSON 0; the API rejects with 'failed to parse json' (invalid_input). Same for start_after_create default '// 1' (JSON 1). Callers had to pass \0/\1. Fix in the lib: coerce documented boolean params to JSON::PP::true/false (create, automount etc.). Related: GET /v1/datacenters now returns 410 deprecated_api_endpoint (Hetzner changelog 2026-06-02) — Datacenters.pm should say so / be deprecated.
+
+Fixed: Servers->create coerces start_after_create/automount/enable_ipv4/enable_ipv6 (incl. inside public_net) and change_type upgrade_disk to JSON booleans via private _json_bool (accepts truthy/falsy, \0/\1, JSON::PP::Boolean); public_net hash copied instead of mutated. Regression t/cloud_servers_booleans.t checks encoded request content (red before, green after). Datacenters.pm POD: DEPRECATION section (live GET confirmed 410 deprecated_api_endpoint). prove -lr t/ green (58 files, 527 tests). Out of scope, noted for follow-up: Volumes->create automount passed verbatim (same bug); Volumes->attach uses $v ? \1 : \0 so a caller's \0 becomes true; CLI Cmd::Datacenter has no POD; Cloud.pm datacenters attr POD not marked deprecated (k29 is editing Cloud.pm).
+
+2026-10-13 03:00 REPORT
+DONE: commit b1ad492 (pushed to origin/main). Servers->create sends start_after_create (default true), automount, enable_ipv4, enable_ipv6 (top level or inside public_net) as JSON true/false via private _json_bool (accepts Perl truthy/falsy, \0/\1, JSON::PP::Boolean). Same fix for change_type upgrade_disk. public_net hash is copied, so the caller hash is no longer mutated. Datacenters.pm POD: DEPRECATION section (410 deprecated_api_endpoint, changelog 2026-06-02, use Locations). Changes entry under {{$NEXT}}.
+VERIFIED: t/cloud_servers_booleans.t checks the encoded JSON body through MockIO; it was red before the fix ("enable_ipv4":0, "start_after_create":1 etc.) and green after. prove -lr t/: 58 files, 527 tests PASS. Live read-only GET /v1/datacenters returns HTTP 410 deprecated_api_endpoint. No live create was done (not allowed).
+LEFT: k31 (Volumes create/attach automount, same bug; attach turns \0 into true); CLI Cmd/Datacenter.pm and the Cloud.pm datacenters attr carry no deprecation note yet (in k31); not released.
