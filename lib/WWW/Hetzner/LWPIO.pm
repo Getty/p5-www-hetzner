@@ -5,6 +5,7 @@ package WWW::Hetzner::LWPIO;
 use Moo;
 use LWP::UserAgent;
 use HTTP::Request;
+use JSON::MaybeXS qw(encode_json);
 use WWW::Hetzner::HTTPResponse;
 
 with 'WWW::Hetzner::Role::IO';
@@ -63,16 +64,31 @@ sub call {
 
     my $response = $self->ua->request($http_req);
 
+    my $content = $response->decoded_content // '';
+
+    # LWP synthesises a 5xx response when the request never reached the
+    # server (connection refused, DNS, TLS, timeout). Report its reason in
+    # the API error shape instead of a bare status code.
+    if (($response->header('Client-Warning') // '') eq 'Internal response') {
+        $content =~ s/\s+$//;
+        $content = encode_json({
+            error => { code => 'transport_error', message => $content || $response->message },
+        });
+    }
+
     return WWW::Hetzner::HTTPResponse->new(
         status  => $response->code,
-        content => $response->decoded_content // '',
+        content => $content,
     );
 }
 
 =method call($req)
 
 Execute an L<WWW::Hetzner::HTTPRequest> via LWP and return a
-L<WWW::Hetzner::HTTPResponse>.
+L<WWW::Hetzner::HTTPResponse>. If LWP reports an internal failure (the
+request never reached the server), the response body is a JSON error with
+code C<transport_error> and LWP's message, so the resulting exception names
+the reason.
 
 =cut
 
