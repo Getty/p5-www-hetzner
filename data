@@ -1,0 +1,30 @@
+---
+class: standard
+completed: 2026-10-13T19:50:28Z
+created: 2026-10-06T19:49:15Z
+id: 27
+priority: medium
+started: 2026-10-13T19:50:28Z
+status: done
+tags:
+- bug
+- error-handling
+- http
+- review-2026-10-06
+title: 'Transport failures are reported as ''Hetzner API error: 500'' with no reason'
+updated: 2026-10-13T19:50:28Z
+---
+
+`WWW::Hetzner::LWPIO::call` (`lib/WWW/Hetzner/LWPIO.pm:52-70`) hands on only status and body of LWP's response. For a request that never reached Hetzner (connection refused, DNS, TLS failure, timeout, missing LWP::Protocol::https) LWP synthesises a 500/501 with a plain-text body; `_parse_response` (`lib/WWW/Hetzner/Role/HTTP.pm:253-261`) decodes only bodies that look like JSON and otherwise croaks with the bare status.
+
+Reproduce:
+
+    perl -Ilib -e 'use WWW::Hetzner::Cloud; eval { WWW::Hetzner::Cloud->new(token => "t", base_url => "http://127.0.0.1:9")->get("/servers") }; print $@'
+    # Hetzner API error: 500 at lib/WWW/Hetzner/Cloud.pm line 179.
+
+A network problem is indistinguishable from a real server error of the API, in the library and in `hcloud.pl`/`hrobot.pl`. The same applies to any non-JSON error body (a proxy's HTML 502/503): only the number survives.
+
+Done when: LWPIO detects LWP's internal response (`Client-Warning: Internal response`) and the croak names the reason (`Hetzner API error: Can't connect to ...`); a non-JSON error body contributes its status line. Test in `t/io.t` with a stub UA.
+
+---
+Fleet review 2026-10-06 · kind: bug · confidence: verified
