@@ -142,6 +142,15 @@ sub get {
     return $self->_wrap($result->{server});
 }
 
+# The Cloud API only accepts JSON booleans for boolean fields; a Perl 0/1
+# would be encoded as a JSON number and rejected as invalid_input (karr #30).
+# Accepts plain truthy/falsy values, \0/\1 and JSON boolean objects alike.
+sub _json_bool {
+    my ($value) = @_;
+    $value = $$value if ref $value eq 'SCALAR';
+    return $value ? \1 : \0;
+}
+
 =method create
 
     my $server = $cloud->servers->create(
@@ -166,6 +175,11 @@ sub get {
     );
 
 Creates a new server. Returns a L<WWW::Hetzner::Cloud::Server> object.
+
+The boolean options C<start_after_create>, C<automount>, C<enable_ipv4> and
+C<enable_ipv6> (also when given inside C<public_net>) accept any Perl true or
+false value, C<\1>/C<\0>, or a JSON boolean object; they are always sent as
+JSON C<true>/C<false>.
 
 =cut
 
@@ -196,7 +210,7 @@ sub create {
     $body->{user_data} = $params{user_data} if $params{user_data};
 
     # Start server after create (default: true)
-    $body->{start_after_create} = $params{start_after_create} // 1;
+    $body->{start_after_create} = _json_bool($params{start_after_create} // 1);
 
     # Placement group (ID or name)
     $body->{placement_group} = $params{placement_group} if $params{placement_group};
@@ -208,7 +222,7 @@ sub create {
     $body->{volumes} = $params{volumes} if $params{volumes};
 
     # Automount volumes
-    $body->{automount} = $params{automount} if exists $params{automount};
+    $body->{automount} = _json_bool($params{automount}) if exists $params{automount};
 
     # Firewalls (array of firewall IDs)
     if ($params{firewalls}) {
@@ -219,9 +233,13 @@ sub create {
 
     # Public network configuration
     if ($params{public_net} || exists $params{enable_ipv4} || exists $params{enable_ipv6}) {
-        $body->{public_net} = $params{public_net} // {};
-        $body->{public_net}{enable_ipv4} = $params{enable_ipv4} if exists $params{enable_ipv4};
-        $body->{public_net}{enable_ipv6} = $params{enable_ipv6} if exists $params{enable_ipv6};
+        # Copy so the caller's hash is not modified by the coercion below
+        my $public_net = $body->{public_net} = { %{ $params{public_net} // {} } };
+        $public_net->{enable_ipv4} = $params{enable_ipv4} if exists $params{enable_ipv4};
+        $public_net->{enable_ipv6} = $params{enable_ipv6} if exists $params{enable_ipv6};
+        for my $flag (qw(enable_ipv4 enable_ipv6)) {
+            $public_net->{$flag} = _json_bool($public_net->{$flag}) if exists $public_net->{$flag};
+        }
         $body->{public_net}{ipv4} = $params{ipv4} if $params{ipv4};
         $body->{public_net}{ipv6} = $params{ipv6} if $params{ipv6};
     }
@@ -341,7 +359,8 @@ sub rebuild {
 
     $cloud->servers->change_type($id, 'cx33', upgrade_disk => 1);
 
-Changes server type. Server must be powered off.
+Changes server type. Server must be powered off. C<upgrade_disk> defaults to
+true and is sent as a JSON boolean.
 
 =cut
 
@@ -353,7 +372,7 @@ sub change_type {
     return $self->_wrap_action(
         $self->client->post("/servers/$id/actions/change_type", {
             server_type     => $server_type,
-            upgrade_disk    => $opts{upgrade_disk} // 1,
+            upgrade_disk    => _json_bool($opts{upgrade_disk} // 1),
         })->{action}
     );
 }
