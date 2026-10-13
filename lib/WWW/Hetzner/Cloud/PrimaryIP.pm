@@ -94,9 +94,12 @@ has datacenter => ( is => 'ro', default => sub { {} } );
 
 =attr datacenter
 
-Datacenter data hash (read-only).
+Datacenter data hash (read-only). Current API responses carry a
+C<location> object instead; see L</location>.
 
 =cut
+
+has location_data => ( is => 'ro', init_arg => 'location', default => sub { {} } );
 
 has dns_ptr => ( is => 'ro', default => sub { [] } );
 
@@ -160,6 +163,19 @@ sub datacenter_name { shift->datacenter->{name} }
 =method datacenter_name
 
 Returns datacenter name.
+
+=cut
+
+sub location {
+    my ($self) = @_;
+    return $self->location_data->{name} // $self->datacenter->{location}{name};
+}
+
+=method location
+
+Returns the location name, e.g. "fsn1". Read from the primary IP's
+C<location> object, falling back to C<datacenter.location> for older
+responses.
 
 =cut
 
@@ -284,6 +300,7 @@ sub data {
         assignee_id   => $self->assignee_id,
         assignee_type => $self->assignee_type,
         datacenter    => $self->datacenter,
+        location      => $self->location_data,
         dns_ptr       => $self->dns_ptr,
         auto_delete   => $self->auto_delete,
         blocked       => $self->blocked,

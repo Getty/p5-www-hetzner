@@ -195,6 +195,8 @@ Returns a L<WWW::Hetzner::Storage> instance for the Storage Box API.
 
 =item * L<WWW::Hetzner::Cloud::Pricing> - Price list object
 
+=item * L<WWW::Hetzner::Cloud::Costs> - Current running cost of a project
+
 =back
 
 =head2 Roles
