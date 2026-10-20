@@ -1,0 +1,22 @@
+---
+claimed_at: 2026-10-20T04:56:52Z
+claimed_by: k31-k33
+class: standard
+completed: 2026-10-20T04:56:52Z
+created: 2026-10-16T07:04:26Z
+id: 33
+priority: medium
+started: 2026-10-20T04:34:26Z
+status: done
+tags:
+- api
+- cloud
+title: 'ServerType: carry per-location data (locations[] with available, deprecation)'
+updated: 2026-10-20T04:56:52Z
+---
+
+From citiai core#71: Hetzner added server_types[].locations (2025-09-24; locations[].available replaces datacenter.server_types.available, 2026-04-01; datacenter endpoints removed 2026-10-01). WWW::Hetzner::Cloud ServerType drops the field on construction, so citiai-core reads /server_types raw. Also the top-level 'deprecated' field goes away 2026-11-02. Related: #32 (datacenter dropped on servers).
+
+2026-10-20 04:51 Done: WWW::Hetzner::Cloud::ServerType gets a locations attribute, verbatim as the API delivers it (name, available, deprecated); available replaces the availability the datacenter used to deliver, the top-level deprecated field falls away on 2026-11-02. Commit 8070f32 on branch k31-k33. t/cloud_server_types.t was red against the old lib (the locations attribute did not exist), now green. Full suite: 61 files, 556 tests, PASS (offline).
+
+2026-10-20 Koordination: Der Branch ist auf main gezogen (fast-forward, keine Merge-Konflikte). Die Karte ist damit erledigt. `WWW::Hetzner::Cloud::ServerType` traegt jetzt ein Attribut `locations`, das die Antwort der API verbatim weitergibt; `available` je Standort ersetzt das alte Feld des Rechenzentrums. Das Top-Level-Feld `deprecated` bleibt als Attribut bestehen und faellt weg, wenn die API es nicht mehr liefert. Nachweis: `prove -lr t/` = 61 Dateien, 556 Tests, alles gruen. Der rote Beweis traegt: `t/cloud_server_types.t` scheitert gegen das alte `lib/`. Kein Push, kein `dzil release`.
