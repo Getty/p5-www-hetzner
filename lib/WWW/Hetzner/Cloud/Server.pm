@@ -101,11 +101,21 @@ Labels hash (read-write).
 
 =cut
 
+has backup_window => ( is => 'ro' );
+
+=attr backup_window
+
+Time window of the daily backup, e.g. "22-02", or C<undef> when backups are
+disabled (read-only).
+
+=cut
+
 # Nested data stored as-is
 has public_net => ( is => 'ro', default => sub { {} } );
 has private_net => ( is => 'ro', default => sub { [] } );
 has server_type_data => ( is => 'ro', init_arg => 'server_type', default => sub { {} } );
 has datacenter_data => ( is => 'ro', init_arg => 'datacenter', default => sub { {} } );
+has location_data => ( is => 'ro', init_arg => 'location', default => sub { {} } );
 has image_data => ( is => 'ro', init_arg => 'image', default => sub { {} } );
 
 # Convenience accessors
@@ -142,11 +152,16 @@ Datacenter name.
 
 =cut
 
-sub location { shift->datacenter_data->{location}{name} }
+sub location {
+    my ($self) = @_;
+    return $self->location_data->{name} // $self->datacenter_data->{location}{name};
+}
 
 =method location
 
-Location name.
+Location name, e.g. "fsn1". Read from the server's C<location> object, which
+current API responses carry; falls back to C<datacenter.location> for older
+responses that only have the datacenter.
 
 =cut
 
@@ -327,7 +342,9 @@ sub data {
         private_net => $self->private_net,
         server_type => $self->server_type_data,
         datacenter  => $self->datacenter_data,
+        location    => $self->location_data,
         image       => $self->image_data,
+        backup_window => $self->backup_window,
     };
 }
 

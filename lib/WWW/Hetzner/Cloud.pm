@@ -22,6 +22,7 @@ use WWW::Hetzner::Cloud::API::LoadBalancerTypes;
 use WWW::Hetzner::Cloud::API::Certificates;
 use WWW::Hetzner::Cloud::API::PlacementGroups;
 use WWW::Hetzner::Cloud::API::Pricing;
+use WWW::Hetzner::Cloud::Costs;
 use namespace::clean;
 
 our $VERSION = '0.102';
@@ -133,6 +134,8 @@ servers, DNS zones, networks, volumes, and other resources.
 =item * datacenters - Datacenters
 
 =item * pricing - Current price list (a single object, not a list)
+
+=item * costs - Current running cost of the project (method, see L</costs>)
 
 =back
 
@@ -393,6 +396,29 @@ has pricing => (
 Returns a L<WWW::Hetzner::Cloud::API::Pricing> instance for reading the
 current price list. Pricing is a single object rather than a collection, so
 that controller only has C<get>.
+
+=cut
+
+sub costs {
+    my ($self, %opts) = @_;
+    return WWW::Hetzner::Cloud::Costs->new(client => $self)->calculate(%opts);
+}
+
+=method costs
+
+    my $costs = $cloud->costs;
+    my $live  = $cloud->costs(label_selector => 'env=live', price => 'net');
+
+    printf "%.4f %s/h, %.2f %s/month (%s)\n",
+        $live->{totals}{hourly},  $live->{currency},
+        $live->{totals}{monthly}, $live->{currency}, $live->{price};
+
+Returns what the project's servers (any status, plus backup surcharge),
+volumes, primary IPs, floating IPs and load balancers currently cost per hour
+and per month, priced per location from the current price list. Prices are
+gross unless C<< price => 'net' >> is passed; C<label_selector> filters every
+list request. Only reads. See L<WWW::Hetzner::Cloud::Costs> for the returned
+structure and how hourly prices are derived where the price list has none.
 
 =cut
 
