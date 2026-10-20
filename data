@@ -1,0 +1,36 @@
+---
+claimed_at: 2026-10-20T09:35:07Z
+claimed_by: k34
+class: standard
+completed: 2026-10-20T09:35:07Z
+created: 2026-10-20T08:37:58Z
+id: 34
+priority: medium
+started: 2026-10-20T09:25:29Z
+status: done
+tags:
+- cpanfile
+- prerequisites
+title: The cpanfile does not require LWP::Protocol::https; the API is HTTPS-only
+updated: 2026-10-20T09:35:07Z
+---
+
+Both API base URLs are https: the Cloud API defaults to https://api.hetzner.cloud/v1 and the Robot API to https://robot-ws.your-server.de. The transport is LWP::UserAgent (WWW::Hetzner::LWPIO), and LWP::UserAgent only speaks https when LWP::Protocol::https is installed - otherwise it answers 501 with "Protocol scheme 'https' is not supported". The cpanfile declares LWP::UserAgent but not LWP::Protocol::https, so a fresh installation cannot reach the API at all.
+
+Fix: declare LWP::Protocol::https as a runtime prerequisite next to LWP::UserAgent, and cover the declared HTTPS transport prerequisites with a test that reads the cpanfile (the pattern of p5-www-vastai and p5-www-picnic). A Changes entry notes the new prerequisite.
+
+Note: the cpanfile audit of card #26 checked that every used module is declared; LWP::Protocol::https is not 'use'd anywhere, so the gap stayed invisible to it.
+
+2026-10-20 09:30 Cause confirmed: cpanfile declared LWP::UserAgent but not LWP::Protocol::https. LWP::Protocol::implementor loads the https handler on demand, so a fresh install answered 501 'Protocol scheme https is not supported' on every request; both base URLs (api.hetzner.cloud/v1, robot-ws.your-server.de) are https only.
+
+2026-10-20 09:30 Done: cpanfile declares LWP::Protocol::https next to LWP::UserAgent; new t/cpanfile.t reads the cpanfile and checks the declared runtime prerequisites (Moo, MooX::Cmd, MooX::Options, LWP::UserAgent, LWP::Protocol::https, JSON::MaybeXS, URI, HTTP::Request, namespace::clean, Log::Any, Path::Tiny) plus the test prerequisites (Test::More, Log::Any::Test); pattern taken from p5-www-vastai and p5-www-picnic. Changes entry added under {{$NEXT}}.
+
+2026-10-20 09:30 Red proof: the new test failed before the cpanfile change with exactly one failing assertion ('LWP::Protocol::https is a declared prerequisite'). It checks a file, not behaviour, so it is green against the unchanged lib/ - the proof for this card is the file finding: the line was missing before and is present now.
+
+2026-10-20 09:30 Verified: prove -lr t/ -> 62 files, 569 tests, all successful (1 skipped: integration_cloud.t needs HETZNER_TEST_TOKEN). dzil build ships both cpanfile and t/cpanfile.t, and the generated META.json lists LWP::Protocol::https among the runtime prereqs.
+
+2026-10-20 09:30 Commit 3797a59 on branch k34 (worktree .claude/worktrees/k34), branched from local main 6bbd01a; main did not move during the work.
+
+2026-10-20 09:30 Also found: lib/WWW/Hetzner/Robot.pm and lib/WWW/Hetzner/Role/HTTP.pm use URI::Escape and the roles use Moo::Role, none of which is declared separately. Both ship with their parent distributions (URI, Moo), so the cpanfile is complete; no action needed.
+
+2026-10-20 09:31 Done: the cpanfile declares LWP::Protocol::https next to LWP::UserAgent, the new t/cpanfile.t checks the declared runtime and test prerequisites (red before the fix with one failing assertion, green after), and a Changes entry notes the new prerequisite. Commit 3797a59 on branch k34; full suite green (62 files, 569 tests, 1 skipped offline).
