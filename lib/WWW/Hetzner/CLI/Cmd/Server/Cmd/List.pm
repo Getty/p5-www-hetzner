@@ -37,7 +37,7 @@ sub execute {
     }
 
     printf "%-10s %-25s %-12s %-16s %-10s %s\n",
-        'ID', 'NAME', 'STATUS', 'IPV4', 'TYPE', 'DATACENTER';
+        'ID', 'NAME', 'STATUS', 'IPV4', 'TYPE', 'LOCATION';
     print "-" x 90, "\n";
 
     for my $s (@$servers) {
@@ -47,7 +47,7 @@ sub execute {
             $s->status,
             $s->ipv4 // '-',
             $s->server_type // '-',
-            $s->datacenter // '-';
+            $s->location // '-';
     }
 }
 

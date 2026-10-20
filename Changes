@@ -31,6 +31,9 @@ Revision history for WWW-Hetzner
     - Fix: Volumes->create and Volumes->attach send automount as a JSON
       boolean; a Perl 0 went out as the JSON number 0, which the API rejected
       as invalid_input, and attach turned every value into true
+    - CLI: hcloud.pl server list and hcloud.pl primary-ip list show the column
+      LOCATION instead of DATACENTER, the API no longer sends the datacenter
+      field
 
 0.101     2026-09-22 05:53:00Z
     - New: WWW::Hetzner::Storage, a third API host (api.hetzner.com) for
