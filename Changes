@@ -1,6 +1,8 @@
 Revision history for WWW-Hetzner
 
 {{$NEXT}}
+    - The distribution declares LWP::Protocol::https, without it every
+      https target fails
     - Fix: transport failures (connection refused, DNS, TLS, timeout) now
       croak with LWP's reason instead of a bare "Hetzner API error: 500";
       non-JSON error bodies (e.g. a proxy's HTML 502) contribute their status
