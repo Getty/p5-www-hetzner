@@ -2,11 +2,11 @@ Revision history for WWW-Hetzner
 
 {{$NEXT}}
     - Fix: transport failures (connection refused, DNS, TLS, timeout) now
-      croak with LWP's reason instead of a bare "Hetzner API error: 500"
-      (karr #27); non-JSON error bodies (e.g. a proxy's HTML 502) contribute
-      their status and text to the error message
+      croak with LWP's reason instead of a bare "Hetzner API error: 500";
+      non-JSON error bodies (e.g. a proxy's HTML 502) contribute their status
+      and text to the error message
     - Fix: the debug log no longer prints password, private_key and
-      user_data values of request bodies (karr #28)
+      user_data values of request bodies
 
 0.101     2026-09-22 05:53:00Z
     - New: WWW::Hetzner::Storage, a third API host (api.hetzner.com) for
