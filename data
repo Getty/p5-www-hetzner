@@ -1,0 +1,26 @@
+---
+claimed_at: 2026-10-20T04:56:40Z
+claimed_by: k31-k33
+class: standard
+completed: 2026-10-20T04:56:40Z
+created: 2026-10-13T02:58:41Z
+id: 31
+priority: medium
+started: 2026-10-20T04:34:14Z
+status: done
+tags:
+- bug
+- volumes
+title: 'Volumes create/attach: automount as JSON boolean'
+updated: 2026-10-20T04:56:40Z
+---
+
+Found during k30. Volumes->create copies automount verbatim (JSON 0/1 -> invalid_input, same as k30). Volumes->attach uses `$opts{automount} ? \1 : \0`, so a caller passing \0 gets true (refs are always truthy). Reuse the _json_bool approach from Servers.pm (k30). Also: CLI Cmd/Datacenter.pm has no POD/deprecation note; Cloud.pm datacenters attr POD not marked deprecated (GET /v1/datacenters is 410 since 2026-06-02); check whether the datacenter param of Servers/PrimaryIPs create is deprecated too.
+
+2026-10-20 04:43 Commit fb9156c. Roter Beweis: t/cloud_volumes_booleans.t gegen das alte lib/ rot (create schickte die JSON-Zahl 0, attach machte aus \0 true), gegen das neue lib/ gruen.
+
+2026-10-20 04:43 Done: neue Rolle WWW::Hetzner::Role::JSONBool mit dem _json_bool-Helfer (Servers.pm zieht sie, die private Kopie entfaellt); Volumes->create und ->attach senden automount als JSON-Boolean; Deprecation-Notizen fuer Cloud->datacenters, hcloud.pl datacenter und den datacenter-Parameter von Servers->create und PrimaryIPs->create. Verifiziert: t/cloud_volumes_booleans.t neu (vorher rot), t/cloud_servers_booleans.t unveraendert gruen, prove -lr t/ 551 Tests gruen (nur t/integration_cloud.t uebersprungen, braucht HETZNER_TEST_TOKEN), dzil build laeuft. Commit fb9156c.
+
+2026-10-20 04:51 Done: Volumes->create and Volumes->attach send automount as a JSON boolean (new role WWW::Hetzner::Role::JSONBool, shared with Servers), the datacenter removal is documented as deprecated. Commit fb9156c on branch k31-k33. New test t/cloud_volumes_booleans.t was red against the old lib (automount went out as the JSON number 0 / attach turned every value into true), now green. Full suite: 61 files, 556 tests, PASS (offline).
+
+2026-10-20 Koordination: Der Branch ist auf main gezogen (fast-forward, keine Merge-Konflikte). Die Karte ist damit erledigt. `Volumes->create` und `Volumes->attach` schicken `automount` jetzt als JSON-Boolean: `0` und `\0` ergeben `false`, `1` und `\1` ergeben `true`, ein nicht gesetzter Parameter bleibt weg. Die Bool-Normalisierung liegt in der neuen Rolle `WWW::Hetzner::Role::JSONBool`, `Servers.pm` zieht dieselbe Rolle, sein Verhalten bleibt unveraendert. Die Abschaltung der Rechenzentren-Endpunkte ist an den drei Stellen dokumentiert (Attribut `datacenters`, CLI-Befehl `datacenter`, Parameter `datacenter` bei `Servers->create` und `PrimaryIPs->create`); der Code dafuer bleibt stehen. Nachweis: `prove -lr t/` = 61 Dateien, 556 Tests, alles gruen. Der rote Beweis traegt: `t/cloud_volumes_booleans.t` scheitert gegen das alte `lib/`. Kein Push, kein `dzil release`.
