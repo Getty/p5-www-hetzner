@@ -1,0 +1,27 @@
+---
+claimed_at: 2026-10-20T04:56:46Z
+claimed_by: k31-k33
+class: standard
+completed: 2026-10-20T04:56:46Z
+created: 2026-10-13T03:04:10Z
+id: 32
+priority: medium
+started: 2026-10-20T04:34:20Z
+status: done
+tags:
+- bug
+- servers
+- api-drift
+title: Live API dropped datacenter on servers/primary IPs
+updated: 2026-10-20T04:56:46Z
+---
+
+Found during k29 (2026-10-13, live read-only): server and primary IP responses no longer carry `datacenter`, only a `location` object. k29 fixed Server->location / PrimaryIP->location (fallback to datacenter.location). Still broken against live data: `hcloud.pl server list` DATACENTER column and PrimaryIP->datacenter_name show "-". Fixtures still use the old shape — add current-shape fixtures; decide whether to show LOCATION instead. Related: k31 (datacenters deprecation).
+
+2026-10-20 04:46 Commit 92128d4. Roter Beweis: t/cli_list_text.t gegen das lib/ von main rot (4 von 11 Subtests: Kopfzeile DATACENTER statt LOCATION, der Wert waere '-'), gegen das neue lib/ gruen.
+
+2026-10-20 04:46 Done: die Serverliste (CLI::Cmd::Server und CLI::Cmd::Server::Cmd::List) und die Primary-IP-Liste zeigen die Spalte LOCATION, der Wert kommt aus der Location-Methode (Fallback auf datacenter.location bleibt rueckwaertskompatibel). Neue Fixtures servers_list_current.json und primary_ips_list_current.json in der heutigen Antwortform, die alten Fixtures bleiben stehen. Verifiziert: t/cli_list_text.t erweitert (vorher rot), prove -lr t/ 554 Tests gruen (nur t/integration_cloud.t uebersprungen, braucht HETZNER_TEST_TOKEN). Commit 92128d4.
+
+2026-10-20 04:51 Done: hcloud.pl server list and hcloud.pl primary-ip list show the column LOCATION instead of DATACENTER; the value comes from the location of the entity, the old fixtures stay and prove backward compatibility. Commit 92128d4 on branch k31-k33. t/cli_list_text.t was red against the old lib and against main (header DATACENTER, value -), now green. Full suite: 61 files, 556 tests, PASS (offline).
+
+2026-10-20 Koordination: Der Branch ist auf main gezogen (fast-forward, keine Merge-Konflikte). Die Karte ist damit erledigt. Die Server- und die Primary-IP-Liste zeigen jetzt die Spalte `LOCATION` statt `DATACENTER`, weil die API das Feld `datacenter` nicht mehr liefert; der Wert kommt aus der Location-Methode, die auf alte Antworten zurueckfaellt, die Listen bleiben also rueckwaertskompatibel. Die alten Fixtures stehen weiterhin, dazu je eines in der heutigen Antwortform. Nachweis: `prove -lr t/` = 61 Dateien, 556 Tests, alles gruen. Der rote Beweis traegt: `t/cli_list_text.t` scheitert gegen das alte `lib/`. Kein Push, kein `dzil release`.
