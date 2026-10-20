@@ -34,6 +34,9 @@ Revision history for WWW-Hetzner
     - CLI: hcloud.pl server list and hcloud.pl primary-ip list show the column
       LOCATION instead of DATACENTER, the API no longer sends the datacenter
       field
+    - New: the server type carries its locations, one entry per location with
+      the name, the availability the datacenter used to deliver and the
+      deprecation flag
 
 0.101     2026-09-22 05:53:00Z
     - New: WWW::Hetzner::Storage, a third API host (api.hetzner.com) for

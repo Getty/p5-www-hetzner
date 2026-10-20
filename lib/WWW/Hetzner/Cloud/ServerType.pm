@@ -100,7 +100,24 @@ has deprecated => ( is => 'ro' );
 
 =attr deprecated
 
-Deprecation timestamp if deprecated, undef otherwise.
+Whether the server type is deprecated.
+
+The API drops this top-level field on 2026-11-02; from then on the attribute
+is undef.
+
+=cut
+
+has locations => ( is => 'ro', default => sub { [] } );
+
+=attr locations
+
+Arrayref of location data hashrefs (read-only), one entry per location the
+server type is offered in. The entries carry the fields the API delivers:
+C<name> (e.g. "fsn1"), C<available> (whether the server type can be ordered
+there) and C<deprecated>.
+
+C<available> replaces the availability the datacenter used to deliver in
+C<server_types.available>; the datacenter endpoints are gone.
 
 =cut
 
@@ -116,6 +133,7 @@ sub data {
         cpu_type     => $self->cpu_type,
         architecture => $self->architecture,
         deprecated   => $self->deprecated,
+        locations    => $self->locations,
     };
 }
 
