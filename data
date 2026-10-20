@@ -1,0 +1,27 @@
+---
+claimed_at: 2026-10-13T03:05:31Z
+claimed_by: worker-k29
+class: standard
+completed: 2026-10-13T03:05:31Z
+created: 2026-10-13T02:51:50Z
+id: 29
+priority: high
+started: 2026-10-13T02:52:36Z
+status: done
+tags:
+- pricing
+- cli
+title: 'Current running cost of a project: hcloud.pl costs'
+updated: 2026-10-20T10:14:58Z
+---
+
+Wish from the CitiAI operators (2026-10-13): one call that answers 'what does this project cost right now, per hour and per month'. Inputs: all running servers (server_type price for the server's location), volumes (size x pricing.volume.price_per_gb_month), primary IPs (ipv4/ipv6 per location), floating IPs, load balancers. Output: table per resource (name, type, location, EUR/h, EUR/month) plus total; optional --label selector (e.g. citiai-env=live); --json. Library API too (e.g. $cloud->costs(label_selector => ...)), not only CLI. Note: Hetzner caps hourly billing at the monthly price; pricing.vat_rate may be 0 (net) — show which. Measured reference 2026-10-13 fsn1: cx23 0.0088/h 5.49/mo, cpx32 0.0569/h 35.49/mo, volume 0.0572/GB/mo, ipv4 0.0008/h 0.50/mo.
+
+Implemented: WWW::Hetzner::Cloud::Costs + $cloud->costs(label_selector=>, price=>'gross'|'net') + hcloud.pl costs [--label] [--net] [--json]. Gross default, net/vat_rate exposed. Hourly for volume/floating IP derived as monthly/624 (Hetzner's hourly:monthly ratio for every dual-priced item), flagged hourly_derived. All servers counted regardless of status, plus server_backup rows (20%) when backup_window set. Unpriced primary IP types (ipv6) = 0; missing type/location -> undef price, warning, excluded from total. Fixed drift: live API returns 'location' (no 'datacenter') on servers and primary IPs; Server/PrimaryIP->location now read it (fallback datacenter.location), Server gains backup_window. prove -lr t/ green (60 files). Live read-only run OK. Drift for follow-up cards (this board): server list DATACENTER column and primary-ip datacenter_name show '-' against the live API since 'datacenter' is gone; label filter skips auto-created primary IPs without labels (by design, but surprising for operators).
+
+2026-10-13 03:05 REPORT
+DONE: commit a93c9e9 (pushed to origin/main). New WWW::Hetzner::Cloud::Costs, $cloud->costs(label_selector => ..., price => gross|net) and `hcloud.pl costs [--label|-l SEL] [--net] [--json]` (also global -o json). Rows (kind, id, name, type, location, status, hourly, monthly, hourly_derived) for servers (any status, plus a server_backup row when backups are on), volumes (size x per-GB monthly), primary IPs, floating IPs and load balancers, priced per location from /pricing, plus totals. Result carries currency, price (gross is the default) and vat_rate, and the CLI header shows net/gross. Volumes and floating IPs have no hourly price in /pricing, so their hourly = monthly/624 (the monthly-cap ratio of every item that has both prices), flagged with *. A missing price gives a warning and is left out of the totals. Also fixed: Server/PrimaryIP->location read the `location` object (the live API no longer sends `datacenter`); new Server backup_window attribute.
+VERIFIED: t/cloud_costs.t + t/cli_costs.t (offline MockIO): every resource kind, cpx32/ipv4 at fsn1 vs sin prices, label_selector on all 5 list requests (not on /pricing), totals, net/gross, missing price, empty project, GET-only. prove -lr t/: 60 files, 542 tests PASS. Live read-only run: whole project 0.0105 EUR/h, 6.56 EUR/month (VAT 0%); --label citiai-env=live 0.0097/h, 6.06/mo (unlabelled primary IPs drop out).
+LEFT: k32 (live API drift: server list DATACENTER column and PrimaryIP datacenter_name show "-"); not counted: traffic overage, images/snapshots; --label skips auto-created unlabelled primary IPs (by design, may surprise operators); not released.
+
+2026-10-20 Nachpruefung der Koordination: die Eintraege zu den Kosten und zur Datacenter-Abloesung standen mit 79 Spalten ueber der Hausgrenze von 78. Die Datei wurde umgebrochen, ohne ein Wort zu aendern. Commit 0db4d35.
