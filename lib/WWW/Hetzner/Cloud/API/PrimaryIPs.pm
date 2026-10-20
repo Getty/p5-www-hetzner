@@ -126,6 +126,9 @@ sub get {
 
 Creates primary IP. Returns L<WWW::Hetzner::Cloud::PrimaryIP> object.
 
+The C<datacenter> parameter is deprecated by the Hetzner API, C<location> is
+its replacement. The parameter is still accepted and sent unchanged.
+
 =cut
 
 sub create {

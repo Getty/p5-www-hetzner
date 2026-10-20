@@ -25,7 +25,12 @@ Revision history for WWW-Hetzner
       change_type's upgrade_disk. The caller's public_net hash is no longer
       modified
     - Docs: WWW::Hetzner::Cloud::API::Datacenters is deprecated, Hetzner
-      removed GET /v1/datacenters (410 deprecated_api_endpoint); use Locations
+      removed GET /v1/datacenters (410 deprecated_api_endpoint); use Locations.
+      The hcloud.pl datacenter command and the datacenter parameter of
+      Servers->create and PrimaryIPs->create are deprecated as well
+    - Fix: Volumes->create and Volumes->attach send automount as a JSON
+      boolean; a Perl 0 went out as the JSON number 0, which the API rejected
+      as invalid_input, and attach turned every value into true
 
 0.101     2026-09-22 05:53:00Z
     - New: WWW::Hetzner::Storage, a third API host (api.hetzner.com) for

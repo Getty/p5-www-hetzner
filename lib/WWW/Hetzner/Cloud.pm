@@ -273,6 +273,11 @@ has datacenters => (
 
 Returns a L<WWW::Hetzner::Cloud::API::Datacenters> instance for listing datacenters.
 
+B<Deprecated:> Hetzner removed the datacenters endpoint, so every method of
+the returned controller dies with the API error C<410 Gone>
+(C<deprecated_api_endpoint>). The controller is kept for backward
+compatibility only; use L<WWW::Hetzner::Cloud::API::Locations> instead.
+
 =cut
 
 has zones => (

@@ -5,6 +5,7 @@ our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
+with 'WWW::Hetzner::Role::JSONBool';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Server;
 use namespace::clean;
@@ -142,15 +143,6 @@ sub get {
     return $self->_wrap($result->{server});
 }
 
-# The Cloud API only accepts JSON booleans for boolean fields; a Perl 0/1
-# would be encoded as a JSON number and rejected as invalid_input (karr #30).
-# Accepts plain truthy/falsy values, \0/\1 and JSON boolean objects alike.
-sub _json_bool {
-    my ($value) = @_;
-    $value = $$value if ref $value eq 'SCALAR';
-    return $value ? \1 : \0;
-}
-
 =method create
 
     my $server = $cloud->servers->create(
@@ -180,6 +172,9 @@ The boolean options C<start_after_create>, C<automount>, C<enable_ipv4> and
 C<enable_ipv6> (also when given inside C<public_net>) accept any Perl true or
 false value, C<\1>/C<\0>, or a JSON boolean object; they are always sent as
 JSON C<true>/C<false>.
+
+The C<datacenter> parameter is deprecated by the Hetzner API, C<location> is
+its replacement. The parameter is still accepted and sent unchanged.
 
 =cut
 

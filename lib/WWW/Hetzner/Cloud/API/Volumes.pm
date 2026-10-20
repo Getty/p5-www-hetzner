@@ -5,6 +5,7 @@ our $VERSION = '0.102';
 
 use Moo;
 with 'WWW::Hetzner::Role::Pagination';
+with 'WWW::Hetzner::Role::JSONBool';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Volume;
 use namespace::clean;
@@ -126,6 +127,10 @@ sub get {
 
 Creates volume. Returns L<WWW::Hetzner::Cloud::Volume> object.
 
+The boolean option C<automount> accepts any Perl true or false value,
+C<\1>/C<\0>, or a JSON boolean object; it is always sent as JSON
+C<true>/C<false>.
+
 =cut
 
 sub create {
@@ -143,7 +148,7 @@ sub create {
 
     $body->{format}    = $params{format}    if $params{format};
     $body->{labels}    = $params{labels}    if $params{labels};
-    $body->{automount} = $params{automount} if exists $params{automount};
+    $body->{automount} = _json_bool($params{automount}) if exists $params{automount};
     $body->{server}    = $params{server}    if $params{server};
 
     my $result = $self->client->post('/volumes', $body);
@@ -175,6 +180,10 @@ sub delete {
 
 Attaches volume to server.
 
+The boolean option C<automount> accepts any Perl true or false value,
+C<\1>/C<\0>, or a JSON boolean object; it is always sent as JSON
+C<true>/C<false>.
+
 =cut
 
 sub attach {
@@ -183,7 +192,7 @@ sub attach {
     croak "Server ID required" unless $server_id;
 
     my $body = { server => $server_id };
-    $body->{automount} = $opts{automount} ? \1 : \0 if exists $opts{automount};
+    $body->{automount} = _json_bool($opts{automount}) if exists $opts{automount};
 
     return $self->_wrap_action(
         $self->client->post("/volumes/$id/actions/attach", $body)->{action}
