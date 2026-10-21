@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::LoadBalancerType;
 # ABSTRACT: Hetzner Cloud LoadBalancerType object
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use namespace::clean;

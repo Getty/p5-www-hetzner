@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Role::WaitsForAction;
 # ABSTRACT: CLI role that waits for a returned Action by default
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo::Role;
 use MooX::Options;

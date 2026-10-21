@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer;
 # ABSTRACT: Hetzner Cloud Load Balancer commands
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Role::HasActions;
 # ABSTRACT: Controller role wrapping raw hashes as Action objects
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo::Role;
 use WWW::Hetzner::Action;

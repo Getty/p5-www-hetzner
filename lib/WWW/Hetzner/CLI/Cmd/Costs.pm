@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Costs;
 # ABSTRACT: Show the current running cost of the project
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

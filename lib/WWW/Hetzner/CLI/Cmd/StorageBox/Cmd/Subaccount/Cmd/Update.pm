@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Subaccount::Cmd::Update;
 # ABSTRACT: Update a Storage Box subaccount
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

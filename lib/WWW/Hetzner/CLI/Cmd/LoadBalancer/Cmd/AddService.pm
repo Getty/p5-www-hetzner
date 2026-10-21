@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::AddService;
 # ABSTRACT: Add a service to a load balancer
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

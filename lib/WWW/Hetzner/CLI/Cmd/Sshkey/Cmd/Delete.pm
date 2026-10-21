@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Sshkey::Cmd::Delete;
 # ABSTRACT: Delete an SSH key
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

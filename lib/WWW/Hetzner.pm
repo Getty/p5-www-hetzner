@@ -8,7 +8,7 @@ use WWW::Hetzner::Storage;
 use WWW::Hetzner::Robot;
 use namespace::clean;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::PlacementGroup::Cmd::List;
 # ABSTRACT: List placement groups
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

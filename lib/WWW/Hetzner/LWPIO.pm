@@ -10,7 +10,7 @@ use WWW::Hetzner::HTTPResponse;
 
 with 'WWW::Hetzner::Role::IO';
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 =head1 SYNOPSIS
 

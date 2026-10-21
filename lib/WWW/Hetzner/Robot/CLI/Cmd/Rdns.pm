@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Rdns;
 # ABSTRACT: Robot reverse DNS commands
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

@@ -25,7 +25,7 @@ use WWW::Hetzner::Cloud::API::Pricing;
 use WWW::Hetzner::Cloud::Costs;
 use namespace::clean;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib 'lib';
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 # Map hyphenated commands to MooX::Cmd package names
 # (Perl packages can't have hyphens, so we translate)

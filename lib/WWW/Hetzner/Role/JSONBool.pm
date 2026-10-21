@@ -1,7 +1,7 @@
 package WWW::Hetzner::Role::JSONBool;
 # ABSTRACT: Helper role for JSON boolean values in the Hetzner API
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo::Role;
 use namespace::clean;

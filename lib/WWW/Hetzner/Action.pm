@@ -1,7 +1,7 @@
 package WWW::Hetzner::Action;
 # ABSTRACT: Hetzner API action object
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use Carp qw(croak);

@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Certificate;
 # ABSTRACT: Hetzner Cloud Certificate object
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 with 'WWW::Hetzner::Role::HasAction';

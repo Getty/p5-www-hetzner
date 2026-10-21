@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::API::Pricing;
 # ABSTRACT: Hetzner Cloud Pricing API
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use WWW::Hetzner::Cloud::Pricing;

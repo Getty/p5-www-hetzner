@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::API::Boot;
 # ABSTRACT: Hetzner Robot Boot Configuration API
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use Carp qw(croak);

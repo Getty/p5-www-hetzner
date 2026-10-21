@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::StorageBox::Cmd::Subaccount::Cmd::ChangeHomeDirectory;
 # ABSTRACT: Change a Storage Box subaccount home directory
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

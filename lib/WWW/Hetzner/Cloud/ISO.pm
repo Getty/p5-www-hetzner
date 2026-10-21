@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::ISO;
 # ABSTRACT: Hetzner Cloud ISO object
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use namespace::clean;

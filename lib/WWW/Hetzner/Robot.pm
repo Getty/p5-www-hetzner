@@ -14,7 +14,7 @@ use WWW::Hetzner::Robot::API::RDNS;
 use WWW::Hetzner::Robot::API::Failover;
 use namespace::clean;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 =head1 SYNOPSIS
 

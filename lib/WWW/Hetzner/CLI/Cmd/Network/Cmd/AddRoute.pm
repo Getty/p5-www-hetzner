@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::AddRoute;
 # ABSTRACT: Add a route to a network
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Unassign;
 # ABSTRACT: Unassign a floating IP from its server
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

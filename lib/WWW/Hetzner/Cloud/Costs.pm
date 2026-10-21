@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Costs;
 # ABSTRACT: Current running cost of a Hetzner Cloud project
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use Carp qw(croak);

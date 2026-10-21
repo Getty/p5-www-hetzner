@@ -1,7 +1,7 @@
 package WWW::Hetzner::Storage;
 # ABSTRACT: Perl client for Hetzner Storage Box API
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use WWW::Hetzner::Storage::API::Actions;

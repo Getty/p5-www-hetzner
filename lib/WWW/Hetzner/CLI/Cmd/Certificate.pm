@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Certificate;
 # ABSTRACT: Hetzner Cloud Certificate commands
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;

@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Volume::Cmd::Detach;
 # ABSTRACT: Detach a volume from a server
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use Moo;
 use MooX::Cmd;
