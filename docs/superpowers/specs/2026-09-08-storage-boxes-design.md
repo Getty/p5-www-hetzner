@@ -1,48 +1,48 @@
 # Design: Storage Boxes (api.hetzner.com)
 
-- Ticket: karr #5 (Board `WWW-Hetzner`)
-- Datum: 2026-09-08
-- Status: Freigegeben am 2026-09-08, vollständiger Umfang
-- Voraussetzungen: Action-Namespace #10; HTTP-Korrekturen #11/#13; additive Pagination #12
+- Ticket: karr #5 (board `WWW-Hetzner`)
+- Date: 2026-09-08
+- Status: approved on 2026-09-08, full scope
+- Prerequisites: action namespace #10; HTTP fixes #11/#13; additive pagination #12
 
-## Problem und Ziel
+## Problem and goal
 
-`WWW::Hetzner` verspricht Cloud, Storage und Robot, bietet bisher aber keinen
-Client für `api.hetzner.com`. Ein eigener Storage-Client ergänzt den fehlenden
-Host und bildet dessen Storage-Box-Ressourcen vollständig ab: Boxen, Typen,
-Actions, Subaccounts und Snapshots, einschließlich CLI, Mock-Fixtures und POD.
+`WWW::Hetzner` promises Cloud, Storage and Robot, but so far offers no
+client for `api.hetzner.com`. A dedicated Storage client adds the missing
+host and covers its Storage Box resources completely: boxes, types,
+actions, subaccounts and snapshots, including CLI, mock fixtures and POD.
 
-Der Maintainer hat den ursprünglich vorgeschlagenen Erstrundenumfang ausdrücklich
-erweitert: Subaccounts, Snapshot-Verwaltung und Storage-Label-Kommandos werden
-**nicht vertagt**. Pagination bleibt kompatibel: `list()` liefert eine Seite,
-`list_all()` wird additiv ergänzt; CLI-Listen und vollständige lokale Namenssuchen
-verwenden `list_all()`.
+The maintainer explicitly extended the originally proposed first-round scope:
+subaccounts, snapshot management and storage label commands are
+**not postponed**. Pagination stays compatible: `list()` returns one page,
+`list_all()` is added additively; CLI lists and complete local name lookups
+use `list_all()`.
 
-## API-Grundlage
+## API basis
 
-Offizielle OpenAPI-Beschreibung, im ursprünglichen Entwurf am 2026-09-08 geprüft:
-`https://docs.hetzner.cloud/hetzner.spec.json`, OpenAPI 3.1.2, Titel „Hetzner API“,
-Server `https://api.hetzner.com/v1`. Vor der Implementierung sind konkrete
-Request-Felder und CLI-Optionen nochmals gegen diese offiziellen Quellen zu prüfen.
-Keine Gegenprobe gegen echte Infrastruktur.
+Official OpenAPI description, checked in the original draft on 2026-09-08:
+`https://docs.hetzner.cloud/hetzner.spec.json`, OpenAPI 3.1.2, title "Hetzner API",
+server `https://api.hetzner.com/v1`. Before implementation, concrete
+request fields and CLI options must be checked again against these official sources.
+No cross-check against real infrastructure.
 
-### Authentifizierung und Fehler
+### Authentication and errors
 
-Bearer-Token aus einem Hetzner-Console-Projekt, beschafft unter Security → API
-Tokens. Dieselbe Beschaffungsanweisung steht in der Cloud-Spezifikation; auch
-Hetzners Ansible-Modul `hetzner.hcloud.storage_box` verwendet denselben
-`api_token`/`HCLOUD_TOKEN` und einen eigenen `api_endpoint_hetzner`.
+Bearer token from a Hetzner Console project, obtained under Security → API
+Tokens. The cloud specification carries the same instructions; Hetzner's
+Ansible module `hetzner.hcloud.storage_box` also uses the same
+`api_token`/`HCLOUD_TOKEN` and a separate `api_endpoint_hetzner`.
 
-Die Distribution verwendet entsprechend ihrer bestehenden Cloud-Konvention
-`HETZNER_API_TOKEN`, nicht `HCLOUD_TOKEN` und keine neue Storage-Variable.
-Robots Basic Auth ist hier nicht beteiligt.
+In line with its existing Cloud convention, the distribution uses
+`HETZNER_API_TOKEN`, not `HCLOUD_TOKEN` and no new Storage variable.
+Robot's Basic Auth is not involved here.
 
-Fehlerform: `{"error":{"code","message","details"}}`, wie Cloud. Bestehendes
-`Role::HTTP::_parse_response` ist wiederzuverwenden.
+Error shape: `{"error":{"code","message","details"}}`, like Cloud. The existing
+`Role::HTTP::_parse_response` is to be reused.
 
-### Endpunkte
+### Endpoints
 
-| Pfad | Methoden | Antwort |
+| Path | Methods | Response |
 |---|---|---|
 | `/storage_boxes` | GET, POST | `{storage_boxes, meta}` · `{storage_box, action}` |
 | `/storage_boxes/{id}` | GET, PUT, DELETE | `{storage_box}` · `{storage_box}` · `{action}` |
@@ -50,7 +50,7 @@ Fehlerform: `{"error":{"code","message","details"}}`, wie Cloud. Bestehendes
 | `/storage_boxes/actions` | GET | `{actions, meta}` |
 | `/storage_boxes/actions/{id}` | GET | `{action}` |
 | `/storage_boxes/{id}/actions` | GET | `{actions, meta}` |
-| `/storage_boxes/{id}/actions/{action_id}` | GET | `{action}`, deprecated; nicht zum Polling benutzen |
+| `/storage_boxes/{id}/actions/{action_id}` | GET | `{action}`, deprecated; do not use for polling |
 | `/storage_boxes/{id}/actions/change_protection` | POST | `{action}` |
 | `/storage_boxes/{id}/actions/change_type` | POST | `{action}` |
 | `/storage_boxes/{id}/actions/reset_password` | POST | `{action}` |
@@ -68,11 +68,11 @@ Fehlerform: `{"error":{"code","message","details"}}`, wie Cloud. Bestehendes
 | `/storage_box_types` | GET | `{storage_box_types, meta}` |
 | `/storage_box_types/{id}` | GET | `{storage_box_type}` |
 
-Der deprecated Einzelaktionspfad wurde laut Spezifikation am 2026-04-30
-abgekündigt. Polling verwendet immer `/storage_boxes/actions/{id}`; ein globales
-`/actions/{id}` existiert für diesen Host nicht.
+According to the specification, the deprecated single-action path was deprecated on
+2026-04-30. Polling always uses `/storage_boxes/actions/{id}`; a global
+`/actions/{id}` does not exist for this host.
 
-### Entity-Felder und Pflichtangaben
+### Entity fields and required fields
 
 - StorageBox: `id`, `name`, `storage_box_type`, `location`, `access_settings`,
   `snapshot_plan` (nullable), `protection`, `labels`, `status`, `username`
@@ -85,194 +85,194 @@ abgekündigt. Polling verwendet immer `/storage_boxes/actions/{id}`; ein globale
   `automatic_snapshot_limit` (nullable), `subaccounts_limit`, `size`, `prices`,
   `deprecation` (nullable).
 
-Create-Pflichtfelder: Box `storage_box_type`, `location`, `name`, `password`;
-Subaccount `home_directory`, `password`; Snapshot keine Pflichtfelder.
-Nullable Werte bleiben `undef`; Datenrepräsentation und Accessoren folgen den
-vorhandenen Cloud-Entities, einschließlich vollständiger Rohdaten über `data()`.
+Required create fields: box `storage_box_type`, `location`, `name`, `password`;
+subaccount `home_directory`, `password`; snapshot no required fields.
+Nullable values stay `undef`; data representation and accessors follow the
+existing Cloud entities, including complete raw data via `data()`.
 
-### Actions und Rückgabevertrag
+### Actions and return contract
 
-Das Action-Schema entspricht Cloud: `id`, `command`, `status`, `progress`,
-`started`, `finished` (nullable), `resources`, `error` (nullable mit code/message).
+The action schema matches Cloud: `id`, `command`, `status`, `progress`,
+`started`, `finished` (nullable), `resources`, `error` (nullable with code/message).
 Status: running/success/error.
 
-- Create liefert das Entity mit erforderlicher `->action`.
-- Update liefert das Entity, **keine erfundene Action**.
-- Delete liefert eine Action; die API antwortet HTTP 201 mit `{action}`, nicht 204.
-- POST-Action-Endpunkte liefern `WWW::Hetzner::Action`.
-- Keine Storage-Operation liefert `next_actions`, plural `actions` beim Create
-  oder Sidecar-Daten. Vorhandene optionale gemeinsame Attribute dürfen leer bleiben.
-- Passwort-Resets nehmen das Passwort als Eingabe; sie liefern keines zurück.
-- Die Bibliothek wartet nicht automatisch. Die CLI wartet nach bestehendem Muster;
-  `--no-wait` schaltet dies ab.
+- Create returns the entity with a required `->action`.
+- Update returns the entity, **no invented action**.
+- Delete returns an action; the API answers HTTP 201 with `{action}`, not 204.
+- POST action endpoints return `WWW::Hetzner::Action`.
+- No Storage operation returns `next_actions`, plural `actions` on create
+  or sidecar data. Existing optional shared attributes may stay empty.
+- Password resets take the password as input; they return none.
+- The library does not wait automatically. The CLI waits following the existing pattern;
+  `--no-wait` turns this off.
 
-### Pagination und Rate Limit
+### Pagination and rate limit
 
-`page`/`per_page` und `meta.pagination` entsprechen Cloud. Default 25, Maximum 50;
-Metadaten: page, per_page, previous_page, next_page, last_page, total_entries,
-zusätzlich Link-Header. Der proseartige `page_size`-Verweis der API-Doku widerspricht
-den maschinenlesbaren Parametern; maßgeblich ist `per_page`.
+`page`/`per_page` and `meta.pagination` match Cloud. Default 25, maximum 50;
+metadata: page, per_page, previous_page, next_page, last_page, total_entries,
+plus Link headers. The prose mention of `page_size` in the API docs contradicts
+the machine-readable parameters; `per_page` is authoritative.
 
-Paginierung gilt für Boxen, Typen und beide Action-Listen. Subaccounts und Snapshots
-haben laut Spezifikation weder entsprechende Parameter noch `meta`.
+Pagination applies to boxes, types and both action lists. According to the specification,
+subaccounts and snapshots have neither such parameters nor `meta`.
 
-`list()` bleibt ein Seitenabruf. `list_all()` nutzt den gemeinsamen Helfer aus #12:
-Start bei erster bzw. ausdrücklich gesetzter `page`, `per_page` als Seitengröße,
-Filter/Sortierung unverändert auf jeder Folgeseite, keine Mutation der Aufrufparameter.
-Fehlende Metadaten bedeuten eine vollständige Einzelantwort; wiederholte oder
-ungültige Folgeseiten und Fehler auf späteren Seiten werden laut gemeldet.
-Nicht paginierte Unterlisten erhalten keine erfundenen Query-Parameter.
+`list()` stays a single-page fetch. `list_all()` uses the shared helper from #12:
+start at the first or explicitly set `page`, `per_page` as page size,
+filters/sorting unchanged on every following page, no mutation of the call parameters.
+Missing metadata means a complete single response; repeated or
+invalid following pages and errors on later pages are reported loudly.
+Non-paginated sublists get no invented query parameters.
 
-Beide APIs nennen 3600 Requests/Stunde und Projekt. Ob sie das Kontingent teilen,
-ist nicht dokumentiert. Kein spekulativer Backoff oder Rate-Limit-Umbau.
+Both APIs state 3600 requests/hour per project. Whether they share the quota
+is not documented. No speculative backoff or rate-limit rework.
 
-## Entscheidungen
+## Decisions
 
-### E1 — Eigener Storage-Client
+### E1 — A dedicated Storage client
 
-`WWW::Hetzner::Storage` wird Geschwister von Cloud und Robot, erreichbar über
-`$hetzner->storage`. Ein Client besitzt eine `base_url`; ein Cloud-Anbau müsste
-sie umbiegen oder den IO-Seam umgehen. Beides wird vermieden. Kein generischer
-Multi-Host-Client und keine vorsorgliche Abstraktion für mögliche weitere Dienste.
+`WWW::Hetzner::Storage` becomes a sibling of Cloud and Robot, reachable via
+`$hetzner->storage`. A client owns one `base_url`; an add-on to Cloud would have to
+bend it or bypass the IO seam. Both are avoided. No generic
+multi-host client and no precautionary abstraction for possible further services.
 
-### E2 — Gemeinsamer Env-Default, explizite Client-Konfiguration
+### E2 — Shared env default, explicit client configuration
 
-Storage verwendet `token` mit Default `$ENV{HETZNER_API_TOKEN}` und überschreibbare
-`base_url` mit Default `https://api.hetzner.com/v1`. Keine neue Env-Variable.
-Die Dachklasse erhält kein zusätzliches Token-Attribut: ihre Clients lesen jeweils
-den bestehenden Env-Default. Individuelle Tokens können am jeweiligen Client gesetzt
-werden. Die CLI baut Cloud und Storage aus ihrer vorhandenen `--token`-Option.
+Storage uses `token` with default `$ENV{HETZNER_API_TOKEN}` and an overridable
+`base_url` with default `https://api.hetzner.com/v1`. No new env variable.
+The umbrella class gets no additional token attribute: its clients each read
+the existing env default. Individual tokens can be set on the respective client.
+The CLI builds Cloud and Storage from its existing `--token` option.
 
-Fehlende Authentifizierung wird wie bei Cloud früh mit hilfreichem Storage-Hinweis
-abgewiesen, bevor der Request ausgeführt wird.
+As with Cloud, missing authentication is rejected early with a helpful Storage hint,
+before the request is executed.
 
-### E3 — Gemeinsamen HTTP-/IO-Seam erhalten
+### E3 — Keep the shared HTTP/IO seam
 
-Storage konsumiert `Role::HTTP`; der Pfad bleibt `_build_request` → `io->call`
-→ `_parse_response`. Keine Storage-HTTP-Rolle und kein direkter LWP-Zugriff.
+Storage consumes `Role::HTTP`; the path stays `_build_request` → `io->call`
+→ `_parse_response`. No Storage HTTP role and no direct LWP access.
 
-Die separaten Tickets #11/#13 korrigieren Form-Encoding für Robot und URI-Kodierung
-für alle Clients. Storage verwendet deren JSON/Bearer-Default unverändert. Die
-Request-/Response-Signaturen und Objektformen bleiben erhalten. Async-Folgetickets
-zur Seam-Regression werden auf dem Schwesterboard gepflegt, ohne dessen Code hier
-zu bearbeiten. Eine Async-Storage-Erweiterung ist nicht Teil dieses Vorhabens.
+The separate tickets #11/#13 fix form encoding for Robot and URI encoding
+for all clients. Storage uses their JSON/Bearer default unchanged. The
+request/response signatures and object shapes are preserved. Async follow-up tickets
+on the seam regression are maintained on the sister board, without editing its code
+here. An async Storage extension is not part of this project.
 
-### E4 — Neutrale Action-Bausteine
+### E4 — Neutral action building blocks
 
-Vorgelagert in #10 freigegeben und umgesetzt:
+Approved and implemented beforehand in #10:
 
-| vorher | nachher |
+| before | after |
 |---|---|
 | `WWW::Hetzner::Cloud::Action` | `WWW::Hetzner::Action` |
 | `WWW::Hetzner::Cloud::Role::HasAction` | `WWW::Hetzner::Role::HasAction` |
 | `WWW::Hetzner::Cloud::Role::HasActions` | `WWW::Hetzner::Role::HasActions` |
 
-Keine Rückwärtsaliases: diese Klassen waren nicht veröffentlicht. Cloud::API::Actions
-bleibt Cloud-spezifisch. Keine zweite Action-Klasse und keine duplizierte Poll-Logik.
+No backward aliases: these classes were never released. Cloud::API::Actions
+stays Cloud-specific. No second action class and no duplicated poll logic.
 
-Die gemeinsamen Wrapper erhalten in #5 einen überschreibbaren Poll-Pfad:
-Cloud `/actions`, Storage `/storage_boxes/actions`. Dies gilt für direkt gelieferte
-Actions und die Create-Actions von Boxen, Subaccounts und Snapshots.
+In #5 the shared wrappers get an overridable poll path:
+Cloud `/actions`, Storage `/storage_boxes/actions`. This applies to directly returned
+actions and the create actions of boxes, subaccounts and snapshots.
 
-### E5 — CLI unter hcloud.pl storage-box
+### E5 — CLI under hcloud.pl storage-box
 
-Kein drittes Binary. `WWW::Hetzner::CLI` folgt der offiziellen hcloud-CLI, deren
-Storage-Box-Zweig seit 1.61.0 existiert. Der separate Robot-Einstieg bleibt unberührt.
+No third binary. `WWW::Hetzner::CLI` follows the official hcloud CLI, whose
+storage-box branch has existed since 1.61.0. The separate Robot entry point stays untouched.
 
-Box-Kommandos: list, describe, create, update, delete, change-type, reset-password,
+Box commands: list, describe, create, update, delete, change-type, reset-password,
 enable-protection, disable-protection, enable-snapshot-plan, disable-snapshot-plan,
 rollback-snapshot, update-access-settings, folders, add-label, remove-label.
-Dazu Untergruppen snapshot und subaccount für deren CRUD und Action-Operationen;
-konkrete Optionennamen anhand der offiziellen CLI-Dokumentation ausrichten.
-Storage-Label-Änderungen erhalten alle anderen Labels; kein Label-Umbau für sämtliche
-Cloud-Ressourcen.
+Plus subgroups snapshot and subaccount for their CRUD and action operations;
+align concrete option names with the official CLI documentation.
+Storage label changes preserve all other labels; no label rework for all
+Cloud resources.
 
-Mechanik: `CLI::Cmd::StorageBox`, `StorageBox::Cmd::*`, Unterbäume für Snapshot und
-Subaccount, vorhandene Alias-Tabelle und custom_help in `bin/hcloud.pl`, eigener
-storage-Accessor in `CLI.pm`. Mutierende Action-Pfade nutzen `WaitsForAction`.
+Mechanics: `CLI::Cmd::StorageBox`, `StorageBox::Cmd::*`, subtrees for snapshot and
+subaccount, the existing alias table and custom_help in `bin/hcloud.pl`, a dedicated
+storage accessor in `CLI.pm`. Mutating action paths use `WaitsForAction`.
 
-### E6 — MockIO und flache Fixtures
+### E6 — MockIO and flat fixtures
 
-`t/lib/Test/WWW/Hetzner/Mock.pm` erhält `mock_storage` nach `mock_cloud`/`mock_robot`,
-mit eigener base_url und test-token. Die in #11/#13 erweiterte MockIO-Schnittstelle
-wird wiederverwendet: Query-Inspektion, Content-Type-gerechte Bodies und originale
-Requests für unabhängige RAW-Assertions. Keine Umgestaltung zu einer generischen
-Fabrik; unterschiedliche Hosts erhalten getrennte MockIO-Instanzen.
+`t/lib/Test/WWW/Hetzner/Mock.pm` gets `mock_storage` after `mock_cloud`/`mock_robot`,
+with its own base_url and test token. The MockIO interface extended in #11/#13
+is reused: query inspection, content-type-correct bodies and original
+requests for independent RAW assertions. No redesign into a generic
+factory; different hosts get separate MockIO instances.
 
-Flache Fixtures unter `t/fixtures/`, Werte aus den offiziellen API-Beispielen:
+Flat fixtures under `t/fixtures/`, values from the official API examples:
 `storage_boxes_{list,get,create,action,folders}.json`,
 `storage_box_actions_{get,list}.json`, `storage_box_types_{get,list}.json`,
-entsprechende `storage_box_subaccounts_*` und `storage_box_snapshots_*`.
-Keine erfundenen Response-Felder und kein neues Fixture-Unterverzeichnis.
+the corresponding `storage_box_subaccounts_*` and `storage_box_snapshots_*`.
+No invented response fields and no new fixture subdirectory.
 
-### E7 — Vollständiger Umfang dieser Umsetzung
+### E7 — Full scope of this implementation
 
-- Storage-Client, Boxen, Typen, Actions.
-- Subaccounts mit CRUD und den drei dokumentierten Actions.
-- Snapshots mit CRUD; Snapshot-Plan/Rollback bleiben Box-Actions.
-- Vollständiger entsprechender CLI-Baum einschließlich Storage-Labels.
-- Fixtures, API-/Entity-/CLI-Tests, POD und Navigation.
-- Pagination und Query-Encoding über die eigenständigen Tickets #12/#13.
+- Storage client, boxes, types, actions.
+- Subaccounts with CRUD and the three documented actions.
+- Snapshots with CRUD; snapshot plan/rollback stay box actions.
+- The complete corresponding CLI tree including storage labels.
+- Fixtures, API/entity/CLI tests, POD and navigation.
+- Pagination and query encoding via the standalone tickets #12/#13.
 
-Keine Vertagung der Unterressourcen in neue Tickets. Nicht enthalten: S3/Object
-Storage, Async-Storage, spekulative zusätzliche API-Ressourcen, Release.
+No postponing of the subresources into new tickets. Not included: S3/Object
+Storage, async Storage, speculative additional API resources, release.
 
-## Architektur und betroffener Bestand
+## Architecture and affected code
 
-Neue Module unter `lib/WWW/Hetzner/`:
+New modules under `lib/WWW/Hetzner/`:
 
 - `Storage.pm`.
 - `Storage/API/{StorageBoxes,StorageBoxTypes,Actions,Subaccounts,Snapshots}.pm`.
 - `Storage/{StorageBox,StorageBoxType,Subaccount,Snapshot}.pm`.
-- `CLI/Cmd/StorageBox.pm`, `CLI/Cmd/StorageBox/Cmd/*.pm` und die Unterbäume.
+- `CLI/Cmd/StorageBox.pm`, `CLI/Cmd/StorageBox/Cmd/*.pm` and the subtrees.
 
-Mesh nach vorhandener Eins-zu-eins-Konvention:
+Mesh following the existing one-to-one convention:
 
-| Ressourcenwurzel | Accessor | Controller | Entity |
+| Resource root | Accessor | Controller | Entity |
 |---|---|---|---|
 | storage_boxes | `$storage->storage_boxes` | API::StorageBoxes | StorageBox |
 | storage_box_types | `$storage->storage_box_types` | API::StorageBoxTypes | StorageBoxType |
 | storage_boxes/actions | `$storage->actions` | API::Actions | WWW::Hetzner::Action |
-| storage_boxes/{id}/actions | `$box->actions` | API::Actions (storage_box_id gesetzt) | WWW::Hetzner::Action |
+| storage_boxes/{id}/actions | `$box->actions` | API::Actions (storage_box_id set) | WWW::Hetzner::Action |
 | subaccounts | `$box->subaccounts` | API::Subaccounts | Subaccount |
 | snapshots | `$box->snapshots` | API::Snapshots | Snapshot |
 
-Unterressourcen-Controller tragen storage_box_id nach `Cloud/API/RRSets.pm`;
-Entity-Zugriff folgt `Cloud/Zone.pm`. Der Actions-Controller verwendet dasselbe
-Muster: optionales storage_box_id bindet ausschließlich list/list_all an die Box;
-get($action_id) und Polling verwenden auch dort den globalen unterstützten Pfad.
-Ein zusätzlicher Wrapper für den deprecated Einzelaktionspfad wird nicht eingeführt.
-Kürzere erfundene Namen wie `$storage->boxes` werden nicht eingeführt.
+Subresource controllers carry storage_box_id following `Cloud/API/RRSets.pm`;
+entity access follows `Cloud/Zone.pm`. The actions controller uses the same
+pattern: an optional storage_box_id binds only list/list_all to the box;
+get($action_id) and polling use the global supported path there as well.
+No additional wrapper for the deprecated single-action path is introduced.
+Shorter invented names such as `$storage->boxes` are not introduced.
 
-Bestehende Dateien: `lib/WWW/Hetzner.pm`, `lib/WWW/Hetzner/CLI.pm`,
+Existing files: `lib/WWW/Hetzner.pm`, `lib/WWW/Hetzner/CLI.pm`,
 `lib/WWW/Hetzner/Role/HasActions.pm`, `bin/hcloud.pl`,
-`t/lib/Test/WWW/Hetzner/Mock.pm`, `t/basic.t`, `Changes`, README und POD-Navigation.
-Alle neuen Module müssen über L<> von WWW::Hetzner erreichbar sein.
+`t/lib/Test/WWW/Hetzner/Mock.pm`, `t/basic.t`, `Changes`, README and POD navigation.
+All new modules must be reachable via L<> from WWW::Hetzner.
 
-## Abnahme und Tests
+## Acceptance and tests
 
-Ausschließlich netzfreie Mock-Tests; sleeper injizieren, kein echtes Warten.
+Network-free mock tests only; inject the sleeper, no real waiting.
 
-- Client: richtiger Host, Bearer-Auth, explizite Tokens/URL und fehlender Token.
-- Boxen/Typen: list/get/list_all/get_by_name, vollständige und nullable Attribute,
-  Create-Pflichtfelder, Update-Entity, Delete-Action, Folders als String-Arrayref.
-- Alle sieben Box-Actions: Pfad, Body und Action-Rückgabe.
-- Subaccounts: CRUD, alle drei Actions, richtige Box-/Subaccount-ID, Passwort als
-  Eingabe, Create-Action und Delete-Action.
-- Snapshots: CRUD, optionale Create-Felder, richtige verschachtelte IDs,
-  Create-Action und Delete-Action; Box-Snapshot-Plan und Rollback separat.
-- Action-Polling für alle Rückgabewege gegen `/storage_boxes/actions/{id}`,
-  niemals global `/actions` oder deprecated Pfade; running → success, API-Fehler,
-  Action-Fehler und Timeout.
-- Pagination für Boxen, Typen und Action-Listen mit mehreren Seiten;
-  Unterressourcen ohne erfundene Pagination.
-- CLI: jedes neue echte execute(), valide Optionen und Request-Weitergabe,
-  JSON decodierbar, Tabellen über Accessoren, Label-Erhalt, Standard-Wait und
-  `--no-wait`, Fehlerweitergabe. Aliases/Hilfe einschließlich Untergruppen prüfen.
-- Fixtures aus offiziellen Beispielen; RAW-Requests unabhängig vom Mock-Dekoder
-  prüfen, wo die Kodierung den Vertrag trägt.
-- Neue Module laden, POD-Syntax und vollständiger Linkgraph, Gesamtsuite,
-  `dzil build` und `dzil test`. Übersprungene Liveintegration ausdrücklich melden.
+- Client: correct host, Bearer auth, explicit tokens/URL and missing token.
+- Boxes/types: list/get/list_all/get_by_name, complete and nullable attributes,
+  required create fields, update entity, delete action, folders as a string arrayref.
+- All seven box actions: path, body and action return.
+- Subaccounts: CRUD, all three actions, correct box/subaccount ID, password as
+  input, create action and delete action.
+- Snapshots: CRUD, optional create fields, correct nested IDs,
+  create action and delete action; box snapshot plan and rollback separately.
+- Action polling for all return paths against `/storage_boxes/actions/{id}`,
+  never global `/actions` or deprecated paths; running → success, API error,
+  action error and timeout.
+- Pagination for boxes, types and action lists with several pages;
+  subresources without invented pagination.
+- CLI: every new real execute(), valid options and request passing,
+  JSON decodable, tables via accessors, label preservation, default wait and
+  `--no-wait`, error passing. Check aliases/help including subgroups.
+- Fixtures from official examples; check RAW requests independently of the mock decoder
+  where the encoding carries the contract.
+- Load new modules, POD syntax and complete link graph, full suite,
+  `dzil build` and `dzil test`. Report skipped live integration explicitly.
 
-`Changes` unter `{{$NEXT}}` beschreibt den tatsächlichen neuen Umfang. Keine
-Versions-/Release-Aktion aus dieser Spezifikation ableiten.
+`Changes` under `{{$NEXT}}` describes the actual new scope. Do not derive
+any version/release action from this specification.

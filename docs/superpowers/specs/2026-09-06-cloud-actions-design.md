@@ -1,270 +1,270 @@
 # Design: Cloud Actions
 
-- Ticket: karr #2 (Board `WWW-Hetzner`)
-- Datum: 2026-09-06
-- Status: genehmigt, Implementierungsplan ausstehend
+- Ticket: karr #2 (board `WWW-Hetzner`)
+- Date: 2026-09-06
+- Status: approved, implementation plan pending
 
 ## Problem
 
-Die Hetzner Cloud API antwortet auf jeden mutierenden Aufruf mit einer Action —
-einem asynchronen Vorgang mit eigenem Status. `WWW::Hetzner` wirft diese
-Information heute weg oder reicht sie unbearbeitet durch:
+The Hetzner Cloud API answers every mutating call with an action —
+an asynchronous operation with its own status. `WWW::Hetzner` currently throws this
+information away or passes it through unprocessed:
 
-- `Cloud/API/Servers.pm:208` gibt nur `$result->{server}` zurück; `action` und
-  `next_actions` fallen unter den Tisch.
-- `Cloud/API/Servers.pm:234` und die übrigen 37 Aktionsmethoden geben den rohen
-  dekodierten Hashref `{action => {...}}` durch.
-- `Role/HTTP.pm:200` croakt ausschliesslich bei HTTP-Status ausserhalb 2xx. Eine
-  fehlgeschlagene Action kommt aber als **HTTP 201 mit `action.status ==
-  "error"`** und läuft damit vollständig am Fehlerpfad vorbei.
+- `Cloud/API/Servers.pm:208` returns only `$result->{server}`; `action` and
+  `next_actions` get dropped.
+- `Cloud/API/Servers.pm:234` and the remaining 37 action methods pass the raw
+  decoded hashref `{action => {...}}` through.
+- `Role/HTTP.pm:200` croaks only on HTTP status outside 2xx. A
+  failed action, however, arrives as **HTTP 201 with `action.status ==
+  "error"`** and so bypasses the error path entirely.
 
-Folge: Ein `create`, dessen Action scheitert, ist von einem erfolgreichen nicht
-zu unterscheiden. `CLI/Cmd/Server/Cmd/Poweron.pm:20` druckt `"Server powered
-on."`, bevor die Action überhaupt begonnen hat.
+Consequence: a `create` whose action fails cannot be told apart from a successful
+one. `CLI/Cmd/Server/Cmd/Poweron.pm:20` prints `"Server powered
+on."` before the action has even started.
 
-Das einzige Warten ist `wait_for_status` (`Cloud/API/Servers.pm:488`). Es pollt
-den Server-Status, nicht die Action, existiert nur für Server und sagt nichts
-darüber, warum ein Vorgang scheiterte.
+The only waiting is `wait_for_status` (`Cloud/API/Servers.pm:488`). It polls
+the server status, not the action, exists only for servers and says nothing
+about why an operation failed.
 
-## Entscheidungen
+## Decisions
 
-Vier Festlegungen, jeweils mit dem Grund, der sie getragen hat.
+Four decisions, each with the reason that carried it.
 
-### E1 — Die Bibliothek wartet nicht ungefragt
+### E1 — The library does not wait unasked
 
-Mutierende Aufrufe geben ein `Action`-Objekt zurück und schlafen nicht. Wer
-warten will, ruft `->wait`.
+Mutating calls return an `Action` object and do not sleep. Whoever
+wants to wait calls `->wait`.
 
-Grund: Eine Bibliothek, die in `create` heimlich schläft, ist überraschend, und
-`wait_for_status` ist der Präzedenzfall für *bewusst angefordertes* Warten.
+Reason: a library that secretly sleeps in `create` is surprising, and
+`wait_for_status` is the precedent for *deliberately requested* waiting.
 
-Verworfene Alternative: blockierend per Default mit `wait => 0` als Opt-out. Das
-löst das Fehlerproblem zwar ohne Zutun des Aufrufers, ändert aber das
-Zeitverhalten jedes bestehenden Aufrufs.
+Rejected alternative: blocking by default with `wait => 0` as opt-out. That
+solves the error problem without any effort from the caller, but changes the
+timing behavior of every existing call.
 
-Ausdrücklich **nicht** tragend war die anfangs angeführte Parität mit
-`p5-net-async-hetzner`. Die Prüfung ergab: `Net::Async::Hetzner::Cloud`
-implementiert `Role::IO` nicht, sondern instanziiert intern ein
-`WWW::Hetzner::Cloud` und borgt sich daraus nur `_build_request` und
-`_parse_response` (`Net/Async/Hetzner/Cloud.pm:100` und `:103`). Es gibt dort
-weder Controller noch Entities — also auch keine Objektform, die in Parität zu
-halten wäre.
+Explicitly **not** a deciding factor was the initially cited parity with
+`p5-net-async-hetzner`. Checking showed: `Net::Async::Hetzner::Cloud`
+does not implement `Role::IO`; it instantiates a
+`WWW::Hetzner::Cloud` internally and borrows only `_build_request` and
+`_parse_response` from it (`Net/Async/Hetzner/Cloud.pm:100` and `:103`). There are
+neither controllers nor entities there — so no object shape that would need to be
+kept in parity either.
 
-### E2 — Das blockierende Warten gehört in die CLI
+### E2 — Blocking wait belongs in the CLI
 
-`hcloud.pl` wartet per Default und bietet `--no-wait`. Dort sitzt der Anwender,
-der das Ergebnis sehen will; die Bibliothek bleibt ehrlich.
+`hcloud.pl` waits by default and offers `--no-wait`. That is where the user sits
+who wants to see the result; the library stays honest.
 
-### E3 — `create` gibt weiterhin das Entity zurück
+### E3 — `create` keeps returning the entity
 
-Das Entity trägt die erzeugende Action als Attribut `action`, die Folgeaktionen
-als `next_actions`. Bestehende `create`-Aufrufe brechen nicht.
+The entity carries the creating action as attribute `action`, the follow-up actions
+as `next_actions`. Existing `create` calls do not break.
 
-Verworfen: ein eigenes `Result`-Objekt mit `->server`/`->action` (bricht jeden
-`create`-Aufruf über alle Ressourcen hinweg) und eine `wantarray`-Rückgabe
-(kontextabhängige Rückgaben sind eine Fehlerquelle, die man später bereut).
+Rejected: a separate `Result` object with `->server`/`->action` (breaks every
+`create` call across all resources) and a `wantarray` return
+(context-dependent returns are a source of bugs you regret later).
 
-### E4 — Injizierbarer Sleeper
+### E4 — Injectable sleeper
 
-Der Client bekommt ein `sleeper`-Attribut, Default `sub { sleep $_[0] }`. Tests
-schieben eine Zähl-Closure hinein.
+The client gets a `sleeper` attribute, default `sub { sleep $_[0] }`. Tests
+push a counting closure in.
 
-Grund: Intervall- **und** Timeout-Pfad werden ohne Wanduhr testbar, und die
-Anzahl der Polls ist prüfbar. Ein Timeout-Test, der echte Sekunden braucht, ist
-ein flaky Test.
+Reason: interval **and** timeout paths become testable without a wall clock, and the
+number of polls can be checked. A timeout test that needs real seconds is
+a flaky test.
 
-### E5 — Action-Methoden mit Sidecar-Daten: die Action trägt sie
+### E5 — Action methods with sidecar data: the action carries it
 
-Fünf Server-Action-Methoden liefern laut `cloud.spec.json` Nutzdaten *neben*
-`action`, die bei der pauschalen Umstellung auf „gib die Action zurück"
+According to `cloud.spec.json`, five server action methods return payload *next to*
+`action` that would be lost in a blanket switch to
 verloren gingen:
 
-| Methode | Sidecar |
+| Method | Sidecar |
 |---|---|
 | `enable_rescue`, `rebuild`, `reset_password` | `root_password` |
 | `request_console` | `password`, `wss_url` |
-| `create_image` | `image` (Endpunkt in dieser Distribution noch nicht implementiert — bekommt `result` automatisch, sobald der Controller-Method dazukommt) |
+| `create_image` | `image` (endpoint not yet implemented in this distribution — gets `result` automatically once the controller method is added) |
 
-Festlegung (Maintainer, 2026-09-07): Diese Methoden geben weiterhin eine
-`Action` zurück, die die Sidecar-Felder trägt. Die `Action` bekommt ein
-Attribut `result` (Hashref, Default `{}`) mit den Zusatzfeldern, plus getippte
-Bequemlichkeits-Leser (`root_password`, `image`, `wss_url`, `password`), die
-aus `result` lesen und `undef` liefern, wenn das Feld fehlt.
+Decision (maintainer, 2026-09-07): these methods keep returning an
+`Action` that carries the sidecar fields. The `Action` gets an
+attribute `result` (hashref, default `{}`) with the extra fields, plus typed
+convenience readers (`root_password`, `image`, `wss_url`, `password`) that
+read from `result` and return `undef` when the field is missing.
 
-Grund: Der einheitliche Action-Rückgabevertrag bleibt (jeder mutierende Aufruf
-gibt eine `Action`), es geht nichts verloren, und die Sidecar-Daten sind am
-Objekt auffindbar. Verworfen: ein eigenes Result-Objekt mit `->action` (wie
-E3) — konzeptuell sauber, aber eigene Rückgabeform pro Methode und mehr Code,
-ohne Mehrwert gegenüber dem `result`-Attribut.
+Reason: the uniform action return contract stays (every mutating call
+returns an `Action`), nothing gets lost, and the sidecar data can be found on the
+object. Rejected: a separate result object with `->action` (like
+E3) — conceptually clean, but its own return shape per method and more code,
+with no gain over the `result` attribute.
 
-Folge: Die CLI-Kommandos, die diese Daten anzeigen (`server rescue`,
-`reset-password`, `rebuild`, `create-image`), lesen sie über den neuen Zugriff
-(`$action->root_password` bzw. `$action->result`). Das behebt zugleich karr #6.
+Consequence: the CLI commands that display this data (`server rescue`,
+`reset-password`, `rebuild`, `create-image`) read it through the new accessor
+(`$action->root_password` or `$action->result`). This also fixes karr #6.
 
-## Architektur
+## Architecture
 
-### Neue Klassen
+### New classes
 
-**`WWW::Hetzner::Cloud::Action`** — Entity nach dem Muster von
-`WWW::Hetzner::Cloud::Server`: `client` als `weak_ref`, dazu die Attribute
+**`WWW::Hetzner::Cloud::Action`** — entity following the pattern of
+`WWW::Hetzner::Cloud::Server`: `client` as `weak_ref`, plus the attributes
 `id`, `command`, `status`, `progress`, `started`, `finished`, `resources`,
 `error`.
 
-| Methode | Verhalten |
+| Method | Behavior |
 |---|---|
-| `is_running` / `is_success` / `is_error` | Status-Prädikate |
-| `error_message` | `error.message` oder `undef` |
-| `refresh` | Neu laden über `poll_path` |
-| `wait(%opts)` | Pollt bis Endzustand |
-| `data` | Rohdaten, wie bei den übrigen Entities |
+| `is_running` / `is_success` / `is_error` | Status predicates |
+| `error_message` | `error.message` or `undef` |
+| `refresh` | Reload via `poll_path` |
+| `wait(%opts)` | Polls until a final state |
+| `data` | Raw data, as with the other entities |
 
-`wait` nimmt `interval` (Default 1) und `timeout` (Default 120, konsistent zu
-`wait_for_status`). Es croakt bei `status eq 'error'` mit der API-Meldung und
-bei Zeitüberschreitung mit Action-Id und Kommando.
+`wait` takes `interval` (default 1) and `timeout` (default 120, consistent with
+`wait_for_status`). It croaks on `status eq 'error'` with the API message and
+on timeout with the action id and command.
 
-**`WWW::Hetzner::Cloud::API::Actions`** — Controller mit `get($id)` und
+**`WWW::Hetzner::Cloud::API::Actions`** — controller with `get($id)` and
 `list(%params)`.
 
-### Der Poll-Pfad
+### The poll path
 
-Die `Action` erhält ihren Poll-Pfad vom erzeugenden Controller als Attribut
-`poll_path`. `refresh` hängt `/$id` daran.
+The `Action` receives its poll path from the creating controller as attribute
+`poll_path`. `refresh` appends `/$id` to it.
 
-Default ist der globale Pfad `/actions` (geklärt: nicht abgekündigt, siehe „Vor
-der Implementierung geklärt"). `poll_path` bleibt als Attribut trotzdem
-erhalten: es macht die Ressourcen-Variante `/{resource}/actions/{id}` zu einer
-Zeile pro Controller statt eines Umbaus, falls sie je gebraucht wird.
+The default is the global path `/actions` (clarified: not deprecated, see "Clarified
+before implementation"). `poll_path` stays as an attribute anyway:
+it turns the resource variant `/{resource}/actions/{id}` into one
+line per controller instead of a rework, should it ever be needed.
 
-### Neue Rollen
+### New roles
 
-**`WWW::Hetzner::Cloud::Role::HasActions`** — liefert `_wrap_action`, konsumiert
-von den 8 Controllern, die Actions erzeugen. Additiv; die bestehenden
-`_wrap`/`_wrap_list` in den Controllern bleiben unangetastet.
+**`WWW::Hetzner::Cloud::Role::HasActions`** — provides `_wrap_action`, consumed
+by the 8 controllers that create actions. Additive; the existing
+`_wrap`/`_wrap_list` in the controllers stay untouched.
 
-**`WWW::Hetzner::Cloud::Role::HasAction`** — liefert Entities die Attribute
-`action` und `next_actions`.
+**`WWW::Hetzner::Cloud::Role::HasAction`** — gives entities the attributes
+`action` and `next_actions`.
 
-Konsumiert von **acht** Entities, deren `create`-Antwort laut offizieller
-`cloud.spec.json` ein singular `action` enthält: `Certificate`, `FloatingIP`,
+Consumed by **eight** entities whose `create` response, according to the official
+`cloud.spec.json`, contains a singular `action`: `Certificate`, `FloatingIP`,
 `LoadBalancer`, `PrimaryIP`, `Server`, `Volume`, `PlacementGroup`, `Zone`.
 
-Die frühere Zählung „genau sechs" stammte aus den vorhandenen Fixtures, nicht
-aus dem echten Vertrag: die `create`-Fixtures von `PlacementGroup` und `Zone`
-sind veraltet und enthalten die Action nicht, die die echte API liefert. Bei
-`PlacementGroup` ist `action` nullable (nur ein *managed* Placement-Group löst
-eine aus) — `HasAction` muss den `undef`-Fall tragen. Siehe „Vor der
-Implementierung geklärt".
+The earlier count of "exactly six" came from the existing fixtures, not
+from the real contract: the `create` fixtures of `PlacementGroup` and `Zone`
+are outdated and do not contain the action the real API returns. For
+`PlacementGroup`, `action` is nullable (only a *managed* placement group triggers
+one) — `HasAction` must handle the `undef` case. See "Clarified before
+implementation".
 
-`Firewall` ist der Sonderfall: `create` liefert **`actions` im Plural** (eine
-Liste), nicht ein einzelnes `action`. `Firewall` konsumiert daher **nicht**
-`HasAction`, sondern bekommt ein eigenes Attribut `actions` (Arrayref von
-`Action`-Objekten). Der Wrap-Helfer in `HasActions` deckt beide Formen ab.
+`Firewall` is the special case: `create` returns **`actions` in the plural** (a
+list), not a single `action`. `Firewall` therefore does **not** consume
+`HasAction`; it gets its own attribute `actions` (arrayref of
+`Action` objects). The wrap helper in `HasActions` covers both shapes.
 
-Nicht konsumiert von `Network`, `RRSet`, `SSHKey` — deren `create`-Antwort
-enthält laut Spec keine Action.
+Not consumed by `Network`, `RRSet`, `SSHKey` — according to the spec their `create` response
+contains no action.
 
-`action` ist der Zustand zum Zeitpunkt der Erzeugung — ein Snapshot. Es ist
-`ro` und wird von `->refresh` des Entities nicht angefasst, bleibt also als
-(dann ggf. veralteter) Erzeugungs-Snapshot erhalten. Das steht so in der POD.
+`action` is the state at creation time — a snapshot. It is
+`ro` and is not touched by the entity's `->refresh`, so it stays as the
+(then possibly outdated) creation snapshot. The POD says so.
 
-(Korrektur 2026-09-07: Der ursprüngliche Entwurf sagte „nach `->refresh`
-`undef`". Das war eine nicht umgesetzte Über-Spezifikation; ein erhaltener
-Snapshot ist harmlos und nützlicher als ein Nullen. Die POD dokumentiert die
-tatsächliche Behaviour.)
+(Correction 2026-09-07: the original draft said "`undef` after `->refresh`".
+That was an unimplemented over-specification; a retained
+snapshot is harmless and more useful than nulling it. The POD documents the
+actual behavior.)
 
-**`WWW::Hetzner::CLI::Role::WaitsForAction`** — liefert die Option `--no-wait`
-und einen `handle_action`-Helfer. Es gibt keine CLI-Basisklasse; jedes Kommando
-ist eigenständig `MooX::Cmd` plus `MooX::Options`, und `MooX::Options` erlaubt
-das Bereitstellen von Optionen aus einer Rolle.
+**`WWW::Hetzner::CLI::Role::WaitsForAction`** — provides the option `--no-wait`
+and a `handle_action` helper. There is no CLI base class; every command
+is standalone `MooX::Cmd` plus `MooX::Options`, and `MooX::Options` allows
+providing options from a role.
 
 ### Sleeper
 
-`sleeper` wird auf `WWW::Hetzner::Role::HTTP` gelegt, nicht auf `Cloud` —
-additiv, und `Robot` erbt es für das spätere `boot`-Polling aus karr #4.
+`sleeper` goes on `WWW::Hetzner::Role::HTTP`, not on `Cloud` —
+additive, and `Robot` inherits it for the later `boot` polling from karr #4.
 
-`is => 'rw'` mit Default `sub { sleep $_[0] }`, damit Tests es nach dem Bau
-setzen können und `mock_cloud` nicht umgebaut werden muss.
+`is => 'rw'` with default `sub { sleep $_[0] }`, so tests can set it after construction
+and `mock_cloud` does not have to be rebuilt.
 
-## Betroffener Bestand
+## Affected code
 
-| Ort | Änderung | Umfang |
+| Location | Change | Scope |
 |---|---|---|
-| `Cloud/API/*.pm` | Aktionsmethoden geben `Action` statt Hashref | 38 Methoden, 8 Dateien |
-| `Cloud/*.pm` (Entities) | gespiegelte Aktionsmethoden ebenso | 28 Methoden, 8 Dateien |
-| `Cloud/*.pm` (Entities) | `HasAction` konsumieren (singular `action`) | 8 Dateien |
-| `Cloud/Firewall.pm` | `actions`-Attribut (Plural-Liste) | 1 Datei |
-| `t/fixtures/*_create.json` | veraltete Fixtures an die echte API angleichen | placement_groups, zones, volumes |
-| `Cloud.pm` | `actions`-Attribut für den neuen Controller | 1 |
-| `CLI/Cmd/**` | `WaitsForAction` konsumieren | mutierende Subcommands |
-| `Role/HTTP.pm` | `sleeper`-Attribut | 1 |
-| `t/cloud_*.t` | `$result->{action}{command}` wird `$result->action->command` | ca. 6 Dateien |
+| `Cloud/API/*.pm` | Action methods return `Action` instead of hashref | 38 methods, 8 files |
+| `Cloud/*.pm` (entities) | mirrored action methods likewise | 28 methods, 8 files |
+| `Cloud/*.pm` (entities) | consume `HasAction` (singular `action`) | 8 files |
+| `Cloud/Firewall.pm` | `actions` attribute (plural list) | 1 file |
+| `t/fixtures/*_create.json` | align outdated fixtures with the real API | placement_groups, zones, volumes |
+| `Cloud.pm` | `actions` attribute for the new controller | 1 |
+| `CLI/Cmd/**` | consume `WaitsForAction` | mutating subcommands |
+| `Role/HTTP.pm` | `sleeper` attribute | 1 |
+| `t/cloud_*.t` | `$result->{action}{command}` becomes `$result->action->command` | approx. 6 files |
 
-`wait_for_status` bleibt unverändert; seine POD verweist zusätzlich auf `->wait`.
+`wait_for_status` stays unchanged; its POD additionally points to `->wait`.
 
-### Brechende Änderung
+### Breaking change
 
-Die 66 Aktionsmethoden geben statt `{action => {...}}` ein `Action`-Objekt
-zurück. Bei Version 0.100 vertretbar, gehört aber als solche in `Changes`.
+The 66 action methods return an `Action` object instead of `{action => {...}}`.
+Acceptable at version 0.100, but it belongs in `Changes` as such.
 
-Die CLI ist davon nicht betroffen: sie verwirft die Rückgabewerte heute
-ohnehin (`CLI/Cmd/Server/Cmd/Poweron.pm:18`).
+The CLI is not affected: it discards the return values today
+anyway (`CLI/Cmd/Server/Cmd/Poweron.pm:18`).
 
 ## Tests
 
-Neu `t/cloud_actions.t`, gegen die Mock-Fixture-Harness, ohne Netz:
+New `t/cloud_actions.t`, against the mock fixture harness, without network:
 
-1. Entity-Attribute und Prädikate aus der Fixture
-2. `refresh` lädt neu
-3. `wait` Erfolgspfad: `running` → `running` → `success`
-4. `wait` Fehlerpfad: croakt mit der Meldung aus `action.error.message`
-5. `wait` Timeout: croakt mit Action-Id und Kommando
-6. Poll-Anzahl über den injizierten Sleeper, **ohne eine echte Sekunde**
-7. `Firewall`-`create` liefert `actions` (Plural) als Arrayref von `Action`
-8. `PlacementGroup`-`create` mit nullable `action`: `undef`-Fall trägt sauber
-9. `Volume`-`create` trägt `next_actions` aus der angeglichenen Fixture
+1. Entity attributes and predicates from the fixture
+2. `refresh` reloads
+3. `wait` success path: `running` → `running` → `success`
+4. `wait` error path: croaks with the message from `action.error.message`
+5. `wait` timeout: croaks with action id and command
+6. Poll count via the injected sleeper, **without a single real second**
+7. `Firewall` `create` returns `actions` (plural) as an arrayref of `Action`
+8. `PlacementGroup` `create` with nullable `action`: the `undef` case holds cleanly
+9. `Volume` `create` carries `next_actions` from the aligned fixture
 
-Neue Fixtures `actions_get.json` und `actions_list.json` in den Zuständen
-`running`, `success` und `error`. Aktions-Fixtures für Ressourcen existieren
-bereits (`networks_action.json`, `firewalls_action.json` und weitere).
+New fixtures `actions_get.json` and `actions_list.json` in the states
+`running`, `success` and `error`. Action fixtures for resources already
+exist (`networks_action.json`, `firewalls_action.json` and more).
 
-Die Mock-Harness bleibt unverändert: `Test::WWW::Hetzner::MockIO` akzeptiert
-schon Coderef-Handler (`t/lib/Test/WWW/Hetzner/Mock.pm:56`), womit sich eine
-Folge wechselnder Antworten für denselben Pfad abbilden lässt.
+The mock harness stays unchanged: `Test::WWW::Hetzner::MockIO` already accepts
+coderef handlers (`t/lib/Test/WWW/Hetzner/Mock.pm:56`), which can model a
+sequence of changing responses for the same path.
 
-## Nicht im Umfang
+## Out of scope
 
-- Robot-Ressourcen (karr #4), Storage Boxes (karr #5), read-only Controller
+- Robot resources (karr #4), Storage Boxes (karr #5), read-only controllers
   (karr #3)
-- `_build_request` und `_parse_response` werden **in ihrer Form nicht
-  angefasst**. Damit bleibt `p5-net-async-hetzner` unberührt und es braucht kein
-  Ticket auf dessen Board. Sollte sich das beim Bauen doch ergeben: anhalten und
-  dort ein Ticket anlegen — niemals ein stiller Cross-Repo-Edit.
-- Kein Release. Das entscheidet der Maintainer gesondert.
+- `_build_request` and `_parse_response` are **not touched in
+  their shape**. That leaves `p5-net-async-hetzner` untouched, and no
+  ticket on its board is needed. Should that turn out differently while building: stop and
+  open a ticket there — never a silent cross-repo edit.
+- No release. The maintainer decides that separately.
 
-## Vor der Implementierung geklärt
+## Clarified before implementation
 
-Beide Punkte am 2026-09-07 gegen die offizielle `cloud.spec.json`
-(`https://docs.hetzner.cloud/cloud.spec.json`) geprüft, nicht geraten:
+Both points checked on 2026-09-07 against the official `cloud.spec.json`
+(`https://docs.hetzner.cloud/cloud.spec.json`), not guessed:
 
-1. **Poll-Endpunkt.** Der globale `GET /actions/{id}` ist **nicht abgekündigt**
-   (`deprecated: false`), ebenso `GET /{resource}/actions/{id}`. Abgekündigt ist
-   nur die alte verschachtelte Form `/{resource}/{id}/actions/{action_id}`. →
-   `poll_path` bekommt als Default den globalen Pfad `/actions`; `refresh` hängt
-   `/$id` an. Der Controller kann den Wert überschreiben, falls je nötig, aber
-   der globale Pfad ist sicher.
-2. **Welche `create` liefert eine Action** (Fixture vs. echte API):
+1. **Poll endpoint.** The global `GET /actions/{id}` is **not deprecated**
+   (`deprecated: false`), nor is `GET /{resource}/actions/{id}`. Only the old
+   nested form `/{resource}/{id}/actions/{action_id}` is deprecated. →
+   `poll_path` defaults to the global path `/actions`; `refresh` appends
+   `/$id`. The controller can override the value if ever needed, but
+   the global path is safe.
+2. **Which `create` returns an action** (fixture vs. real API):
 
-   | Ressource | Fixture | echte API |
+   | Resource | Fixture | Real API |
    |---|---|---|
    | Server, FloatingIP, LoadBalancer, PrimaryIP, Certificate | `action` | `action` |
    | Volume | `action` | `action` + `next_actions` |
-   | Firewall | `actions` | `actions` (Plural-Liste) |
+   | Firewall | `actions` | `actions` (plural list) |
    | PlacementGroup | — | `action` (nullable) |
    | Zone | — | `action` |
    | Network, RRSet, SSHKey | — | — |
 
-   Konsequenz (vom Maintainer bestätigt, 2026-09-07): auf die echte API
-   korrigieren. `HasAction` auf acht Entities, `Firewall` mit Plural-`actions`,
-   und die veralteten Fixtures `placement_groups_create.json`,
-   `zones_create.json` sowie das fehlende `next_actions` in
-   `volumes_create.json` an die echte API angleichen.
+   Consequence (confirmed by the maintainer, 2026-09-07): correct to the real
+   API. `HasAction` on eight entities, `Firewall` with plural `actions`,
+   and align the outdated fixtures `placement_groups_create.json`,
+   `zones_create.json` as well as the missing `next_actions` in
+   `volumes_create.json` with the real API.
