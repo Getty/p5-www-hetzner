@@ -7,8 +7,8 @@ not here.
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it yourself — the
-principle, the delegation lock and the release rule are in
-`.claude/rules/www-hetzner-rules.md`.
+delegation lock and the publish gate are shared house rules (skilletor bundle
+`getty-cpan-dist@getty`); lanes and hazards are in `.claude/rules/www-hetzner-rules.md`.
 
 | Task | Agent |
 |---|---|
