@@ -1,6 +1,9 @@
 Revision history for WWW-Hetzner
 
 {{$NEXT}}
+    - The distribution declares Data::Record and Regexp::Common, which
+      MooX::Options needs for the comma-separated list options of the CLI
+      (GitHub issue 1)
 
 0.102     2026-10-21 18:48:51Z
     - The distribution declares LWP::Protocol::https, without it every
