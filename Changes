@@ -1,6 +1,9 @@
 Revision history for WWW-Hetzner
 
 {{$NEXT}}
+    - The skill perl-www-hetzner ships in .claude/skills/ for projects that
+      call WWW::Hetzner: install it with skilletor as
+      perl-www-hetzner@p5-www-hetzner.
     - The distribution declares Data::Record and Regexp::Common, which
       MooX::Options needs for the comma-separated list options of the CLI
       (GitHub issue 1)
