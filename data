@@ -1,0 +1,57 @@
+---
+class: standard
+completed: 2026-10-30T21:51:14Z
+created: 2026-10-30T21:38:51Z
+id: 35
+priority: medium
+started: 2026-10-30T21:46:24Z
+status: done
+tags:
+- skills
+- docs
+- escalated-from:kubernetes-ocp#243
+title: Consumer skill for using WWW::Hetzner from other projects (working name perl-www-hetzner)
+updated: 2026-10-30T21:51:14Z
+---
+
+kubernetes-ocp uses WWW::Hetzner (Cloud API) for its Hetzner provider and has no skill for
+using it. Working name: `perl-www-hetzner`.
+
+## What the consumer calls today (kubernetes-ocp at 3b4c8c7)
+
+- `WWW::Hetzner::Cloud->new(token => …)` — lib/OCP/Provider/Hetzner.pm, lib/OCP/Hetzner/Picker.pm, lib/OCP/Cmd/Hetzner/List.pm
+- `->servers->create / get / delete / list / list_by_label / wait_for_status`
+- `->ssh_keys->ensure($name, $pubkey)`
+- `->locations->list`, `->server_types->list` (pickers)
+- The returned `WWW::Hetzner::Cloud::Server` objects
+
+Worth covering for consumers beyond that: the Cloud vs Robot split, the pluggable IO
+transport and the mock fixtures (a consumer's network-free tests need them), what dies vs
+what returns undef, and the per-location server type data (k33). Generic Hetzner platform
+knowledge (networks, firewalls, IPs, costs) is `hetzner-operator@getty` — reference it,
+don't repeat it.
+
+## Why
+
+This repo's own skill is a maintainer skill: it is written as "load before editing <this
+dist>". A consumer project (here: kubernetes-ocp) needs the other half — how to *use* the
+module correctly from outside — and must not install the maintainer skill, which would
+fire on the wrong tasks. Precedent: kubernetes-rest ships `perl-kubernetes-rest` next to
+`kubernetes-rest-core`; io-k8s-p5 ships `perl-io-k8s-kubernetes-classes` next to
+`io-k8s-core`. The skill lives here because this repo owns its subject (skill
+`getty-skill-library`, "Where a skill lives"); consumers install it as `<name>@<this-repo>`.
+
+## Done when
+
+- A tracked `.claude/skills/<name>/SKILL.md` exists here, its description written as a
+  trigger for consumer work ("Use when calling <Module> from another project — …"), with
+  no overlap with the maintainer skill (link to it for internals instead).
+- The name follows the house naming rule (skill `getty-skill-library`, "Naming") and does
+  not collide with anything in `skilletor available`. Working name below; the repo's
+  agent decides.
+- It covers the surface a consumer actually calls (list below), the argument and return
+  shapes, how errors surface, and the traps a caller can step into — mined from the code
+  and tests (skill `skill-mining`), not from memory.
+- Wiring it into kubernetes-ocp is that board's card (see escalated-from), not this one.
+
+2026-10-30 21:51 Done: .claude/skills/perl-www-hetzner/SKILL.md (145 lines) plus a Changes entry, commit bc6b4f0, pushed. Claims mined from lib/ and t/, behaviour confirmed offline against a fake IO (paging, errors, ensure, wait_for_status, per-location server type data). Consumer bugs found in kubernetes-ocp go to that board.
