@@ -1,21 +1,21 @@
 requires 'perl', '5.008001';
-requires 'Moo';
-requires 'MooX::Cmd';
-requires 'MooX::Options';
 # MooX::Options loads these at run time for options with autosplit (the
 # --authorized-key style list options); it only recommends them itself.
 requires 'Data::Record';
-requires 'Regexp::Common';
-requires 'LWP::UserAgent';
-requires 'LWP::Protocol::https';
-requires 'JSON::MaybeXS';
-requires 'URI';
 requires 'HTTP::Request';
-requires 'namespace::clean';
+requires 'JSON::MaybeXS';
 requires 'Log::Any';
+requires 'LWP::Protocol::https';
+requires 'LWP::UserAgent';
+requires 'Moo';
+requires 'MooX::Cmd';
+requires 'MooX::Options';
+requires 'namespace::clean';
 requires 'Path::Tiny';
+requires 'Regexp::Common';
+requires 'URI';
 
 on test => sub {
-    requires 'Test::More', '0.94';
     requires 'Log::Any::Test';
+    requires 'Test::More', '0.94';
 };
