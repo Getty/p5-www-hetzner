@@ -68,11 +68,14 @@ sub call {
 
     # LWP synthesises a 5xx response when the request never reached the
     # server (connection refused, DNS, TLS, timeout). Report its reason in
-    # the API error shape instead of a bare status code.
+    # the API error shape instead of a bare status code. LWP's content
+    # repeats the reason below its first line and adds a Perl source
+    # position, so only the first line is kept.
     if (($response->header('Client-Warning') // '') eq 'Internal response') {
-        $content =~ s/\s+$//;
+        my ($reason) = $content =~ /^\s*(\S[^\n]*)/;
+        $reason =~ s/\s+$// if defined $reason;
         $content = encode_json({
-            error => { code => 'transport_error', message => $content || $response->message },
+            error => { code => 'transport_error', message => $reason || $response->message },
         });
     }
 
@@ -86,9 +89,13 @@ sub call {
 
 Execute an L<WWW::Hetzner::HTTPRequest> via LWP and return a
 L<WWW::Hetzner::HTTPResponse>. If LWP reports an internal failure (the
-request never reached the server), the response body is a JSON error with
-code C<transport_error> and LWP's message, so the resulting exception names
-the reason.
+request never reached the server), the response has status 500 and a JSON
+error body with code C<transport_error>. Its message is the first line of
+LWP's content, falling back to LWP's status message, so the reason appears
+once and without LWP's Perl source position. The caller's
+L<WWW::Hetzner::Role::HTTP> turns it into a L<WWW::Hetzner::Error>, for
+example C<Hetzner API error: Can't connect to 127.0.0.1:1 (Connection
+refused) (500 transport_error)>.
 
 =cut
 

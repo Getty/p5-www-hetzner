@@ -308,7 +308,7 @@ subtest 'LWPIO names the reason for LWP internal failures' => sub {
     }
     require HTTP::Response;
     my $cloud = WWW::Hetzner::Cloud->new(
-        token => 't',
+        token => 'test-token',
         io    => WWW::Hetzner::LWPIO->new(ua => Test::StubUA->new),
     );
     eval { $cloud->get('/servers') };
@@ -316,14 +316,14 @@ subtest 'LWPIO names the reason for LWP internal failures' => sub {
 };
 
 subtest 'non-JSON error body contributes status and text' => sub {
-    my $cloud = WWW::Hetzner::Cloud->new(token => 't');
+    my $cloud = WWW::Hetzner::Cloud->new(token => 'test-token');
     my $res = WWW::Hetzner::HTTPResponse->new(
         status => 502, content => "<html><body><h1>Bad Gateway</h1></body></html>");
     eval { $cloud->_parse_response($res, 'GET', '/servers') };
     like($@, qr/Hetzner API error: 502 Bad Gateway/, 'status and stripped text');
     $res = WWW::Hetzner::HTTPResponse->new(status => 503);
     eval { $cloud->_parse_response($res, 'GET', '/servers') };
-    like($@, qr/Hetzner API error: 503 at/, 'bare status when no body');
+    is("$@", "Hetzner API error: 503\n", 'bare status when no body');
 };
 
 done_testing;

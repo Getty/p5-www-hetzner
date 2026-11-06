@@ -40,6 +40,7 @@ lib/WWW/Hetzner/Robot.pm           # Robot API client
 lib/WWW/Hetzner/Robot/API/*.pm     # Robot API controllers
 lib/WWW/Hetzner/Role/HTTP.pm       # HTTP role (_build_request, _parse_response)
 lib/WWW/Hetzner/Role/IO.pm         # IO backend interface (requires 'call')
+lib/WWW/Hetzner/Error.pm           # exception object for non-2xx API responses
 lib/WWW/Hetzner/HTTPRequest.pm     # transport-independent request object
 lib/WWW/Hetzner/HTTPResponse.pm    # transport-independent response object
 lib/WWW/Hetzner/LWPIO.pm           # default sync IO backend (LWP::UserAgent)
@@ -79,7 +80,8 @@ HTTP transport is **pluggable** through `WWW::Hetzner::Role::IO`. Every request 
 
 1. `_build_request()` — builds an `HTTPRequest` (method, url, headers, content).
 2. `io->call($req)` — the IO backend executes it and returns an `HTTPResponse`.
-3. `_parse_response()` — decodes JSON, checks for API errors.
+3. `_parse_response()` — decodes JSON, checks for API errors; a non-2xx response throws a
+   `WWW::Hetzner::Error` (`status`, `code`, `api_message`, `message`).
 
 The default backend is `LWPIO` (LWP::UserAgent). A custom backend is any class that
 `with 'WWW::Hetzner::Role::IO'` and implements `call($req)` — receives an `HTTPRequest`,

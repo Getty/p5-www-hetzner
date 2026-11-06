@@ -6,6 +6,7 @@ use Moo::Role;
 use WWW::Hetzner::HTTPRequest;
 use WWW::Hetzner::HTTPResponse;
 use WWW::Hetzner::LWPIO;
+use WWW::Hetzner::Error;
 use JSON::MaybeXS qw(decode_json encode_json);
 use URI::Escape ();
 use Carp qw(croak);
@@ -42,9 +43,26 @@ Uses L<Log::Any> for logging HTTP requests and responses. The debug log of a
 request body masks the top-level keys C<password>, C<private_key> and
 C<user_data>; the request itself is sent unchanged.
 
-Non-2xx responses croak with C<Hetzner API error: ...>: the API's error
-message if the body carries one, otherwise the status code followed by the
-(tag-stripped, truncated) body text.
+A non-2xx response throws a L<WWW::Hetzner::Error>, which stringifies to one
+line:
+
+=over 4
+
+=item * With an API message: C<Hetzner API error: MESSAGE (STATUS CODE)>, or
+C<(STATUS)> when the body carries no code, for example
+C<Hetzner API error: unable to authenticate (401 unauthorized)>.
+
+=item * Without one: C<Hetzner API error: STATUS CODE>, otherwise STATUS
+followed by the (tag-stripped, truncated) body text, or STATUS alone for an
+empty body.
+
+=back
+
+The text quotes nothing from the request: no method, path, body or headers.
+Where the response body repeats the client's credential (the token; for Robot
+the password and the Base64 block of the C<Authorization> header), it reads
+C<********>. A caller reads the HTTP status, the API's error code and the API's
+message from the object's C<status>, C<code> and C<api_message> methods.
 
 =head1 REQUIRED ATTRIBUTES
 
@@ -262,6 +280,27 @@ sub _mask_body {
     return \%copy;
 }
 
+# The client's secrets as the server could echo them: the token (for Robot
+# its password) and the credential after the scheme in the Authorization
+# header (for Robot base64 of user:password).
+sub _credentials {
+    my ($self) = @_;
+    my $token = $self->token;
+    return () unless defined $token && length $token;
+    my %headers;
+    $self->_set_auth(\%headers);
+    my ($credential) = ($headers{Authorization} // '') =~ /^\S+\s+(\S+)/;
+    return grep { defined && length } $token, $credential;
+}
+
+sub _mask_credentials {
+    my ($self, $text) = @_;
+    for my $secret (sort { length $b <=> length $a } $self->_credentials) {
+        $text =~ s/\Q$secret\E/********/g;
+    }
+    return $text;
+}
+
 sub _parse_response {
     my ($self, $response, $method, $path) = @_;
 
@@ -273,11 +312,22 @@ sub _parse_response {
     }
 
     unless ($response->status >= 200 && $response->status < 300) {
-        my $error = (ref $data eq 'HASH' && ref $data->{error} eq 'HASH'
-                ? $data->{error}{message} : undef);
-        unless (defined $error) {
-            $error = $response->status;
-            my $text = $response->content // '';
+        my $status = $response->status;
+        my $api = ref $data eq 'HASH' && ref $data->{error} eq 'HASH' ? $data->{error} : {};
+        my ($code, $message) = map {
+            defined $_ && !ref $_ && length $_ ? $self->_mask_credentials($_) : undef
+        } @{$api}{qw(code message)};
+
+        my $error;
+        if (defined $message) {
+            $error = "$message (" . join(' ', grep { defined } $status, $code) . ')';
+        }
+        elsif (defined $code) {
+            $error = "$status $code";
+        }
+        else {
+            $error = $status;
+            my $text = $self->_mask_credentials($response->content // '');
             $text =~ s/<[^>]*>/ /g;
             $text =~ s/\s+/ /g;
             $text =~ s/^ //; $text =~ s/ $//;
@@ -285,7 +335,12 @@ sub _parse_response {
             $error .= " $text" if length $text;
         }
         $log->errorf("API error: %s", $error);
-        croak "Hetzner API error: $error";
+        WWW::Hetzner::Error->throw(
+            message     => "Hetzner API error: $error",
+            status      => $status,
+            code        => $code,
+            api_message => $message,
+        );
     }
 
     $log->infof("%s %s -> %s", $method, $path, $response->status);
@@ -296,7 +351,9 @@ sub _parse_response {
 
     my $data = $self->_parse_response($response, 'GET', '/servers');
 
-Parses a L<WWW::Hetzner::HTTPResponse>: decodes JSON, checks for errors.
+Parses a L<WWW::Hetzner::HTTPResponse>: decodes JSON, checks for errors. A
+non-2xx response throws a L<WWW::Hetzner::Error>; otherwise the decoded data
+is returned.
 Useful for async workflows where response parsing happens after transport.
 
 =cut
@@ -314,7 +371,7 @@ sub _request {
 =head1 SEE ALSO
 
 L<WWW::Hetzner::Cloud>, L<WWW::Hetzner::Role::IO>, L<WWW::Hetzner::LWPIO>,
-L<WWW::Hetzner::Action>, L<Log::Any>
+L<WWW::Hetzner::Action>, L<WWW::Hetzner::Error>, L<Log::Any>
 
 =cut
 

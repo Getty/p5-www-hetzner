@@ -96,19 +96,23 @@ my @here = grep { $_->{name} eq 'fsn1' && $_->{available} && !$_->{deprecation} 
 
 ## Errors
 
-Plain strings via `croak`; no exception classes. Match on the message.
+API errors are `WWW::Hetzner::Error` objects (`status`, `code`, `api_message`, `message`) that
+stringify to `Hetzner API error: ...`. Every other error (no token, missing argument, action,
+pagination) stays a plain string via `croak`.
 
 | Situation | Message starts with |
 |---|---|
 | no token (first request) | `No Cloud API token configured.` |
 | missing argument | `Server ID required`, `name required`, `server_type required`, `image required`, `Name required` |
-| any non-2xx (404, 422, 429, ...) | `Hetzner API error: <API error.message>` |
-| non-JSON body (proxy 502) | `Hetzner API error: 502 <tag-stripped body text>` |
-| transport failure (DNS, refused, TLS, timeout) | `Hetzner API error: <LWP reason>` |
+| any non-2xx (404, 422, ...) | `Hetzner API error: <error.message> (<status> <code>)`; `(<status>)` without a code |
+| non-2xx without API message | `Hetzner API error: 429 rate_limit_exceeded`, or for a non-JSON body (proxy 502) `Hetzner API error: 502 <tag-stripped body text>`; `<status>` alone for an empty body |
+| transport failure (DNS, refused, TLS, timeout) | `Hetzner API error: <LWP reason> (500 transport_error)` |
 | action failed / timed out | `Action <id> (<command>) failed: ...` / `Timed out waiting for action ...` |
 
-The HTTP status and the API `error.code` are not exposed, only the message text. A caller that
-needs "does it exist" semantics wraps `get` in `eval` and matches the message, or looks the thing up with
+Read status and code off the object: `blessed $@ && $@->isa('WWW::Hetzner::Error') && $@->status == 404`
+(`$@->code` is Hetzner's `error.code` or undef). The text quotes nothing from the request, and a
+credential echoed by the response body reads `********`. A caller that
+needs "does it exist" semantics wraps `get` in `eval` and tests `status == 404`, or looks the thing up with
 `list_all( name => ... )` (servers) or `get_by_name` (ssh_keys, locations, server_types, images), which
 return empty/undef instead of dying.
 Default HTTP timeout is 30 s per request: `io => WWW::Hetzner::LWPIO->new( timeout => 60 )`.

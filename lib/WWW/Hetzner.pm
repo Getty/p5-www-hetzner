@@ -802,6 +802,9 @@ test harness.
         io    => My::CustomIO->new,
     );
 
+An API failure surfaces as a L<WWW::Hetzner::Error> object that stringifies
+to C<Hetzner API error: ...>.
+
 =over 4
 
 =item * L<WWW::Hetzner::Role::HTTP> - Builds requests, parses responses, holds the C<io> attribute
@@ -813,6 +816,8 @@ test harness.
 =item * L<WWW::Hetzner::HTTPRequest> - Transport independent request object
 
 =item * L<WWW::Hetzner::HTTPResponse> - Transport independent response object
+
+=item * L<WWW::Hetzner::Error> - Exception thrown for a non-2xx response, with C<status>, C<code> and C<api_message>
 
 =back
 

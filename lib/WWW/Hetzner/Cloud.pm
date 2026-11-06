@@ -454,7 +454,7 @@ This allows you to integrate with any logging framework of your choice.
 
 =item * B<info> - Successful API calls (method, path, status)
 
-=item * B<error> - API errors before croak
+=item * B<error> - API errors, before the L<WWW::Hetzner::Error> is thrown
 
 =back
 

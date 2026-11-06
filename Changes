@@ -16,6 +16,15 @@ Revision history for WWW-Hetzner
     - WWW::Hetzner::Cloud::Image has a deprecation attribute, also in data
     - The ServerType documentation names the keys of a locations entry as
       the API delivers them: id, name, deprecation, recommended, available
+    - A failed API request raises a WWW::Hetzner::Error object instead of a
+      string: status, code and api_message carry the HTTP status, the API's
+      error code and its message. It stringifies to "Hetzner API error:
+      <message> (<status> <code>)", or "<status> <code>" / "<status> <body
+      text>" when the body has no message, without a Perl source position.
+      Nothing from the request appears in it, and a client credential the
+      response body echoes reads ********.
+    - WWW::Hetzner::LWPIO states the reason of a transport failure once,
+      instead of repeating it with LWP's source position
 
 0.102     2026-10-21 18:48:51Z
     - The distribution declares LWP::Protocol::https, without it every
