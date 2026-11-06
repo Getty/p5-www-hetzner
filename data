@@ -1,0 +1,51 @@
+---
+claimed_at: 2026-11-06T20:04:00Z
+claimed_by: ocp-k36-k37
+class: standard
+completed: 2026-11-06T20:04:05Z
+created: 2026-10-31T01:50:37Z
+id: 36
+priority: high
+started: 2026-11-06T19:44:25Z
+status: done
+tags:
+- docs
+- api
+- server-types
+title: ServerType locations docs name a 'deprecated' field; the API's field is 'deprecation'
+updated: 2026-11-06T20:04:50Z
+---
+
+Found by OCP (kubernetes-ocp k246, 2026-10-31) against Hetzner's OpenAPI spec (docs.hetzner.cloud/cloud.spec.json) and the changelog entry of Oct 08: "Field deprecated will be removed".
+
+- **The field name is wrong.** The POD of WWW::Hetzner::Cloud::ServerType says each `locations` entry has a `deprecated` field. Per the spec, each entry has `id`, `name`, `deprecation` (an object or null), `recommended` and `available`. There is no `deprecated` key. The library passes the data through unchanged, so code that follows the docs and filters on `{deprecated}` hides nothing.
+- **The top-level field goes away.** Hetzner removes the top-level `deprecated` response field from Server Types, Images and Load Balancer Types on **2 November 2026**. The replacement for server types is the per-location `deprecation`; for images and LB types it is the top-level `deprecation`.
+- **The consumer skill has the same error.** perl-www-hetzner (sourced from this repo) shows `!$_->{deprecated}` as its example and says "Test the per-location deprecated". Both need to say `deprecation`.
+
+Done when:
+- the POD lists the real per-location keys;
+- the `->deprecated` accessors on ServerType, Image and LoadBalancerType are documented as gone after 2026-11-02, or are removed or derived from `deprecation`, whichever the maintainer prefers;
+- the consumer skill example uses `deprecation`;
+- a test with a fixture shaped like the spec pins the per-location keys.
+
+Festlegungen des Hubs perl-developer-bb für das OCP-Release (2026-11-06), keine Entscheidung des Maintainers: (1) Die POD von ServerType nennt die Schlüssel je Location laut Spec: id, name, deprecation (Objekt oder undef), recommended, available. (2) Die Accessoren deprecated auf ServerType, Image und LoadBalancerType behalten ihre dokumentierte Bedeutung; fehlt das Feld, leiten sie sie aus deprecation ab: Image und LoadBalancerType geben deprecation->{announced} zurück, ServerType ist deprecated, wenn jede Location eine deprecation trägt. Die POD sagt, woher der Wert kommt. (3) Consumer-Skill perl-www-hetzner und www-hetzner-core zeigen deprecation. (4) Test mit Fixture in Spec-Form. Geprüft gegen cloud.spec.json (2026-11-06) und den Changelog vom 2026-11-02 (Feld entfernt).
+
+2026-11-06 19:50 Worker start: entities are built by the controllers' _wrap (Class->new(client=>..., %$data)), so a Moo lazy builder on 'deprecated' covers list/get/get_by_name and keeps an API-supplied 'deprecated' (key present, even null) winning. ServerType derived value will be a JSON boolean (JSON::MaybeXS JSON()->true/false) = same type the old API field decoded to; JSONBool's \1/\0 are request-body refs and always true in Perl boolean context, so not usable for an accessor.
+
+2026-11-06 19:57 Implemented: deprecated on ServerType, Image and LoadBalancerType is now a lazy Moo attribute with _build_deprecated; a deprecated key sent by the API (even null) wins.
+
+2026-11-06 19:57 Image and LoadBalancerType derive deprecation.announced (undef without deprecation). ServerType derives JSON true when locations is non-empty and every location has a defined deprecation, otherwise JSON false: the same JSON::PP::Boolean class the decoded API field had, so the JSON output of the CLI prints true or false. Image got a deprecation attribute, in data too, with a short attr POD entry.
+
+2026-11-06 19:57 ISO unchanged per hub ruling: the CLI iso command already reads deprecation.unavailable_after first, which matches the old ISO field's meaning. Fixtures in spec form: server_types_list_current (cx11 deprecated in all locations, cx23 in none, cx33 in one of two; location keys id, name, deprecation, recommended, available), server_types_get (with locations, no top-level deprecated), images_list and images_get (deprecation null added), load_balancer_types_list and _get (deprecated null replaced by deprecation null). server_types_list.json stays in the legacy form on purpose, for the pass-through test.
+
+2026-11-06 19:57 Red against the old lib (git archive 2889d01, loaded via -I, verified with INC): cloud_server_types 4 of 9 subtests fail, cloud_images dies (no deprecation method), cloud_load_balancer_types 1 of 9, cli_list_text 1 of 12, cli_list_json 1 of 9. Green: prove -lr t/ gives Files=62, Tests=579, PASS; integration_cloud.t skipped because HETZNER_TEST_TOKEN is unset.
+
+2026-11-06 19:57 Left for the doc-writer: ServerType POD for deprecated still says the attribute is undef after 2026-11-02, and the locations POD still names a deprecated key; both are now wrong. Image and LoadBalancerType deprecated POD should say where the value comes from. Skills perl-www-hetzner and www-hetzner-core still to do. Also found (drift, not in scope): reading the hash slot of an entity directly bypasses the lazy derivation, the slot stays empty until the accessor runs, and some tests read entities that way; the Image entity lacks several spec fields (image_size, protection, bound_to, created_from, deleted, rapid_deploy) and ServerType lacks category. Request and response contract untouched, no ticket on the async repo needed.
+
+2026-11-06 19:58 Done: deprecated on ServerType, Image and LoadBalancerType is derived from deprecation when the API does not send it; an API-sent value wins; Image gains deprecation. Fixtures in spec form, tests replaced and added, red against the old lib shown, full suite Files=62 Tests=579 PASS. POD and skills left for the doc-writer, see notes. Not committed.
+
+Koordinator: Richtigstellung — dass ISO unverändert bleibt (deprecated nur durchgereicht, POD verweist auf deprecation), ist meine Festlegung als Koordinator, nicht die des Hubs: das alte ISO-Feld bedeutete laut alter Hetzner-Doku eher unavailable_after, eine Ableitung aus announced wäre geraten. Doc-writer: POD von ServerType (locations-Schlüssel id/name/deprecation/recommended/available, Herkunft von deprecated, bestellbar bis unavailable_after), Image, LoadBalancerType, ISO und Consumer-Skill perl-www-hetzner nachgezogen; www-hetzner-core sagt nichts dazu. Geprüft: prove -lr t/ Files=62 Tests=579 PASS (integration_cloud.t übersprungen, HETZNER_TEST_TOKEN nicht gesetzt); dzil build sauber; podchecker auf die vier gebauten Module OK.
+
+Committed as 3521bcf
+
+Amended: subject now carries (k36); commit is b5db4c4, 3521bcf is gone
