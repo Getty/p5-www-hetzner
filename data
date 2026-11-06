@@ -1,0 +1,38 @@
+---
+claimed_at: 2026-11-06T20:18:43Z
+claimed_by: ocp-k36-k37
+class: standard
+completed: 2026-11-06T20:18:47Z
+created: 2026-10-31T10:47:48Z
+id: 37
+priority: low
+started: 2026-11-06T20:05:36Z
+status: done
+tags:
+- errors
+- api
+title: Raised API error drops the HTTP status and error code when the body has a message;
+  a transport error repeats its reason
+updated: 2026-11-06T20:18:47Z
+---
+
+Found by kubernetes-ocp (k265, 2026-10-31), where `ocp init --hetzner` now prints why the catalogue read failed, as WWW::Hetzner raised it.
+
+- With WWW::Hetzner 0.102, when the response body carries an API message, the raised error drops the HTTP status and the API's error code: Hetzner's own 401 reads "unable to authenticate" with no "401" and no `unauthorized` code in it. A caller cannot tell a 401 from a 403 or a 429 without parsing the message text.
+- A transport failure repeats the reason: "... (Connection refused) Connection refused".
+
+Done = the raised error carries status and API code beside the message (as text, and ideally as fields on an exception object a caller can read), and a transport error states its reason once. Tests for a 401 with Hetzner's body, a body without message, and a refused connection.
+
+Festlegung des Hubs perl-developer-bb (OCP-Release 2026-11-06), keine Entscheidung des Maintainers: Der geworfene Fehler trägt HTTP-Status und API-Code neben der Meldung, als Text und als Felder eines Exception-Objekts; vorhandene Exception-Klasse der Dist nutzen (es gibt keine); ein Transportfehler nennt seinen Grund einmal; Tests: 401 mit Hetzners Body, Body ohne message, abgelehnte Verbindung; die Meldung zitiert keine Werte aus dem Request (kein Token, keine Nutzdaten).
+
+Festlegungen des Koordinators (meine, nicht Hub oder Maintainer): (1) Neue Klasse WWW::Hetzner::Error nach dem Hausmuster WWW::Authentik::Error (Moo, overload). Felder: status (HTTP-Status der IO-Antwort), code (API error.code oder undef), api_message (Hetzners error.message oder undef), message (die ganze Zeile, ohne Perl-Quellposition). Stringifiziert zu message plus Zeilenumbruch, damit ein ungefangener Fehler in der CLI sauber endet. (2) Text: mit API-Meldung 'Hetzner API error: <api_message> (<status> <code>)' — die Meldung bleibt vorn, damit Aufrufer, die auf 'Hetzner API error: <meldung>' matchen, weiter greifen; ohne API-Meldung wie bisher '<status> <code>' bzw. '<status> <Body-Text>'. (3) Transportfehler: LWPIO nimmt nur die erste Zeile von LWPs Text (bzw. die Statusmeldung) statt des ganzen Inhalts mit wiederholtem Grund und Perl-Position; Status bleibt LWPs 500, Code transport_error. (4) Kein Wert aus dem Request in der Meldung: weder Methode/Pfad noch Body noch Header; zitiert der Antwort-Body das Credential des Clients, wird es als ******** maskiert. (5) _parse_response behält Signatur und Rückgabe; nur der geworfene Wert wird ein Objekt — Net::Async::Hetzner bekommt dazu eine Info-Karte. (6) kubernetes-ocp t/265 pinnt den alten 401-Text exakt und wird absehbar rot; das ist gewollt und geht an den Hub.
+
+2026-11-06 20:08 Worker start. Robot: token() returns user && password (= the password); Authorization carries base64(user:password). Plan: mask token() and the credential part of the Authorization value from _set_auth — one generic helper in Role::HTTP covers Cloud, Storage and Robot without a Robot override. namespace::clean removes an overload declared before it (verified), so Error.pm puts use overload after use namespace::clean.
+
+2026-11-06 20:14 Verified red against old lib (b5db4c4): all 9 subtests of t/error.t red — old 401 text has no status/code, token leaks verbatim from a non-JSON body, refused connection counts 'Connection refused' twice; t/io.t 'bare status when no body' red (old text 'Hetzner API error: 503 at t/io.t line 325.'). Also found (outside the card, not fixed): a non-2xx body starting with '{' or '[' that is not valid JSON (proxy garbage) makes decode_json die with a plain JSON::XS string plus Perl position — no WWW::Hetzner::Error, no status. Masking has no minimum length: a one-char credential masks that char everywhere in the body text, so t/io.t's two token 't' fixtures became 'test-token'.
+
+2026-11-06 20:14 Done, uncommitted in worktree ocp-k36-k37. New lib/WWW/Hetzner/Error.pm (message/status/code/api_message, stringifies to message plus newline, throw). Role::HTTP _parse_response throws it: 'Hetzner API error: <api_message> (<status> <code>)', '(<status>)' without code, '<status> <code>' without message, else '<status> <masked, stripped, cut body text>'; token and the Authorization credential (Robot: password and base64 user:password) masked as ******** before cutting. Signature and return unchanged. LWPIO keeps only the first line of LWP's content as the transport reason. Tests: new t/error.t (401 Hetzner body, 404 without code, 429 code without message, non-JSON body quoting the token, masked api_message, mask-before-cut, real LWPIO against a closed 127.0.0.1 port, Robot, Storage); t/io.t bare-status assertion now exact, two 't' tokens -> 'test-token'. prove -lr t/: Files=63, Tests=588, PASS (integration_cloud.t skipped, no HETZNER_TEST_TOKEN). Error.pm and t/error.t are untracked: they must be staged before a dzil build ships them.
+
+Koordinator: Drift aus dem Worker-Bericht als eigene Karte k39 (kaputtes JSON in Nicht-2xx-Body wirft rohen decode-String). Info-Karte auf dem Board von p5-net-async-hetzner angelegt (dort k10): _parse_response wirft jetzt das Objekt; Signatur und Rückgabe unverändert. Doc-writer zieht POD (Role::HTTP, LWPIO, Cloud, WWW::Hetzner-Verlinkung) und Skills (perl-www-hetzner Errors, www-hetzner-core) nach.
+
+Committed as 7d9e205
