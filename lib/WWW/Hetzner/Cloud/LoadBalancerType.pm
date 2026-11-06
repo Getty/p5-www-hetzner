@@ -98,13 +98,24 @@ C<price_per_tb_traffic>.
 
 =cut
 
-has deprecated => ( is => 'ro' );
+has deprecated => ( is => 'lazy' );
 
 =attr deprecated
 
 Deprecation timestamp if deprecated, undef otherwise.
 
+If the API sends a C<deprecated> field, its value is returned unchanged.
+Otherwise the value is the C<announced> timestamp from L</deprecation>.
+
 =cut
+
+# A deprecated sent by the API is kept as is; without it, the announced
+# timestamp of the deprecation stands in.
+sub _build_deprecated {
+    my ($self) = @_;
+    my $deprecation = $self->deprecation;
+    return $deprecation ? $deprecation->{announced} : undef;
+}
 
 has deprecation => ( is => 'ro' );
 

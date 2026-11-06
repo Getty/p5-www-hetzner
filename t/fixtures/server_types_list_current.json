@@ -1,27 +1,95 @@
 {
   "server_types": [
     {
-      "id": 22,
-      "name": "cx23",
-      "description": "CX23",
-      "cores": 2,
-      "memory": 4,
-      "disk": 40,
-      "deprecated": false,
+      "id": 1,
+      "name": "cx11",
+      "description": "CX11",
+      "cores": 1,
+      "memory": 2,
+      "disk": 20,
       "prices": [],
       "storage_type": "local",
       "cpu_type": "shared",
       "architecture": "x86",
       "locations": [
         {
+          "id": 1,
           "name": "fsn1",
-          "available": true,
-          "deprecated": false
+          "deprecation": {
+            "announced": "2023-06-01T00:00:00+00:00",
+            "unavailable_after": "2023-09-01T00:00:00+00:00"
+          },
+          "recommended": false,
+          "available": false
         },
         {
+          "id": 2,
           "name": "nbg1",
-          "available": false,
-          "deprecated": false
+          "deprecation": {
+            "announced": "2023-06-01T00:00:00+00:00",
+            "unavailable_after": "2023-09-01T00:00:00+00:00"
+          },
+          "recommended": false,
+          "available": false
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "cx23",
+      "description": "CX23",
+      "cores": 2,
+      "memory": 4,
+      "disk": 40,
+      "prices": [],
+      "storage_type": "local",
+      "cpu_type": "shared",
+      "architecture": "x86",
+      "locations": [
+        {
+          "id": 1,
+          "name": "fsn1",
+          "deprecation": null,
+          "recommended": true,
+          "available": true
+        },
+        {
+          "id": 2,
+          "name": "nbg1",
+          "deprecation": null,
+          "recommended": false,
+          "available": false
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "name": "cx33",
+      "description": "CX33",
+      "cores": 4,
+      "memory": 8,
+      "disk": 80,
+      "prices": [],
+      "storage_type": "local",
+      "cpu_type": "shared",
+      "architecture": "x86",
+      "locations": [
+        {
+          "id": 1,
+          "name": "fsn1",
+          "deprecation": {
+            "announced": "2026-10-01T00:00:00+00:00",
+            "unavailable_after": "2027-01-01T00:00:00+00:00"
+          },
+          "recommended": false,
+          "available": true
+        },
+        {
+          "id": 2,
+          "name": "nbg1",
+          "deprecation": null,
+          "recommended": true,
+          "available": true
         }
       ]
     }

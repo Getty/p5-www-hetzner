@@ -4,6 +4,7 @@ package WWW::Hetzner::Cloud::ServerType;
 our $VERSION = '0.103';
 
 use Moo;
+use JSON::MaybeXS qw(JSON);
 use namespace::clean;
 
 =head1 SYNOPSIS
@@ -96,25 +97,71 @@ CPU architecture: x86 or arm.
 
 =cut
 
-has deprecated => ( is => 'ro' );
+has deprecated => ( is => 'lazy' );
 
 =attr deprecated
 
 Whether the server type is deprecated.
 
-The API drops this top-level field on 2026-11-02; from then on the attribute
-is undef.
+The API dropped this top-level field on 2026-11-02. If a response still
+carries it, the value is returned unchanged. Otherwise it is derived from
+L</locations>: true when the server type is deprecated (has a C<deprecation>)
+in every location it is offered in, false when at least one location has none
+or the server type is offered nowhere.
+
+A server type that is deprecated in only some locations therefore counts as
+not deprecated here. To find out whether it can be used in a given location,
+check the C<deprecation> of that location's entry in L</locations>.
 
 =cut
+
+# A deprecated sent by the API is kept as is. Without it, the type counts as
+# deprecated when it is deprecated in every location it is offered in.
+sub _build_deprecated {
+    my ($self) = @_;
+    my @locations = @{ $self->locations };
+    return JSON()->false unless @locations;
+    return ( grep { !defined $_->{deprecation} } @locations )
+        ? JSON()->false
+        : JSON()->true;
+}
 
 has locations => ( is => 'ro', default => sub { [] } );
 
 =attr locations
 
 Arrayref of location data hashrefs (read-only), one entry per location the
-server type is offered in. The entries carry the fields the API delivers:
-C<name> (e.g. "fsn1"), C<available> (whether the server type can be ordered
-there) and C<deprecated>.
+server type is offered in. Each entry has these keys:
+
+=over 4
+
+=item C<id>
+
+ID of the location.
+
+=item C<name>
+
+Location name, e.g. "fsn1".
+
+=item C<deprecation>
+
+Hashref with C<announced> and C<unavailable_after> timestamps, undef if the
+server type is not deprecated in this location.
+
+=item C<recommended>
+
+Whether Hetzner recommends the server type in this location.
+
+=item C<available>
+
+False if the server type is temporarily not orderable in this location.
+
+=back
+
+A server type can be ordered in location L when the entry for L has a true
+C<available> and either no C<deprecation> or a C<deprecation> whose
+C<unavailable_after> still lies in the future. An entry with a C<deprecation>
+marks the server type as being phased out in that location.
 
 C<available> replaces the availability the datacenter used to deliver in
 C<server_types.available>; the datacenter endpoints are gone.

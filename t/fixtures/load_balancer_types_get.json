@@ -7,7 +7,7 @@
     "max_services": 5,
     "max_targets": 25,
     "max_assigned_certificates": 10,
-    "deprecated": null,
+    "deprecation": null,
     "prices": [
       {
         "location": "fsn1",

@@ -108,6 +108,49 @@ subtest 'load balancer type data' => sub {
     is($data->{name}, 'lb11', 'data name');
     is($data->{max_assigned_certificates}, 10, 'data max assigned certificates');
     is($data->{prices}[0]{location}, 'fsn1', 'data carries prices');
+    ok(exists $data->{deprecation}, 'data carries deprecation');
+    ok(!defined $data->{deprecated}, 'a null deprecation: deprecated is undef');
+};
+
+subtest 'deprecated is derived from deprecation when the API does not send it' => sub {
+    my $cloud = mock_cloud(
+        'GET /load_balancer_types/9' => {
+            load_balancer_type => {
+                id          => 9,
+                name        => 'lb-old',
+                deprecation => {
+                    announced         => '2025-04-01T00:00:00+00:00',
+                    unavailable_after => '2025-07-01T00:00:00+00:00',
+                },
+            },
+        },
+    );
+
+    my $type = $cloud->load_balancer_types->get(9);
+
+    is($type->deprecated, '2025-04-01T00:00:00+00:00',
+        'deprecated is the announced timestamp');
+    is($type->data->{deprecated}, '2025-04-01T00:00:00+00:00',
+        'data carries the derived deprecated');
+};
+
+subtest 'an API-supplied deprecated wins over deprecation' => sub {
+    my $cloud = mock_cloud(
+        'GET /load_balancer_types/9' => {
+            load_balancer_type => {
+                id          => 9,
+                name        => 'lb-old',
+                deprecated  => '2025-03-01T00:00:00+00:00',
+                deprecation => {
+                    announced         => '2025-04-01T00:00:00+00:00',
+                    unavailable_after => '2025-07-01T00:00:00+00:00',
+                },
+            },
+        },
+    );
+
+    is($cloud->load_balancer_types->get(9)->deprecated, '2025-03-01T00:00:00+00:00',
+        'deprecated is passed through');
 };
 
 done_testing;

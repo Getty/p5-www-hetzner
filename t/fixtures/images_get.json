@@ -8,6 +8,7 @@
     "os_flavor": "debian",
     "os_version": "13",
     "architecture": "x86",
-    "rapid_deploy": true
+    "rapid_deploy": true,
+    "deprecation": null
   }
 }

@@ -117,6 +117,16 @@ my @cases = (
         matches => [ qr/cx11/, 'server type is shown', qr/2 GB/, 'memory is shown' ],
     },
     {
+        name    => 'servertype with a current response',
+        class   => 'WWW::Hetzner::CLI::Cmd::Servertype',
+        routes  => [ 'GET /server_types' => load_fixture('server_types_list_current') ],
+        matches => [
+            qr/^1\s+cx11\s.*\syes$/m,  'a type deprecated in every location shows yes',
+            qr/^22\s+cx23\s.*\s-$/m,   'a type deprecated in no location shows -',
+            qr/^33\s+cx33\s.*\s-$/m,   'a type deprecated in one of two locations shows -',
+        ],
+    },
+    {
         name    => 'zone',
         class   => 'WWW::Hetzner::CLI::Cmd::Zone',
         routes  => [ 'GET /zones' => load_fixture('zones_list') ],

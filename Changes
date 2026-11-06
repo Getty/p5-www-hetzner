@@ -7,6 +7,15 @@ Revision history for WWW-Hetzner
     - The distribution declares Data::Record and Regexp::Common, which
       MooX::Options needs for the comma-separated list options of the CLI
       (GitHub issue 1)
+    - WWW::Hetzner::Cloud::ServerType, ::Image and ::LoadBalancerType keep
+      their deprecated accessor now that the API no longer sends the field:
+      a server type counts as deprecated when it is deprecated in every
+      location it is offered in; images and load balancer types return the
+      announced timestamp of their deprecation. A deprecated value the API
+      still sends is returned unchanged.
+    - WWW::Hetzner::Cloud::Image has a deprecation attribute, also in data
+    - The ServerType documentation names the keys of a locations entry as
+      the API delivers them: id, name, deprecation, recommended, available
 
 0.102     2026-10-21 18:48:51Z
     - The distribution declares LWP::Protocol::https, without it every

@@ -6,10 +6,25 @@
     "cores": 2,
     "memory": 4,
     "disk": 40,
-    "deprecated": false,
     "prices": [],
     "storage_type": "local",
     "cpu_type": "shared",
-    "architecture": "x86"
+    "architecture": "x86",
+    "locations": [
+      {
+        "id": 1,
+        "name": "fsn1",
+        "deprecation": null,
+        "recommended": true,
+        "available": true
+      },
+      {
+        "id": 2,
+        "name": "nbg1",
+        "deprecation": null,
+        "recommended": false,
+        "available": false
+      }
+    ]
   }
 }

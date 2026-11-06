@@ -82,15 +82,15 @@ a changed comment counts as different content.
 my $locs  = $cloud->locations->list_all;                   # name city country network_zone description
 my $types = $cloud->server_types->list_all;                # name cores memory(GB) disk(GB) cpu_type architecture
 my ($t) = grep { $_->name eq 'cx32' } @$types;             # or ->get_by_name('cx32')
-my @here = grep { $_->{name} eq 'fsn1' && $_->{available} && !$_->{deprecated} } @{ $t->locations };
+my @here = grep { $_->{name} eq 'fsn1' && $_->{available} && !$_->{deprecation} } @{ $t->locations };
 ```
 
 - `architecture` is `x86` or `arm`; `cpu_type` is `shared` or `dedicated`.
-- `ServerType->locations` is an arrayref of `{ name, available, deprecated }`, one per location the
-  type is offered in. Decide "orderable in L" from that entry. `available` false means ordering there
-  fails at create time.
-- Test the per-location `deprecated`. The top-level `ServerType->deprecated` reads undef once the
-  API omits the field, and `!$t->deprecated` then filters nothing.
+- `ServerType->locations` is an arrayref of `{ id, name, deprecation, recommended, available }`, one per
+  location the type is offered in. Decide "orderable in L" from that entry. `available` false means
+  ordering there fails at create time.
+- Test the per-location `deprecation`. `ServerType->deprecated` is true only when the type is
+  deprecated in every location, so it does not tell whether L is fine.
 - `locations->list` and `server_types->list` are single pages too; the catalogue can exceed one page. Use `list_all`.
 - `datacenters` is dead (every call dies with API error 410 Gone); use `locations`.
 

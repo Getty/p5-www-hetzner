@@ -120,6 +120,24 @@ my @cases = (
         },
     },
     {
+        name   => 'servertype with a current response',
+        class  => 'WWW::Hetzner::CLI::Cmd::Servertype',
+        routes => [ 'GET /server_types' => load_fixture('server_types_list_current') ],
+        check  => sub {
+            my ($list) = @_;
+            is($list->[0]{name}, 'cx11', 'first server type');
+            ok(JSON::MaybeXS::is_bool($list->[0]{deprecated}) && $list->[0]{deprecated},
+                'a derived deprecated is printed as JSON true');
+            ok(JSON::MaybeXS::is_bool($list->[1]{deprecated}) && !$list->[1]{deprecated},
+                'a derived not-deprecated is printed as JSON false');
+            is_deeply(
+                [ sort keys %{ $list->[0]{locations}[0] } ],
+                [qw(available deprecation id name recommended)],
+                'the per-location keys survive --output json'
+            );
+        },
+    },
+    {
         name   => 'zone',
         class  => 'WWW::Hetzner::CLI::Cmd::Zone',
         routes => [ 'GET /zones' => load_fixture('zones_list') ],

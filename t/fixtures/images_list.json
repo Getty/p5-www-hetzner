@@ -9,7 +9,8 @@
       "os_flavor": "debian",
       "os_version": "12",
       "architecture": "x86",
-      "rapid_deploy": true
+      "rapid_deploy": true,
+      "deprecation": null
     },
     {
       "id": 2,
@@ -20,7 +21,8 @@
       "os_flavor": "debian",
       "os_version": "13",
       "architecture": "x86",
-      "rapid_deploy": true
+      "rapid_deploy": true,
+      "deprecation": null
     },
     {
       "id": 3,
@@ -31,7 +33,8 @@
       "os_flavor": "ubuntu",
       "os_version": "24.04",
       "architecture": "x86",
-      "rapid_deploy": true
+      "rapid_deploy": true,
+      "deprecation": null
     }
   ]
 }

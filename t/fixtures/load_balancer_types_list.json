@@ -8,7 +8,7 @@
       "max_services": 5,
       "max_targets": 25,
       "max_assigned_certificates": 10,
-      "deprecated": null,
+      "deprecation": null,
       "prices": [
         {
           "location": "fsn1",
@@ -27,7 +27,7 @@
       "max_services": 10,
       "max_targets": 75,
       "max_assigned_certificates": 20,
-      "deprecated": null,
+      "deprecation": null,
       "prices": [
         {
           "location": "fsn1",
@@ -46,7 +46,7 @@
       "max_services": 15,
       "max_targets": 150,
       "max_assigned_certificates": 30,
-      "deprecated": null,
+      "deprecation": null,
       "prices": [
         {
           "location": "fsn1",

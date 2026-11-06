@@ -88,8 +88,8 @@ has deprecated => ( is => 'ro' );
 
 =attr deprecated
 
-Legacy deprecation timestamp. Superseded by C<deprecation> in the current
-API; kept for responses that still carry it.
+Legacy deprecation timestamp. The API no longer sends this field, so the
+attribute reads undef; use L</deprecation> instead.
 
 =cut
 
