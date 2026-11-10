@@ -146,6 +146,17 @@ subtest 'deprecated is derived from the locations when the API does not send it'
     ok($found->deprecated, 'get_by_name derives the value as well');
 };
 
+subtest 'category is carried' => sub {
+    my $type = server_type_from(category => 'Shared vCPU');
+
+    is($type->category, 'Shared vCPU', 'category accessor');
+    is($type->data->{category}, 'Shared vCPU', 'data carries category');
+
+    my $plain = server_type_from();
+    ok(!defined $plain->category, 'category is undef when the API does not send it');
+    ok(exists $plain->data->{category}, 'data has the category key regardless');
+};
+
 subtest 'a type offered in no location is not deprecated' => sub {
     my $type = server_type_from(locations => []);
 

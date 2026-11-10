@@ -140,6 +140,59 @@ undef unless the image is deprecated.
 
 =cut
 
+has image_size => ( is => 'ro' );
+
+=attr image_size
+
+Size of the image file in the storage in GB, undef if the API does not
+report one. For snapshots this is the value that costs are calculated from.
+
+=cut
+
+has protection => ( is => 'ro' );
+
+=attr protection
+
+Protection hashref with a C<delete> key: true if the image is protected
+against deletion.
+
+=cut
+
+has bound_to => ( is => 'ro' );
+
+=attr bound_to
+
+ID of the server the image is bound to. Only set for images of type
+C<backup>, undef otherwise.
+
+=cut
+
+has created_from => ( is => 'ro' );
+
+=attr created_from
+
+Hashref with C<id> and C<name> of the server the image was created from
+(the name as it was when the image was created), undef for images that were
+not created from a server.
+
+=cut
+
+has deleted => ( is => 'ro' );
+
+=attr deleted
+
+Timestamp of the deletion of the image, undef if it was not deleted.
+
+=cut
+
+has rapid_deploy => ( is => 'ro' );
+
+=attr rapid_deploy
+
+Whether rapid deploy is available for the image.
+
+=cut
+
 has labels => ( is => 'ro', default => sub { {} } );
 
 =attr labels
@@ -163,6 +216,12 @@ sub data {
         created      => $self->created,
         deprecated   => $self->deprecated,
         deprecation  => $self->deprecation,
+        image_size   => $self->image_size,
+        protection   => $self->protection,
+        bound_to     => $self->bound_to,
+        created_from => $self->created_from,
+        deleted      => $self->deleted,
+        rapid_deploy => $self->rapid_deploy,
         labels       => $self->labels,
     };
 }

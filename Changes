@@ -29,6 +29,9 @@ Revision history for WWW-Hetzner
       (a proxy's "{ upstream broken") raises a WWW::Hetzner::Error with its
       status and body text, like any other non-JSON body; a successful
       response that does not decode still dies loudly
+    - WWW::Hetzner::Cloud::Image gains image_size, protection, bound_to,
+      created_from, deleted and rapid_deploy, WWW::Hetzner::Cloud::ServerType
+      gains category; all of them are also in data
 
 0.102     2026-10-21 18:48:51Z
     - The distribution declares LWP::Protocol::https, without it every

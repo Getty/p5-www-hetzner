@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
+use JSON::PP ();
 use lib 't/lib';
 
 use Test::WWW::Hetzner::Mock;
@@ -120,6 +121,62 @@ subtest 'an API-supplied deprecated wins over deprecation' => sub {
 
     is($cloud->images->get(10)->deprecated, '2025-03-01T00:00:00+00:00',
         'deprecated is passed through');
+};
+
+subtest 'fields beyond the basics are carried' => sub {
+    my $cloud = mock_cloud(
+        'GET /images/7' => {
+            image => {
+                id           => 7,
+                name         => 'snap',
+                type         => 'snapshot',
+                image_size   => 2.3,
+                protection   => { delete => JSON::PP::true },
+                bound_to     => undef,
+                created_from => { id => 1, name => 'web-1' },
+                deleted      => '2026-01-01T00:00:00+00:00',
+                rapid_deploy => JSON::PP::false,
+            },
+        },
+    );
+
+    my $image = $cloud->images->get(7);
+
+    is($image->image_size, 2.3, 'image_size');
+    ok($image->protection->{delete}, 'protection hashref');
+    ok(!defined $image->bound_to, 'bound_to undef for a non-backup');
+    is_deeply($image->created_from, { id => 1, name => 'web-1' }, 'created_from');
+    is($image->deleted, '2026-01-01T00:00:00+00:00', 'deleted');
+    ok(defined $image->rapid_deploy && !$image->rapid_deploy, 'rapid_deploy false');
+
+    my $data = $image->data;
+    is($data->{image_size}, 2.3, 'data carries image_size');
+    ok($data->{protection}{delete}, 'data carries protection');
+    ok(exists $data->{bound_to}, 'data carries bound_to');
+    is($data->{created_from}{name}, 'web-1', 'data carries created_from');
+    is($data->{deleted}, '2026-01-01T00:00:00+00:00', 'data carries deleted');
+    ok(exists $data->{rapid_deploy}, 'data carries rapid_deploy');
+};
+
+subtest 'a backup image is bound to a server' => sub {
+    my $cloud = mock_cloud(
+        'GET /images/8' => { image => { id => 8, type => 'backup', bound_to => 42 } },
+    );
+
+    my $image = $cloud->images->get(8);
+
+    is($image->bound_to, 42, 'bound_to');
+    is($image->data->{bound_to}, 42, 'data carries bound_to');
+};
+
+subtest 'rapid_deploy comes from the fixture' => sub {
+    my $cloud = mock_cloud( 'GET /images/2' => load_fixture('images_get') );
+
+    my $image = $cloud->images->get(2);
+
+    ok($image->rapid_deploy, 'rapid_deploy true');
+    ok(!defined $image->image_size, 'image_size undef when not sent');
+    ok(!defined $image->created_from, 'created_from undef when not sent');
 };
 
 done_testing;

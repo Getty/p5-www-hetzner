@@ -97,6 +97,14 @@ CPU architecture: x86 or arm.
 
 =cut
 
+has category => ( is => 'ro' );
+
+=attr category
+
+Category of the server type, e.g. "Shared vCPU".
+
+=cut
+
 has deprecated => ( is => 'lazy' );
 
 =attr deprecated
@@ -179,6 +187,7 @@ sub data {
         disk         => $self->disk,
         cpu_type     => $self->cpu_type,
         architecture => $self->architecture,
+        category     => $self->category,
         deprecated   => $self->deprecated,
         locations    => $self->locations,
     };
