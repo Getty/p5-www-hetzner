@@ -1,6 +1,9 @@
 Revision history for WWW-Hetzner
 
 {{$NEXT}}
+    - The distribution requires perl 5.014. Older perls were never usable: 5.8
+      and 5.10 cannot install the required dependencies, and on 5.12 the
+      command line tests fail.
     - The skill perl-www-hetzner ships in .claude/skills/ for projects that
       call WWW::Hetzner: install it with skilletor as
       perl-www-hetzner@p5-www-hetzner.

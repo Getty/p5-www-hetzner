@@ -1,4 +1,4 @@
-requires 'perl', '5.008001';
+requires 'perl', '5.014';
 # MooX::Options loads these at run time for options with autosplit (the
 # --authorized-key style list options); it only recommends them itself.
 requires 'Data::Record';
