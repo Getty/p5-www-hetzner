@@ -1,0 +1,26 @@
+---
+claimed_at: 2026-11-10T02:20:58Z
+claimed_by: worker
+class: standard
+completed: 2026-11-10T02:20:58Z
+created: 2026-11-06T20:03:05Z
+id: 38
+priority: low
+started: 2026-11-10T01:53:41Z
+status: done
+tags:
+- api
+- drift
+title: Image and ServerType entities lack fields the API delivers
+updated: 2026-11-10T02:20:58Z
+---
+
+Found while working k36 (2026-11-06), against docs.hetzner.cloud/cloud.spec.json: WWW::Hetzner::Cloud::Image has no accessor for image_size, protection, bound_to, created_from, deleted and rapid_deploy; WWW::Hetzner::Cloud::ServerType has none for category. The data arrives in the API response but the entity drops it (no attribute, not in data()). Done = decide per field whether the entity carries it; the ones it carries get an attribute, a data() key, POD and a fixture-backed test.
+
+Decisions (spec: docs.hetzner.cloud/cloud.spec.json, read from a copy outside the repo): all six Image fields and ServerType category are carried, all read-only, no builders. image_size number|null (GB), protection object {delete: bool}, bound_to integer|null (backup images only), created_from {id,name}|null, deleted string|null (RFC3339), rapid_deploy boolean; category string. Values pass through unchanged (JSON booleans stay JSON booleans). Tests use inline mock data plus the images_get fixture (rapid_deploy true); red before (no accessor), green after. Not touched: Server entity still embeds image/server_type as raw hashes.
+
+Commit-ready in worktree k38-k39; see report
+
+Commit d5fb5d3
+
+Also found: Server-Entity hält embedded image/server_type als rohe Hashes; podchecker meldet 15 bereits vorhandene Fehler in ServerType.pm
