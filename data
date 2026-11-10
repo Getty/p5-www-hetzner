@@ -1,0 +1,20 @@
+---
+claimed_at: 2026-11-10T17:30:07Z
+claimed_by: k40-worker
+class: standard
+completed: 2026-11-10T17:30:07Z
+created: 2026-11-10T17:05:52Z
+id: 40
+priority: high
+started: 2026-11-10T17:30:07Z
+status: done
+tags:
+- release
+- prereqs
+title: Perl floor is 5.14 by measurement; the cpanfile says 5.008001
+updated: 2026-11-10T17:30:07Z
+---
+
+Hub pre-release smoke 2026-11-10 on the Linux smoker, requires only, every perl from 5.8 to 5.44: PASS from 5.14.4 on. 5.8.9 and 5.10.1: the required dependencies do not install (DEPFAIL). 5.12.5: FAIL in the CLI tests (t/cli_cloud_delete_no_action.t, t/cli_cloud_identity.t, t/cli_cloud_networking.t, t/cli_cloud_serve*.t and more). Done = the cpanfile requires perl 5.014, POD or README lines that name a perl version say the same, Changes entry.
+
+Commit d50178c on k40-floor: cpanfile requires perl 5.014, Changes entry. No other file names a perl version (checked dist.ini, lib, bin, README). Suite 63 files/594 tests PASS offline.
