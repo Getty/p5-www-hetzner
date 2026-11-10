@@ -103,6 +103,33 @@ subtest 'non-JSON body quoting the token' => sub {
         'status and text, token masked');
 };
 
+subtest 'non-2xx body that looks like JSON but is not' => sub {
+    my $cloud = cloud_answering(502, '{ upstream broken');
+    my $err = error_of(sub { $cloud->get('/servers') });
+
+    is_hetzner_error($err, 'broken JSON 502');
+    is(field($err, q{status}), 502, 'status');
+    is(field($err, q{code}), undef, 'code undef');
+    is(field($err, q{api_message}), undef, 'api_message undef');
+    is("$err", "Hetzner API error: 502 { upstream broken\n",
+        'status and body text, like any non-JSON body');
+    unlike("$err", qr/ at \S+ line \d+/, 'no Perl source position');
+
+    my $array = error_of(sub { cloud_answering(503, '[ truncated')->get('/servers') });
+    is_hetzner_error($array, 'broken JSON array 503');
+    is(field($array, q{status}), 503, 'status of the array body');
+};
+
+subtest '2xx body that looks like JSON but is not fails loudly' => sub {
+    my $err = error_of(sub { cloud_answering(200, '{ upstream broken')->get('/servers') });
+
+    ok(defined $err, 'raises');
+    ok(!(blessed $err && $err->isa('WWW::Hetzner::Error')),
+        'not an API error: the response was a success');
+    like("$err", qr/malformed|expected|unexpected|at character|offset/i,
+        'the decode error is passed on');
+};
+
 subtest 'API message quoting the token is masked' => sub {
     my $cloud = cloud_answering(401,
         qq({"error":{"code":"unauthorized","message":"token $TOKEN is invalid"}}));

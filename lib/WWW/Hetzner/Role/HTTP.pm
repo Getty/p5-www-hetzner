@@ -307,11 +307,15 @@ sub _parse_response {
     $log->debugf("Response: %s", $response->status);
 
     my $data;
+    my $ok = $response->status >= 200 && $response->status < 300;
     if ($response->content && $response->content =~ /^\s*[\{\[]/) {
-        $data = decode_json($response->content);
+        # A body that fails to decode is an error in itself on a 2xx; on any
+        # other status it is treated like a non-JSON body (a proxy's page).
+        $data = $ok ? decode_json($response->content)
+            : eval { decode_json($response->content) };
     }
 
-    unless ($response->status >= 200 && $response->status < 300) {
+    unless ($ok) {
         my $status = $response->status;
         my $api = ref $data eq 'HASH' && ref $data->{error} eq 'HASH' ? $data->{error} : {};
         my ($code, $message) = map {
@@ -352,8 +356,9 @@ sub _parse_response {
     my $data = $self->_parse_response($response, 'GET', '/servers');
 
 Parses a L<WWW::Hetzner::HTTPResponse>: decodes JSON, checks for errors. A
-non-2xx response throws a L<WWW::Hetzner::Error>; otherwise the decoded data
-is returned.
+non-2xx response throws a L<WWW::Hetzner::Error>, also when its body looks
+like JSON but does not decode; otherwise the decoded data is returned. A 2xx
+body that does not decode dies with the decoder's message.
 Useful for async workflows where response parsing happens after transport.
 
 =cut
