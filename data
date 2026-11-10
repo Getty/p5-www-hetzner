@@ -1,0 +1,25 @@
+---
+claimed_at: 2026-11-10T02:21:05Z
+claimed_by: worker
+class: standard
+completed: 2026-11-10T02:21:05Z
+created: 2026-11-06T20:15:53Z
+id: 39
+priority: low
+started: 2026-11-10T01:53:50Z
+status: done
+tags:
+- errors
+- api
+- drift
+title: A non-2xx body that looks like JSON but is not raises a raw decode error
+updated: 2026-11-10T02:21:05Z
+---
+
+Found while working k37 (2026-11-06). _parse_response decodes any body that starts with { or [ before it checks the status. A non-2xx response whose body starts that way but is not valid JSON (e.g. "{ upstream broken" from a proxy) dies with the raw decode_json message and a Perl source position, not with a WWW::Hetzner::Error: no status, no code, no Hetzner API error prefix. Done = such a response raises WWW::Hetzner::Error with its status and the body text like any other non-JSON body; a 2xx body that fails to decode keeps failing loudly. Test with a fixture body, no network.
+
+Fix: _parse_response decodes inside eval on non-2xx only; the body then falls into the existing non-JSON branch (status + masked body text). 2xx still uses bare decode_json. Tests in t/error.t (two subtests); the non-2xx one was red against old lib (8 failures), the 2xx one is a guard and passes before and after.
+
+Commit-ready in worktree k38-k39; see report
+
+Commit 90a8394
